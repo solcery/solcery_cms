@@ -4,10 +4,9 @@ import { WalletProvider } from "./contexts/wallet";
 import { ConnectionProvider } from "./contexts/connection";
 import { AccountsProvider } from "./contexts/accounts";
 import { AppLayout } from "./components/Layout";
+import { SolceryMenu } from "./components/SolceryMenu";
 
-import { HomeView } from "./views";
-import { StorageView } from "./views";
-
+import { HomeView, StorageView, AccountView, TemplateView, ObjectView } from "./views";
 export function Routes() {
   return (
     <>
@@ -16,19 +15,13 @@ export function Routes() {
           <WalletProvider>
               <AccountsProvider>
                 <AppLayout>
-{/*                <ul>
-                  <li>
-                    <Link to="/">Home</Link>
-                  </li>
-                  <li>
-                    <Link to="/about">About</Link>
-                  </li>
-                  <li>
-                    <Link to="/storage">Storage</Link>
-                  </li>
-                </ul>*/}
                   <Switch>
-                    <Route exact path="/storage/:templateId" component={() => <StorageView/>} />
+                    <Route exact path="/storage/:storageId" component={() => <StorageView/>} />
+                    <Route exact path="/account" component={() => <AccountView/>} />
+                    <Route path="/account/:accountKey" component={() => <AccountView/>} />
+                    <Route path="/object/:objectId" component={() => <ObjectView/>} />
+                    <Route exact path="/template" component={() => <TemplateView/>} />
+                    <Route path="/template/:templateKey" component={() => <TemplateView/>} />
                     <Route exact path="/" component={() => <HomeView />} />
                   </Switch>
                 </AppLayout>

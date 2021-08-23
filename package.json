@@ -5,7 +5,7 @@
   "dependencies": {
     "@craco/craco": "^6.1.2",
     "@ledgerhq/hw-transport-webusb": "^5.51.1",
-    "@project-serum/serum": "^0.13.34",
+    "@project-serum/serum": "0.13.34",
     "@project-serum/sol-wallet-adapter": "^0.2.0",
     "@solana/spl-token": "^0.1.4",
     "@solana/spl-token-registry": "^0.2.105",
@@ -17,7 +17,7 @@
     "antd": "^4.15.6",
     "axios": "^0.21.1",
     "bn.js": "^5.2.0",
-    "borsh": "^0.7.0",
+    "borsh": "^0.4.0",
     "bs58": "^4.0.1",
     "buffer-layout": "^1.2.1",
     "craco-less": "^1.17.1",
@@ -29,6 +29,8 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.3",
     "react-unity-webgl": "^8.3.9",
+    "reactjs-popup": "^2.0.5",
+    "sass": "^1.38.0",
     "typescript": "^4.2.4",
     "universal-cookie": "^4.0.4"
   },

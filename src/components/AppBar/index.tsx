@@ -6,6 +6,7 @@ import { SettingOutlined } from "@ant-design/icons";
 import { Settings } from "../Settings";
 import { LABELS } from "../../constants";
 import { ConnectButton } from "../ConnectButton";
+import { SolceryMenu } from "../SolceryMenu";
 
 export const AppBar = (props: { left?: JSX.Element; right?: JSX.Element }) => {
   const { connected } = useWallet();
@@ -22,6 +23,7 @@ export const AppBar = (props: { left?: JSX.Element; right?: JSX.Element }) => {
           style={{ color: "#2abdd2" }}
         />
       )}
+
       <Popover
         placement="topRight"
         title={LABELS.SETTINGS_TOOLTIP}
