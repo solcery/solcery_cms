@@ -1,18 +1,23 @@
 import { PublicKey, Connection} from "@solana/web3.js";
 import { getAccountData, getAccountObject } from "./engine"
 import { BinaryReader, BinaryWriter } from "borsh";
+import { solceryTypes, SType } from "./types";
 
 
 
 
 class SolceryAccount {
+  publicKey: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz');
   static async get(connection: Connection, publicKey: PublicKey) {
-    return await getAccountObject(connection, publicKey, this, SolcerySchema)
+    var ret = await getAccountObject(connection, publicKey, this, SolcerySchema)
+    ret.publicKey = publicKey
+    return ret;
   }
 }
 
 export class Project extends SolceryAccount {
   name: string = 'No name';
+  publicKey: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz');
   owner: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz'); //TODO: dumb
   templateStorage: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz');
   constructor( src : { name: string, owner: PublicKey, templateStorage: PublicKey } | undefined = undefined) {
@@ -26,6 +31,7 @@ export class Project extends SolceryAccount {
 }
 
 export class Storage extends SolceryAccount {
+  publicKey: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz');
   template: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz');
   accounts: PublicKey[] = [];
   constructor (src: { template: PublicKey, accounts: PublicKey[] } | undefined = undefined) {
@@ -38,6 +44,7 @@ export class Storage extends SolceryAccount {
 }
 
 export class TemplateData extends SolceryAccount {
+  publicKey: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz');
   name: string = "Template name";
   fields: TemplateField[] = [];
   storages: PublicKey[] = [];
@@ -54,10 +61,6 @@ export class TemplateData extends SolceryAccount {
     }
   }
 
-  // static async get(connection: Connection, publicKey: PublicKey) {
-  //   return await getAccountObject(connection, publicKey, TemplateData, SolcerySchema)
-  // }
-
   getField(fieldId: number) {
     for (let field of this.fields) {
       if (field.id == fieldId)
@@ -65,36 +68,10 @@ export class TemplateData extends SolceryAccount {
     }
     throw new Error('Template.getField error')
   }
-
-  async getObject(connection: Connection, publicKey: PublicKey) {
-    var objectData = await getAccountData(connection, publicKey)
-    if (!objectData)
-      return {}
-    objectData = objectData.slice(33)
-    var fields = new Map()
-    var reader = new BinaryReader(objectData)
-    var templatePublicKey = reader.readPubkey()
-    var fieldId = reader.readU32();
-    while (fieldId > 0) {
-      var field = this.getField(fieldId)
-      if (field === undefined)
-        throw new Error("Error deserializing tpl Object")
-      if (field.fieldType == 1) {
-        fields.set(field.id, reader.readU32());
-      }
-      if (field.fieldType == 2) {
-        fields.set(field.id, reader.readString());
-      }
-      var fieldId = reader.readU32();
-    }
-    return {
-      template: templatePublicKey,
-      fields: fields,
-    };
-  }
 }
 
 export class TplObject {
+  publicKey: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz');
   template: PublicKey;
   fields: Map<number, any>;
   constructor(src: { template : PublicKey, fields: Map<number, any> } ) {
@@ -114,14 +91,8 @@ export class TplObject {
     var fieldId = reader.readU32();
     while (fieldId > 0) {
       var field = template.getField(fieldId)
-      if (field === undefined)
-        throw new Error("Error deserializing tpl Object")
-      if (field.fieldType == 1) {
-        fields.set(field.id, reader.readU32());
-      }
-      if (field.fieldType == 2) {
-        fields.set(field.id, reader.readString());
-      }
+      var stype = field.fieldType
+      fields.set(field.id, stype.readValue(reader))
       var fieldId = reader.readU32();
     }
     var tplObject = new TplObject({
@@ -137,32 +108,19 @@ export class TplObject {
     for (let [fieldId, value] of this.fields) {
       var field = template.getField(fieldId)
       writer.writeU32(field.id)
-      if (field === undefined)
-        throw new Error("Error serializing tpl Object")
-      if (field.fieldType == 1) {
-        writer.writeU32(value)
-      }
-      if (field.fieldType == 2) {
-        writer.writeString(value)
-      }
+      field.fieldType.writeValue(value, writer)
     }
     return writer.buf.slice(0, writer.length)
   }
 }
 
-export class Template extends TemplateData {
-  publicKey: PublicKey | null = null;
-}
-
-export class TemplateField {
+export class TemplateField { //TODO: Template field params
   id = 0;
   enabled = false;
-  fieldType = 0;
+  fieldType = new SType();
   name = "Field name";
-  data: number[] = [];
-  constructor(src: { id: number, enabled: boolean, fieldType: number, name: string, data: number[] } | undefined = undefined) {
+  constructor(src: { id: number, enabled: boolean, fieldType: SType, name: string } | undefined = undefined) {
     if (src) {
-      this.data = src.data;
       this.id = src.id;
       this.enabled = src.enabled;
       this.fieldType = src.fieldType;
@@ -182,9 +140,8 @@ SolcerySchema.set(TemplateData, { kind: 'struct', fields: [
 SolcerySchema.set(TemplateField, { kind: 'struct', fields: [
     ['id', 'u32'],
     ['enabled', 'boolean'],
-    ['fieldType', 'u8'],
+    ['fieldType', 'sType'],
     ['name', 'string'],
-    ['fieldData', ['u8']],
 ]});
 SolcerySchema.set(Storage, { kind: 'struct', fields: [
     ['template', 'pubkey'],

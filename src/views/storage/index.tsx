@@ -12,8 +12,10 @@ import {
 
 import { useParams, useHistory } from "react-router-dom";
 import { Button, Table } from "antd";
-import { TemplateData, TemplateField, SolcerySchema, Template, Storage, TplObject } from "../../solcery/classes"
+import { TemplateData, TemplateField, SolcerySchema, Storage, TplObject } from "../../solcery/classes"
 import { programId, projectPublicKey, projectStoragePublicKey } from "../../solcery/engine"
+import { ValueRender } from "../../solcery/types"
+
 
 export async function onWalletConnected() {}
 
@@ -112,7 +114,6 @@ export const StorageView = () => {
 
   if (storage && template && objects)
   {
-
     var tableData: any[] = []
     for (let objectInfo of objects) {
       var res = Object.fromEntries(objectInfo.object.fields)
@@ -135,7 +136,17 @@ export const StorageView = () => {
               <a href={"/#/object/"+record.key}>{record.key}</a>
           )}
         />
-        {template.fields.map((field: TemplateField) => { return <Column title={field.name} key={field.id} dataIndex={field.id} />} )}
+        {template.fields.map((field: TemplateField) => { return <Column 
+          title={field.name} 
+          key={field.id} 
+          render={(text, object: any) => (
+              <ValueRender 
+                type={field.fieldType}
+                defaultValue={object[field.id]} 
+                readonly={true}
+              />
+          )}
+        />} )}
       </Table>
       <Button onClick={createObject}>Create new object</Button>
     </div>

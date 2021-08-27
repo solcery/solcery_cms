@@ -13,27 +13,24 @@ declare module "borsh" {
   }
 }
 
-export function load() {
-  (BinaryReader.prototype).readPubkey = function readPubkey() {
-    const reader = this;
-    const array = reader.readFixedArray(32);
-    return new PublicKey(array);
-  };
+(BinaryReader.prototype).readPubkey = function readPubkey() {
+  const reader = this;
+  const array = reader.readFixedArray(32);
+  return new PublicKey(array);
+};
 
-  (BinaryWriter.prototype).writePubkey = function writePubkey(value: PublicKey) {
-    const writer = this;
-    writer.writeFixedArray(value.toBuffer());
-  };
+(BinaryWriter.prototype).writePubkey = function writePubkey(value: PublicKey) {
+  const writer = this;
+  writer.writeFixedArray(value.toBuffer());
+};
 
-  (BinaryReader.prototype).readBoolean = function readBoolean() {
-    const reader = this;
-    const u8 = reader.readU8();
-    return u8 > 0;
-  };
+(BinaryReader.prototype).readBoolean = function readBoolean() {
+  const reader = this;
+  const u8 = reader.readU8();
+  return u8 > 0;
+};
 
-  (BinaryWriter.prototype).writeBoolean = function writeBoolean(value: boolean) {
-    const writer = this;
-    writer.writeU8(value ? 1 : 0);
-  };
-}
-
+(BinaryWriter.prototype).writeBoolean = function writeBoolean(value: boolean) {
+  const writer = this;
+  writer.writeU8(value ? 1 : 0);
+};

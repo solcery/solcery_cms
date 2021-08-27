@@ -48,7 +48,7 @@ export const SolceryMenu = () => {
     return (
       <div className='Solcery-Bar'>
         { templates.map((tpl) => {
-          return (<a href={'/#/template/' + tpl.publicKey.toBase58()}>{tpl.name}</a>)
+          return (<a key={tpl.publicKey.toBase58()} href={'/#/template/' + tpl.publicKey.toBase58()}>{tpl.name}</a>)
         })}
         
         <table id='templatesTable'></table>

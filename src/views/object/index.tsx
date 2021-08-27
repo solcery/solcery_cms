@@ -8,12 +8,12 @@ import { notify } from "../../utils/notifications";
 import {
   deserializeUnchecked, BinaryReader, BinaryWriter, serialize
 } from 'borsh';
-import { IntRender, StringRender, ValueRender } from "../../solcery/types"
+import { ValueRender, SType } from "../../solcery/types"
 
 import { Form, Button, Input, Table } from "antd";
 
 import { useParams, useHistory } from "react-router-dom";
-import { TplObject, TemplateField, TemplateData, SolcerySchema, Template, Storage } from "../../solcery/classes"
+import { TplObject, TemplateField, TemplateData, SolcerySchema, Storage } from "../../solcery/classes"
 import { programId, projectPublicKey } from "../../solcery/engine"
 
 
@@ -77,7 +77,7 @@ export const ObjectView = () => {
       key: number,
       fieldId: number,
       fieldName: string,
-      fieldType: number,
+      fieldType: SType,
       value: any,
     }
     var objectData: ObjectFieldData[] = []
@@ -105,8 +105,8 @@ export const ObjectView = () => {
             key="value"
             render={(text, record: ObjectFieldData) => (
                 <ValueRender 
-                  value={record.value} 
-                  typeId={record.fieldType} 
+                  defaultValue={record.value} 
+                  type={record.fieldType} 
                   onChange={(newValue: any) => { setFieldValue(record.fieldId, newValue)  } }
                 />
             )}
