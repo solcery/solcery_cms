@@ -40,7 +40,10 @@ export const ObjectView = () => {
       return;
     if (!object)
       return;
+    console.log(object)
     var buf = await object.borshSerialize(connection)
+    console.log(buf)
+
     const saveObjectIx = new TransactionInstruction({
       keys: [
         { pubkey: objectPublicKey, isSigner: false, isWritable: true },

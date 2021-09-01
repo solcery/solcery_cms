@@ -14,6 +14,8 @@ import { getAccountObject, programId, projectPublicKey, projectStoragePublicKey}
 import { useParams, useHistory } from "react-router-dom";
 import { Button, Input } from "antd";
 
+
+
 export async function onWalletConnected() {
   
 
@@ -23,6 +25,7 @@ type HomeViewParams = {
 };
 
 export const HomeView = () => {
+
 
 
 
@@ -83,6 +86,8 @@ export const HomeView = () => {
       history.push("/template/" + templateAccount.publicKey);
     })
   }
+
+
 
   return (
     <div>

@@ -8,9 +8,7 @@ import { useConnection} from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
 import { SolcerySchema, TemplateData, Storage } from "../classes"
 import { projectStoragePublicKey } from "../engine"
-import { SInt } from "./index";
-import { SLink } from "./index";
-import { SString} from "./index";
+import { SInt, SLink, SString, SBrick } from "./index";
 
 type SolceryTypeId = number;
 
@@ -18,10 +16,13 @@ export class SType {
   id: SolceryTypeId = 0;
   typeName = "Error";
   write: (writer: BinaryWriter) => void = () => {};
+  schema: Map<any, any> = new Map();
   nameRender: any = (<p>Error</p>);
   render: any = (<p>Error</p>);
+  
   readValue: (reader: BinaryReader) => any = (reader: BinaryReader) => { throw new Error('Trying to read empty type value') };
   writeValue: (value: any, writer: BinaryWriter) => void = (value: any, writer: BinaryWriter) => { throw new Error('Trying to write empty type value') };
+  
   static read = (reader: BinaryReader) => {
   	return new SType()
   }
@@ -31,6 +32,20 @@ export class SType {
   	return writer.buf.slice(0, writer.length)
   }
 }
+
+export class STypeValue {
+  value: any;
+  type: SType = new SType();
+
+  static read = (reader: BinaryReader) => { 
+  	return new STypeValue()
+  };
+
+  write = (writer: BinaryWriter) => {}
+
+
+}
+
 
 export const ValueRender = (props: {
 	defaultValue?: any,
@@ -70,9 +85,10 @@ export const TypeNameRender = (props: {
 
 export const solceryTypes = () => {
 	return new Map([
-		[1, {id: 1, name: "Integer", class: SInt}],
-		[2, {id: 2, name: "String", class: SString}],
-		[3, {id: 3, name: "Link", class: SLink}]
+		[1, { id: 1, name: "Integer", class: SInt }],
+		[2, { id: 2, name: "String", class: SString }],
+		[3, { id: 3, name: "Link", class: SLink }],
+		[4, { id: 4, name: "Brick", class: SBrick }],
 	])
 }
 
