@@ -99,7 +99,6 @@ export class TplObject {
       template: templatePublicKey,
       fields: fields,
     });
-    console.log(tplObject)
     return [ tplObject, template ]
   }
 

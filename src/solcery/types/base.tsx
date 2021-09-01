@@ -42,8 +42,6 @@ export class STypeValue {
   };
 
   write = (writer: BinaryWriter) => {}
-
-
 }
 
 

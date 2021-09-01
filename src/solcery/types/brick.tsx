@@ -106,7 +106,7 @@ export const SBrickRender = (props: {
 
 	var [value, setValue] = useState(props.defaultValue)
 	if (props.readonly)
-		return (<p>{props.defaultValue}</p>)
+		return (<p>Brick</p>)
 	return (
 		<Unity tabIndex={3} style={{ width: 500, height: 200 }} unityContext={unityContext} />
 	);
@@ -129,9 +129,9 @@ export const SBrickSubtypeRender = (props: {
 	})
 	return (
 		<Select defaultValue={1} onChange={(brickType) => { props?.onChange && props.onChange(new SBrick({brickType: brickType}) ) }}>
-		  	<Option value={1} key={1}>Action</Option>
-		  	<Option value={2} key={2}>Condition</Option>
-		  	<Option value={3} key={3}>Value</Option>
+	  	<Option value={1} key={1}>Action</Option>
+	  	<Option value={2} key={2}>Condition</Option>
+	  	<Option value={3} key={3}>Value</Option>
 		</Select>
 	)
 }

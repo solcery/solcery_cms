@@ -89,6 +89,7 @@ export const StorageView = () => {
   const loadObject = async (objectPublicKey: PublicKey) => {
     var [obj, tpl] = await TplObject.get(connection, objectPublicKey)
     if (objects) {
+      console.log(objects)
       objects?.push({
         publicKey: objectPublicKey, 
         object: obj
