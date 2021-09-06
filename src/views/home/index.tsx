@@ -73,7 +73,7 @@ export const HomeView = () => {
 
     const createTemplateIx = new TransactionInstruction({
       keys: [
-        { pubkey: projectPublicKey, isSigner: false, isWritable: false },
+        { pubkey: projectPublicKey, isSigner: false, isWritable: true },
         { pubkey: templateAccount.publicKey, isSigner: false, isWritable: true },
         { pubkey: storageAccount.publicKey, isSigner: false, isWritable: true },
         { pubkey: projectStoragePublicKey, isSigner: false, isWritable: true },

@@ -52,9 +52,8 @@ export const TemplateView = () => {
       programId: programId,
       data: Buffer.concat([Buffer.from([0, 2,]), buf ]),
     });
-    await sendTransaction(connection, wallet, [deleteFieldIx], []).then(() => {
-      load()
-    })
+    await sendTransaction(connection, wallet, [deleteFieldIx], [])
+    load()
   }
 
   const sendChangeName = async(templateName: string, templatePublicKey: PublicKey) => {
@@ -119,6 +118,13 @@ export const TemplateView = () => {
             key="fieldType"
             render={(text, record: any) => (
                 <TypeNameRender type={record.fieldType} />
+            )}
+          />
+          <Column
+            title="Actions"
+            key="actions"
+            render={(text, record: any) => (
+                <Button onClick={() => { deleteField(record.id)} }>Delete</Button>
             )}
           />
         </Table>

@@ -40,9 +40,7 @@ export const ObjectView = () => {
       return;
     if (!object)
       return;
-    console.log(object)
-    var buf = await object.borshSerialize(connection)
-    console.log(buf)
+    var buf = await object.serialize(connection)
 
     const saveObjectIx = new TransactionInstruction({
       keys: [
@@ -59,7 +57,8 @@ export const ObjectView = () => {
   useEffect(() => { 
     if (!object) {
       (async () => {
-        const [obj, tpl] = await TplObject.get(connection, objectPublicKey)
+        var tpl = await TplObject.getTemplate(connection, objectPublicKey)
+        var [ obj, _ ] = await tpl.getObject(connection, objectPublicKey)
         setObject(obj)
         setTemplate(tpl)
       })()

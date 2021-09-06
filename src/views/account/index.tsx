@@ -76,7 +76,9 @@ export const AccountView = () => {
     const PROJECT_ACCOUNT_SIZE = 1000
     const STORAGE_ACCOUNT_SIZE = 3200
     var projectAccount = new Account()
+    console.log(projectAccount.publicKey.toBase58())
     var storageAccount = new Account()
+    console.log(storageAccount.publicKey.toBase58())
     var createProjectAccountIx = SystemProgram.createAccount({
       programId: programId,
       space: PROJECT_ACCOUNT_SIZE, // TODO

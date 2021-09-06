@@ -32,8 +32,7 @@ export const StorageView = () => {
   let { storageId } = useParams<StorageViewParams>();
   var [ storage, setStorage ] = useState<Storage | undefined>(undefined);
   var [ template, setTemplate ] = useState<TemplateData | undefined>(undefined);
-  var [ objects, setObjects ] = useState<{publicKey: PublicKey, object: TplObject}[] | undefined>([]);
-  var [ objectsAmount, setObjectsAmount] = useState(0)
+  var [ objects, setObjects ] = useState<TplObject[] | undefined>([]);
   var storagePublicKey = new PublicKey(storageId)
 
   const createObject = async () => {
@@ -55,7 +54,7 @@ export const StorageView = () => {
     });
     const createObjectIx = new TransactionInstruction({
       keys: [
-        { pubkey: projectPublicKey, isSigner: false, isWritable: false },
+        { pubkey: projectPublicKey, isSigner: false, isWritable: true },
         { pubkey: storage.template, isSigner: false, isWritable: false },
         { pubkey: storagePublicKey, isSigner: false, isWritable: true },
         { pubkey: objectAccount.publicKey, isSigner: false, isWritable: true },
@@ -86,29 +85,14 @@ export const StorageView = () => {
     })
   }
 
-  const loadObject = async (objectPublicKey: PublicKey) => {
-    var [obj, tpl] = await TplObject.get(connection, objectPublicKey)
-    if (objects) {
-      console.log(objects)
-      objects?.push({
-        publicKey: objectPublicKey, 
-        object: obj
-      })
-      setObjectsAmount(objects?.length)
-    }
-  }
-
-
   useEffect(() => { 
     if (!storage) {
       (async () => {
         const strg = await Storage.get(connection, storagePublicKey)
-        setStorage(strg)
-        for (let objectPublicKey of strg.accounts) {
-          loadObject(objectPublicKey)
-        }
         const tpl = await TemplateData.get(connection, strg.template)
+        setStorage(strg)
         setTemplate(tpl)
+        setObjects(await tpl.getObjects(connection, strg.accounts))
       })()
     }
   });
@@ -117,10 +101,9 @@ export const StorageView = () => {
   {
     var tableData: any[] = []
     for (let objectInfo of objects) {
-      var res = Object.fromEntries(objectInfo.object.fields)
-      // var res = { "test" : "test", key: objectInfo.publicKey.toBase58() }
+      var res = Object.fromEntries(objectInfo.fields)
       res.key = objectInfo.publicKey.toBase58()
-      res.objectId = res.key
+      res.id = objectInfo.id
       tableData.push(res)
     }
 
@@ -132,9 +115,9 @@ export const StorageView = () => {
       <Table dataSource={tableData} >
         <Column 
           title="Object" 
-          key="objectId"
+          key="objectKey"
           render={(text, record: any) => (
-              <a href={"/#/object/"+record.key}>{record.key}</a>
+              <a href={"/#/object/"+record.key}>{record.id}</a>
           )}
         />
         {template.fields.map((field: TemplateField) => { return <Column 

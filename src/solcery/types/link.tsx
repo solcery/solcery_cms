@@ -24,7 +24,8 @@ export const SLinkRender = (props: {
   var [ objectsAmount, setObjectsAmount ] = useState(0)
 
   const loadObject = async (objectPublicKey: PublicKey) => {
-    var [obj, tpl] = await TplObject.get(connection, objectPublicKey)
+    var tpl = await TplObject.getTemplate(connection, objectPublicKey)
+    var obj = await tpl.getObject(connection, objectPublicKey)
     var stringKey = objectPublicKey.toBase58()
     if (objects.get(stringKey))
     {
