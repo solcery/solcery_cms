@@ -87,9 +87,6 @@ export const SBrickRender = (props: {
       return
     }
     var newBrick = oldBrickToBrick(oldBrick)
-    // var tmpBrickType = new SBrick({ brickType: props.brickType})
-    // var writer = new BinaryWriter()
-    // tmpBrickType.writeValue(newBrick, writer)
     props.onChange(newBrick)
   })
 
@@ -212,50 +209,6 @@ export class SBrick extends SType {
     }
   }
 
-
-
-
-
-  // const serializeBrick = (brick: Brick, writer: BinaryWriter) => {
-  //   buffer.writeu32(brick.Type)
-  //   buffer.writeu32(brick.Subtype)
-  //   if (brick.HasField && !brick.StringField) {
-  //     buffer.writei32(brick.IntField)
-  //   }
-  //   if (brick.HasField && brick.StringField) {
-  //     buffer.writeString(brick.StringField)
-  //   }
-  //   brick.Slots.forEach((slot) => {
-  //     serializeBrick(slot, buffer)
-  //   })
-  // }
-
-
-  // const deserializeBrick = (buffer: SolanaBuffer) => {
-  //   var type = buffer.readu32()
-  //   var subtype = buffer.readu32()
-  //   var config = getBrickConfig(type, subtype)
-  //   var intField = 0
-  //   var stringField = null
-  //   var slots = []
-  //   if (config.FieldType == 1)
-  //     intField = buffer.readi32()
-  //   if (config.FieldType == 2)
-  //     stringField = buffer.readString()
-  //   for (let i = 0; i < config.Slots; i++) {
-  //     slots.push(deserializeBrick(buffer))
-  //   }
-  //   var result: Brick = {
-  //     Type: type,
-  //     Subtype: subtype,
-  //     HasField: config.FieldType == 1 || config.FieldType == 2,
-  //     IntField: intField,
-  //     StringField: stringField,
-  //     Slots: slots,
-  //   }
-  //   return result
-  // }
-
  declare module "borsh" {
   interface BinaryReader {
     readBrick(): SBrick;
@@ -326,7 +279,6 @@ export const solceryBricks: BrickSignature[] = [
   }
 ];
 
-console.log(JSON.stringify(solceryBricks))
 
 function brickSignatureToBrickConfig(brick: BrickSignature) {
   var Slots = []

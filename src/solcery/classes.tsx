@@ -14,7 +14,7 @@ class SolceryAccount {
     return ret;
   }
   static async getAll(connection: Connection, publicKeys: PublicKey[]) {
-    var accountInfos = await getAllAccountObjects(connection, publicKeys, this, SolcerySchema)
+    return await getAllAccountObjects(connection, publicKeys, this, SolcerySchema)
   }
 }
 
@@ -53,8 +53,8 @@ export class TemplateData extends SolceryAccount {
   fields: TemplateField[] = [];
   storages: PublicKey[] = [];
   maxFieldIndex: number = 0;
-  customData: number[] = [];
-  constructor(src: { id: number, name : string, maxFieldIndex: number, storages: PublicKey[], fields: TemplateField[], customData: number[] } | undefined = undefined) {
+  customParams: any = {};
+  constructor(src: { id: number, name : string, maxFieldIndex: number, storages: PublicKey[], fields: TemplateField[], customData: Uint8Array  } | undefined = undefined) {
     super()
     if (src) {
       this.id = src.id;
@@ -62,7 +62,8 @@ export class TemplateData extends SolceryAccount {
       this.maxFieldIndex = src.maxFieldIndex;
       this.name = src.name;
       this.fields = src.fields;
-      this.customData = src.customData;
+      if (src.customData.length > 0)
+        this.customParams = JSON.parse(Buffer.from(src.customData).toString());
     }
   }
 
@@ -84,7 +85,6 @@ export class TemplateData extends SolceryAccount {
   async getObjects(connection: Connection, publicKeys: PublicKey[]) {
     var result = []
     var accountInfos = await connection.getMultipleAccountsInfo(publicKeys)
-    console.log(accountInfos)
     for (let i in accountInfos) {
       if (accountInfos[i]) {
         result.push((await TplObject.build(publicKeys[i], accountInfos[i]!.data, this))[0])
@@ -106,12 +106,19 @@ export class TplObject {
     this.publicKey = src.publicKey;
   }
 
+  getName() {
+    var prefix = "[" + this.id + "] "
+    var name = this.fields.get(1)
+    if (name && name != "") 
+      return prefix + name;
+    return prefix + this.publicKey.toBase58();
+  }
+
   static async getTemplate(connection: Connection, publicKey: PublicKey) {
     var objectData = await getAccountData(connection, publicKey)
     if (!objectData)
       return undefined
     var reader = new BinaryReader(objectData.slice(37)) //TODO
-    console.log(reader)
     var templatePublicKey = reader.readPubkey()
     return await TemplateData.get(connection, templatePublicKey)
   }
@@ -183,6 +190,7 @@ export class TemplateField { //TODO: Template field params
       this.enabled = src.enabled;
       this.fieldType = src.fieldType;
       this.name = src.name;
+     
     }
   }
 }
@@ -198,9 +206,10 @@ SolcerySchema.set(TemplateData, { kind: 'struct', fields: [
 ]});
 SolcerySchema.set(TemplateField, { kind: 'struct', fields: [
     ['id', 'u32'],
-    ['enabled', 'boolean'],
     ['fieldType', 'sType'],
     ['name', 'string'],
+    ['construct_client', 'boolean'],
+    ['construct_server', 'boolean'],
 ]});
 SolcerySchema.set(Storage, { kind: 'struct', fields: [
     ['template', 'pubkey'],

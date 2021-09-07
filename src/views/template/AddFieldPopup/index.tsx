@@ -44,8 +44,9 @@ export const AddFieldPopup = (props: { templateKey: string }) => {
     var data = Buffer.concat([
       Buffer.from([0, 1]), 
       fieldType.toBuffer(),
-      Buffer.from([fieldName.length, 0, 0, 0]),
-      Buffer.from(fieldName)
+      Buffer.from([fieldName.length, 0, 0, 0]), //TODO
+      Buffer.from(fieldName),
+      Buffer.from([1, 1]), 
     ])
     console.log(data)
     const addFieldIx = new TransactionInstruction({

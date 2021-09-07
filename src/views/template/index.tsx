@@ -38,6 +38,7 @@ export const TemplateView = () => {
   var [ template, setTemplate ] = useState<TemplateData | undefined>()
   var [ addFieldMenu, setAddFieldMenu ] = useState(false)
 
+
   const deleteField = async (fieldId: number) => {
     if (!publicKey || wallet === undefined) {
       return;

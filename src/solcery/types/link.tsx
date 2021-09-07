@@ -7,7 +7,6 @@ import { projectStoragePublicKey } from "../engine";
 import { PublicKey } from "@solana/web3.js";
 import { BinaryReader, BinaryWriter } from "borsh";
 
-
 export const SLinkRender = (props: { 
   templatePublicKey: PublicKey,
   defaultValue?: PublicKey, 
@@ -18,49 +17,42 @@ export const SLinkRender = (props: {
 
 	const connection = useConnection();
   const { Option } = Select;
-  var [ storage, setStorage ] = useState<Storage|undefined>();
-  // var [ objects, setObjects ] = useState<{publicKey: PublicKey, object: TplObject}[]>([]);
-  var [ objects, setObjects] = useState(new Map())
-  var [ objectsAmount, setObjectsAmount ] = useState(0)
-
-  const loadObject = async (objectPublicKey: PublicKey) => {
-    var tpl = await TplObject.getTemplate(connection, objectPublicKey)
-    var obj = await tpl.getObject(connection, objectPublicKey)
-    var stringKey = objectPublicKey.toBase58()
-    if (objects.get(stringKey))
-    {
-      return
-    }
-    objects.set(stringKey, obj)
-    setObjectsAmount(objects.size)
-  
-  }
-
+  var [ objects, setObjects] = useState<TplObject[]>([]);
+  var [ object, setObject ] = useState<TplObject|undefined>();
 
   useEffect(() => { 
-    if (!props.readonly && !storage) {
+    if (!props.readonly && objects.length == 0) {
       (async () => {
         const tpl = await TemplateData.get(connection, props.templatePublicKey)
-        const strg = await Storage.get(connection, tpl.storages[0])
-        setStorage(strg)
-        for (let objectPublicKey of strg.accounts) {
-          loadObject(objectPublicKey)
+        const storages = await Storage.getAll(connection, tpl.storages)
+        var objectsToLoad: PublicKey[] = []
+        for (let storage of storages) {
+          objectsToLoad = objectsToLoad.concat(storage.accounts)
         }
+        setObjects(await tpl.getObjects(connection, objectsToLoad))
+      })()
+    }
+    if (props.defaultValue && object === undefined) {
+      (async () => {
+        const tpl = await TemplateData.get(connection, props.templatePublicKey)
+        var [obj, _] = await tpl.getObject(connection, props.defaultValue)
+        setObject(obj)
       })()
     }
   });
 
-  if (props.readonly)
-    return (<a href={'/#/object/'+props.defaultValue?.toBase58()}>{props.defaultValue?.toBase58()}</a>)
+  if (props.readonly && object) {
+    return (<a href={'/#/object/'+props.defaultValue?.toBase58()}>{ object.getName() }</a>)
+  }
 
-  if (storage && objects && objects.size > 0) {
+  if (objects) {
     return (
       <Select defaultValue={ props.defaultValue ? props.defaultValue.toBase58() : 'None' } onChange={(objectKey) => { 
         props?.onChange && props.onChange(objectKey != 'None' ? new PublicKey(objectKey) : undefined)
       }}>
       <Option key='none' value='None'>None</Option>
-      {Array.from(objects.keys()).map( (key) => {
-        return (<Option key={key} value={key}>{key}</Option>)
+      {objects.map( (obj) => {
+        return (<Option key={obj.publicKey.toBase58()} value={ obj.publicKey.toBase58()}>{ obj.getName() }</Option>) //TODO
       })} 
       </Select>
     )
@@ -75,54 +67,48 @@ export const SLinkSubtypeRender = (props: {
 }) => {
 	const connection = useConnection();
 	const { Option } = Select;
-	var [ loaded, setLoaded ] = useState(false)
-  var [ storage, setStorage ] = useState<Storage|undefined>();
-  var [ templates, setTemplates ] = useState<{publicKey: PublicKey, name: string}[] | undefined>([]);
-  var [ templatesAmount, setTemplatesAmount] = useState(0)
-
-	const loadTemplate = async (templatePublicKey: PublicKey) => {
-    var tpl = await TemplateData.get(connection, templatePublicKey)
-    if (templates) {
-      templates?.push({
-        publicKey: templatePublicKey, 
-        name: tpl.name
-      })
-      setTemplatesAmount(templates?.length)
-    }
-  }
+  var [ templates, setTemplates ] = useState<TemplateData[]>([]);
 
    useEffect(() => { 
-    if (!storage) {
+    if (templates.length <= 0)
       (async () => {
-        const strg = await Storage.get(connection, projectStoragePublicKey)
-        setStorage(strg)
-        for (let templatePublicKey of strg.accounts) {
-          loadTemplate(templatePublicKey)
-        }
+        let strg = await Storage.get(connection, projectStoragePublicKey)
+        setTemplates(await TemplateData.getAll(connection, strg.accounts))
       })()
-    }
-    if (storage && templates && templates.length > 0) {
-    	if (!loaded) {
-	  		setLoaded(true)
-	  		props?.onLoad && props.onLoad(new SLink({ templatePublicKey: templates[0].publicKey }))
-	  	}
-    }
-
   });
 
 
-  if (storage && templates && templates.length > 0) {
+  if (templates.length > 0) {
 	  return (
 	  	<Select defaultValue={ templates[0].publicKey.toBase58() } onChange={(templateKey) => { 
 	  		props?.onChange && props.onChange(new SLink({templatePublicKey: new PublicKey(templateKey)})) 
 	  	}}>
 	  	{templates.map((tpl) => {
+        console.log(tpl.publicKey.toBase58())
       	return (<Option key={tpl.publicKey.toBase58()} value={tpl.publicKey.toBase58()}>{tpl.name}</Option>)
       })}
 	  	</Select>
 	  )
   }
 	return (<div></div>)
+}
+
+export const SLinkNameRender = (props: { 
+  templatePublicKey: PublicKey,
+}) => {
+  const connection = useConnection();
+  var [ template, setTemplate ] = useState<TemplateData>();
+
+   useEffect(() => { 
+    if (!template)
+      (async () => {
+        setTemplate(await TemplateData.get(connection, props.templatePublicKey))
+      })()
+  });
+
+  return (
+    <p>Link to: <a href = {'/#/template/'+props.templatePublicKey.toBase58()}>{ template ? template.name : props.templatePublicKey.toBase58() }</a></p>
+  )
 }
 
 export class SLink extends SType {
@@ -143,7 +129,7 @@ export class SLink extends SType {
       templatePublicKey={this.templatePublicKey}
       readonly={props?.readonly}
     />)}
-    this.nameRender = (<p>Link to: <a href = {'/#/template/'+src.templatePublicKey.toBase58()}>{src.templatePublicKey.toBase58()}</a></p>); //TOD: name
+    this.nameRender = <SLinkNameRender templatePublicKey={ src.templatePublicKey }/>; //TOD: name
   }
   static read = (reader: BinaryReader) => {
   	return new SLink({ templatePublicKey: reader.readPubkey() })
