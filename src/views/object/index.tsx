@@ -8,7 +8,7 @@ import { notify } from "../../utils/notifications";
 import {
   deserializeUnchecked, BinaryReader, BinaryWriter, serialize
 } from 'borsh';
-import { ValueRender, SType } from "../../solcery/types"
+import { SType } from "../../solcery/types"
 
 import { Form, Button, Input, Table } from "antd";
 
@@ -97,6 +97,8 @@ export const ObjectView = () => {
     const divStyle = {
       width: '100%',
     };
+    console.log(objectData)
+    console.log(object)
     return (
     <div style={divStyle}>
       <a href={"/#/template/" + object.template.toBase58()}>Template: {template?.name}</a>
@@ -105,13 +107,16 @@ export const ObjectView = () => {
           <Column
             title="Value"
             key="value"
-            render={(text, record: ObjectFieldData) => (
-                <ValueRender 
-                  defaultValue={record.value} 
-                  type={record.fieldType} 
-                  onChange={(newValue: any) => { setFieldValue(record.fieldId, newValue)  } }
-                />
-            )}
+            render={(text, record: ObjectFieldData) => React.createElement(
+                record.fieldType.valueRender,
+                { 
+                  defaultValue: record.value, 
+                  onChange: (newValue: any) => { 
+                    setFieldValue(record.fieldId, newValue) 
+                  } 
+                }
+              )
+            }
           />
         </Table>
         <Button onClick={saveObject}>Save</Button>

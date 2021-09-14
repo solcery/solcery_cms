@@ -9,17 +9,17 @@ import { Button, Select, Input } from "antd";
 import { BinaryWriter } from "borsh";
 
 import { programId } from "../../../solcery/engine"
-import { solceryTypes, SType, SubtypeRender } from "../../../solcery/types"
+import { solceryTypes, SType, TypeSelector } from "../../../solcery/types"
 
 export const AddFieldPopup = (props: { templateKey: string }) => {
 
   const { Option } = Select;
+  const { TextArea } = Input;
   var [ visible, setVisible ] = useState(false)
 
-  var [ fieldType, setFieldType ] = useState<SType>(new SType()) //TODO: new field component
-  var [ fieldTypeNum, setFieldTypeNum ] = useState(1);
-  var [ fieldSubtype, setFieldSubtype ] = useState<any|undefined>(undefined)
-  var [ fieldName, setFieldName ] = useState('')
+  var [ fieldType, setFieldType ] = useState<SType|undefined>(undefined) //TODO: new field component
+  var [ fieldName, setFieldName ] = useState('Unnamed field')
+  var [ customData, setFieldCustomData ] = useState('')
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
 
@@ -27,23 +27,16 @@ export const AddFieldPopup = (props: { templateKey: string }) => {
     setVisible(!visible)
   }
 
-  var onFieldTypeChange = (typeId: number) => {
-    setFieldTypeNum(typeId)
-  }
-
-  var onFieldSubtypeChange = (newValue: any) => {
-    console.log(newValue)
-    setFieldType(newValue)
-  }
-
   const addField = async () => {
     if (!publicKey || wallet === undefined) {
       return;
     }
+    if (fieldType == undefined) 
+      return
     var templatePublicKey = new PublicKey(props.templateKey)
     var data = Buffer.concat([
       Buffer.from([0, 1]), 
-      fieldType.toBuffer(),
+      fieldType?.toBuffer(),
       Buffer.from([fieldName.length, 0, 0, 0]), //TODO
       Buffer.from(fieldName),
       Buffer.from([1, 1]), 
@@ -58,24 +51,23 @@ export const AddFieldPopup = (props: { templateKey: string }) => {
     });
     await sendTransaction(connection, wallet, [addFieldIx], [])
   }
-  return (
+  return ( // TODO: edit field
     <div>
     {visible && <Popup
       content={
-      <div>
-        Add Field<br/>
-        <Select id="fieldType" defaultValue={1} onChange={onFieldTypeChange}>
-        {Array.from(solceryTypes().values()).map((solceryType) => 
-          <Option key={solceryType.id} value={solceryType.id}>{solceryType.name}</Option>
-        )}
-        </Select>
-        <SubtypeRender typeId={fieldTypeNum} onLoad={onFieldSubtypeChange} onChange={onFieldSubtypeChange}/>
-        <Input onChange={(event) => { setFieldName(event.target.value) } }></Input>
-        <Button onClick={addField}>Add</Button>
-      </div>}
+        <div>
+          <TypeSelector onChange = { setFieldType }/>
+          <Input defaultValue='Unnamed field' onChange={(event) => { setFieldName(event.target.value) } }></Input>
+          
+          <Button onClick={addField}>Add</Button>
+        </div>
+      }
       handleClose={toggleAddFieldMenu}
     />}
+
     <Button onClick={toggleAddFieldMenu}>Add field</Button>
     </div>
   );
 };
+
+//<TextArea rows={10} defaultValue='' onChange={(event) => { setFieldCustomData(event.target.value) } }/>

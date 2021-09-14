@@ -61,19 +61,19 @@ export const SLinkRender = (props: {
 }
 
 export const SLinkSubtypeRender = (props: { 
-  defaultValue?: any, 
-  onLoad?: (newValue: any) => void, 
+  defaultValue?: any, //TODO:
   onChange?: (newValue: any) => void  
 }) => {
 	const connection = useConnection();
 	const { Option } = Select;
   var [ templates, setTemplates ] = useState<TemplateData[]>([]);
-
-   useEffect(() => { 
+  useEffect(() => { 
     if (templates.length <= 0)
       (async () => {
         let strg = await Storage.get(connection, projectStoragePublicKey)
-        setTemplates(await TemplateData.getAll(connection, strg.accounts))
+        var tpls = await TemplateData.getAll(connection, strg.accounts)
+        props.onChange && props.onChange(new SLink({templatePublicKey: tpls[0].publicKey}))
+        setTemplates(tpls)
       })()
   });
 
@@ -84,7 +84,6 @@ export const SLinkSubtypeRender = (props: {
 	  		props?.onChange && props.onChange(new SLink({templatePublicKey: new PublicKey(templateKey)})) 
 	  	}}>
 	  	{templates.map((tpl) => {
-        console.log(tpl.publicKey.toBase58())
       	return (<Option key={tpl.publicKey.toBase58()} value={tpl.publicKey.toBase58()}>{tpl.name}</Option>)
       })}
 	  	</Select>
@@ -112,29 +111,31 @@ export const SLinkNameRender = (props: {
 }
 
 export class SLink extends SType {
-  id = 3;
+  id = 5;
   typeName = "Link";
   render = SLinkRender;
   templatePublicKey: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz');
   nameRender = (<p>Link</p>);
+  static nested = true;
   readValue = (reader: BinaryReader) => { return reader.readPubkey() }
   writeValue = (value: string, writer: BinaryWriter) => { console.log('writeKey ' + value); writer.writePubkey(new PublicKey(value)) }
-  static subtypeRender = SLinkSubtypeRender;
+  static typedataRender = SLinkSubtypeRender;
+
   constructor(src: { templatePublicKey: PublicKey }) {
   	super()
   	this.templatePublicKey = src.templatePublicKey;
-    this.render = (props: { readonly?: boolean, defaultValue?: PublicKey,  onChange?: (newValue: any) => void  }) => { return(<SLinkRender 
+    this.nameRender = <SLinkNameRender templatePublicKey={ src.templatePublicKey }/>; //TOD: name
+    this.valueRender = (props: { readonly?: boolean, defaultValue?: PublicKey,  onChange?: (newValue: any) => void  }) => { return(<SLinkRender 
       onChange={props.onChange} 
       defaultValue={props.defaultValue} 
       templatePublicKey={this.templatePublicKey}
       readonly={props?.readonly}
     />)}
-    this.nameRender = <SLinkNameRender templatePublicKey={ src.templatePublicKey }/>; //TOD: name
   }
-  static read = (reader: BinaryReader) => {
+  static readType = (reader: BinaryReader) => {
   	return new SLink({ templatePublicKey: reader.readPubkey() })
   }
-  write = (writer: BinaryWriter) => {
+  writeType = (writer: BinaryWriter) => {
   	writer.writePubkey(this.templatePublicKey)
   }
 }

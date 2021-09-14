@@ -14,37 +14,18 @@ import { Button, Input } from "antd";
 export const SolceryMenu = () => {
 
   const connection = useConnection();
-  const { wallet, publicKey } = useWallet();
-  var [ storage, setStorage ] = useState<Storage|undefined>();
-  var [ templates, setTemplates ] = useState<{publicKey: PublicKey, name: string}[] | undefined>([]);
-  var [ templatesAmount, setTemplatesAmount] = useState(0)
-
-
-
-  const loadTemplate = async (templatePublicKey: PublicKey) => {
-    var tpl = await TemplateData.get(connection, templatePublicKey)
-    if (templates) {
-      templates?.push({
-        publicKey: templatePublicKey, 
-        name: tpl.name
-      })
-      setTemplatesAmount(templates?.length)
-    }
-  }
+  var [ templates, setTemplates ] = useState<TemplateData[]>([]);
 
   useEffect(() => { 
-    if (!storage) {
+    if (templates.length < 1) {
       (async () => {
         const strg = await Storage.get(connection, projectStoragePublicKey)
-        setStorage(strg)
-        for (let templatePublicKey of strg.accounts) {
-          loadTemplate(templatePublicKey)
-        }
+        setTemplates(await TemplateData.getAll(connection, strg.accounts))
       })()
     }
   });
 
-  if (storage && templates) 
+  if (templates.length > 0) 
     return (
       <div className='Solcery-Bar'>
         { templates.map((tpl) => {

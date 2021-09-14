@@ -7,8 +7,8 @@ export const programId = new PublicKey('DZyJMt5pQWJS9gzbeLydrwcoi6SyswKFkHhKU9c6
 // export const projectPublicKey = new PublicKey("9Rp3AXZqQBFw4QiwkMPsoJC7dTpRCKnd78jBBDVUjRGK"); // TODO: context
 // export const projectStoragePublicKey = new PublicKey("G3w2m4GCqaswe2eQM7zakwTSvRidbiqpPwHf3wh7UfZf")
 
-export const projectPublicKey = new PublicKey("FRxd9UDqzh3nwtGLZambyeCUmZkis2GpnPpgnT4pBUe5"); // TODO: context
-export const projectStoragePublicKey = new PublicKey("54G65Xm3VWfauULxHK4reV4aygi6of1P5wDHzH7E4ynX")
+export const projectPublicKey = new PublicKey("Mmw8kXJm19XrKd34ue8wD1atEXDeV8sNG2PdcSPcDCh"); // TODO: context
+export const projectStoragePublicKey = new PublicKey("6TVGtAPMTaYsWm7eGJhaURYMR9LHamihmowV3vUcVgMw")
 
 export const getAccountData = async (connection: Connection, publicKey: PublicKey) => {
     var accountInfo = await connection.getAccountInfo(publicKey);
@@ -42,6 +42,7 @@ export async function getAllAccountObjects(connection: Connection, publicKeys: P
     var accountInfos = await connection.getMultipleAccountsInfo(publicKeys);
     for (let i in accountInfos) {
         if (accountInfos[i]) {
+            console.log(accountInfos[i]!.data)
             var res = deserializeUnchecked(
                 schema,
                 classname,

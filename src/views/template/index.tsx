@@ -13,7 +13,7 @@ import { useParams, useHistory } from "react-router-dom";
 import { Button, Table } from "antd";
 
 import { programId, projectPublicKey, projectStoragePublicKey } from "../../solcery/engine"
-import { solceryTypes, TypeNameRender} from "../../solcery/types"
+import { solceryTypes } from "../../solcery/types"
 import { TemplateData, SolcerySchema, TemplateField } from "../../solcery/classes"
 import { AddFieldPopup } from "./AddFieldPopup";
 
@@ -113,13 +113,10 @@ export const TemplateView = () => {
         <Table dataSource={tableData} >
           <Column title="ID" dataIndex="id" key="fieldId"/>
           <Column title="Name" dataIndex="name" key="fieldName"/>
-          <Column title="Type" dataIndex="fieldType" key="fieldType"/>
           <Column
             title="Type"
             key="fieldType"
-            render={(text, record: any) => (
-                <TypeNameRender type={record.fieldType} />
-            )}
+            render={(text, record: any) => record.fieldType.nameRender}
           />
           <Column
             title="Actions"

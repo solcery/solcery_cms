@@ -112,16 +112,15 @@ export const SBrickRender = (props: {
 
 export const SBrickSubtypeRender = (props: {
 	defaultValue?: any, 
-	onLoad: (newValue: any) => void,
- 	onChange?: (newValue: any) => void  
+ 	onChange?: (newValue: any) => void,
 }) => {
 	const { Option } = Select;
 	var [loaded, setLoaded] = useState(false)
 	useEffect(() => {
-		if (!loaded)
+		if (props.onChange && !loaded)
 		{
 			setLoaded(true)
-			props.onLoad(new SBrick({brickType: 1}))
+			props.onChange(new SBrick({brickType: 1}))
 		}
 	})
 	return (
@@ -134,28 +133,28 @@ export const SBrickSubtypeRender = (props: {
 }
 
 export class SBrick extends SType {
-  id = 4;
+  id = 6;
   typeName = "Brick";
   nameRender = (<p>Brick</p>);
-  render = SBrickRender;
-  brickType = 1;
+  valueRender = SBrickRender;
+  brickType = 0;
 
-  static subtypeRender = SBrickSubtypeRender;
+  static typedataRender = SBrickSubtypeRender;
    constructor(src: { brickType: number }) {
   	super()
   	this.brickType = src.brickType
-    this.render = (props: { readonly?: boolean, defaultValue?: PublicKey,  onChange?: (newValue: any) => void  }) => { return(<SBrickRender 
+    this.nameRender = (<p>Brick: { this.brickType }</p>); //TOD: name
+    this.valueRender = (props: { readonly?: boolean, defaultValue?: PublicKey,  onChange?: (newValue: any) => void  }) => { return(<SBrickRender 
       onChange={props.onChange} 
       defaultValue={props.defaultValue} 
       brickType={this.brickType}
       readonly={props?.readonly}
     />)}
-    this.nameRender = (<p>Brick: { this.brickType }</p>); //TOD: name
   }
-  static read = (reader: BinaryReader) => {
+  static readType = (reader: BinaryReader) => {
   	return new SBrick({ brickType: reader.readU32() })
   }
-  write = (writer: BinaryWriter) => {
+  writeType = (writer: BinaryWriter) => {
   	writer.writeU32(this.brickType)
   }
 
