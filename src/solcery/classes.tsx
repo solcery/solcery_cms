@@ -83,14 +83,24 @@ export class TemplateData extends SolceryAccount {
   }
 
   async getObjects(connection: Connection, publicKeys: PublicKey[]) {
-    var result = []
+    var result: TplObject[] = []
     var accountInfos = await connection.getMultipleAccountsInfo(publicKeys)
     for (let i in accountInfos) {
       if (accountInfos[i]) {
-        result.push((await TplObject.build(publicKeys[i], accountInfos[i]!.data, this))[0])
+        result.push(await TplObject.build(publicKeys[i], accountInfos[i]!.data, this))
       }
     }
     return result
+  }
+
+  async construct(connection: Connection) {
+    var objects: any[] = []
+    await this.storages.forEach(async (storagePublicKey: PublicKey) => {
+        var tplStorage = await Storage.get(connection, storagePublicKey)
+        var storageObjects = await this.getObjects(connection, tplStorage.accounts)
+        storageObjects.forEach((obj: TplObject) => objects.push(obj.construct(this)))
+    })
+    return objects
   }
 }
 
@@ -112,6 +122,10 @@ export class TplObject {
     if (name && name != "") 
       return prefix + name;
     return prefix + this.publicKey.toBase58();
+  }
+
+  construct(tpl: TemplateData) {
+    return Object.fromEntries(this.fields)
   }
 
   static async getTemplate(connection: Connection, publicKey: PublicKey) {
@@ -154,14 +168,13 @@ export class TplObject {
       template: templatePublicKey,
       fields: fields,
     });
-    return [ tplObject, template ]
+    return tplObject
   }
 
 
   async serialize(connection: Connection) {
-    console.log(this)
-    var dataWriter = new BinaryWriter()
     var offsetWriter = new BinaryWriter()
+    var dataWriter = new BinaryWriter()
     var template = await TemplateData.get(connection, this.template)
     offsetWriter.writeU32(this.fields.size)
     for (let [fieldId, value] of this.fields) {

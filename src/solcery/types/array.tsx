@@ -19,7 +19,8 @@ export const SArrayRender = (props: {
   const onChange = (newValue: any, index: number) => {
     value[index] = newValue;
     setValue(value)
-    console.log(value)
+    var res = value.filter((value: any) => value != undefined)
+    props.onChange && props.onChange(res)
   }
 
   const addNewElement = () => {
@@ -29,14 +30,15 @@ export const SArrayRender = (props: {
   }
 
   if (props.readonly)
-    return (<p>Array</p>)
+    return (<p>Array</p>) // TODO
   return (
     <div>
       {value.map((val: any, index: number) => <div key={index}>
         {
           React.createElement(props.subtype.valueRender, 
             {
-              onChange: (newValue: any) => { onChange(newValue, index) }, readonly: props.readonly
+              defaultValue: val,
+              onChange: (newValue: any) => { onChange(newValue, index) }, readonly: props.readonly,
             }
           )
         }
@@ -78,6 +80,19 @@ export class SArray extends SType {
       subtype={this.subtype}
       readonly={props?.readonly}
     />)}
+  }
+
+  readValue = (reader: BinaryReader) => { 
+    var arrayLength = reader.readU32();
+    var result = []
+    for (let i = 0; i < arrayLength; i++) {
+      result.push(this.subtype.readValue(reader))
+    }
+    return result
+  }
+  writeValue = (value: any[], writer: BinaryWriter) => { 
+    writer.writeU32(value.length)
+    value.forEach((val) => this.subtype.writeValue(val, writer))
   }
 
   static readType = (reader: BinaryReader) => {

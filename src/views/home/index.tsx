@@ -10,7 +10,7 @@ import {
   deserializeUnchecked, BinaryReader, BinaryWriter, serialize
 } from 'borsh';
 import { Project, TemplateData, SolcerySchema, Storage} from "../../solcery/classes"
-import { getAccountObject, programId, projectPublicKey, projectStoragePublicKey} from "../../solcery/engine";
+import { getAccountObject, programId, projectPublicKey, projectStoragePublicKey, construct } from "../../solcery/engine";
 import { useParams, useHistory } from "react-router-dom";
 import { Button, Input } from "antd";
 
@@ -36,6 +36,10 @@ export const HomeView = () => {
   const getAccountData = async (publicKey: PublicKey) => {
     var accountInfo = await connection.getAccountInfo(publicKey);
     return accountInfo?.data
+  }
+
+  const constructContent = async () => {
+    construct(connection)
   }
 
   const createTemplate = async () => {
@@ -92,6 +96,7 @@ export const HomeView = () => {
   return (
     <div>
       <Button onClick = { createTemplate }>NEW TEMPLATE</Button>
+      <Button onClick = { constructContent }>CONSTRUCT CONTENT</Button>
     </div>
   );
 };

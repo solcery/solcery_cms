@@ -31,11 +31,9 @@ export class SType {
   }
 
   toBuffer = () => {
-  	console.log('toBuffer')
   	var writer = new BinaryWriter()
   	writer.writeSType(this)
   	return writer.buf.slice(0, writer.length)
-  	console.log( writer.buf.slice(0, writer.length))
   }
 }
 

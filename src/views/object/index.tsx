@@ -49,6 +49,7 @@ export const ObjectView = () => {
       programId: programId,
       data: Buffer.concat([ Buffer.from([1, 1]), buf]),
     });
+    console.log(buf)
     sendTransaction(connection, wallet, [saveObjectIx], []).then(() => {
       history.push("/object/" + objectId);
     })
@@ -58,7 +59,7 @@ export const ObjectView = () => {
     if (!object) {
       (async () => {
         var tpl = await TplObject.getTemplate(connection, objectPublicKey)
-        var [ obj, _ ] = await tpl.getObject(connection, objectPublicKey)
+        var obj = await tpl.getObject(connection, objectPublicKey)
         setObject(obj)
         setTemplate(tpl)
       })()
