@@ -37,56 +37,68 @@ export class SType {
   }
 }
 
-export const solceryTypes = () => {
-	return new Map<number, any>([
-		[1, SBool ],
-		[2, SInt ],
-		[3, SString ],
-		[4, SUrl ],
-		[5, SLink ],
-		[6, SBrick ],
-		[7, SArray ],
-	])
-}
+export const solceryTypes = (excludeContainers: boolean = false) => {
+	const types = new Map <number, any> ([
+		[1, SBool],
+		[2, SInt],
+		[3, SString],
+		[4, SUrl],
+		[5, SLink],
+		[6, SBrick]
+	]);
+	if (!excludeContainers)
+	{
+		types.set(7, SArray);
+	}
+	return types;
+};
 
 export const TypeSelector = (props: { //TODO: -> Type render
-	onChange?: (newValue: SType) => void,
+	label?: string,
+	excludeContainers?: boolean,
+	onChange?: (newValue: SType) => void
 }) => {
 	const DEFAULT_STYPE = new SInt();
+	const types = solceryTypes(props.excludeContainers);
 	const { Option } = Select;
 	const [ typeId, setTypeId ] = useState(DEFAULT_STYPE.id);
-	var [loaded, setLoaded] = useState(false)
+	var [loaded, setLoaded] = useState(false);
 
 	useEffect(() => {
 		if (!loaded) {
 			setLoaded(true)
 			onChangeSolceryType(DEFAULT_STYPE)
 		}
-	})
+	});
+
 	const onChangeSolceryType = (newValue: any) => {
-		if (props.onChange)
-			props.onChange(newValue)
-	}
+		if (props.onChange) props.onChange(newValue);
+	};
+
 	return (
 		<div>
-	    Add Field<br/>
-	    <Select id="fieldType" defaultValue={ DEFAULT_STYPE.id } onChange={(solceryTypeId) => { 
-	    	let solceryType = solceryTypes().get(solceryTypeId)
-	    	setTypeId(solceryTypeId)
-	    	if (!solceryType.typedataRender)
-	    		onChangeSolceryType(new solceryType())
-	    }} >
-	    {Array.from(solceryTypes().keys()).map((solceryTypeId) => 
-	      <Option key={solceryTypeId} value={solceryTypeId}>{solceryTypes().get(solceryTypeId).name}</Option>
-	    )}
+	    <div>{props.label}</div>
+	    <Select id="fieldType" defaultValue={DEFAULT_STYPE.id} onChange={(solceryTypeId) => {
+	    	let solceryType = types.get(solceryTypeId);
+	    	setTypeId(solceryTypeId);
+	    	if (!solceryType.typedataRender) onChangeSolceryType(new solceryType());
+	    }}>
+				{Array.from(types.keys()).map((solceryTypeId) =>
+					<Option key={solceryTypeId} value={solceryTypeId}>{types.get(solceryTypeId).name}</Option>
+				)}
 	    </Select>
-	    {solceryTypes().get(typeId)?.typedataRender && React.createElement(
-	    	solceryTypes().get(typeId)?.typedataRender,
+	    {types.get(typeId)?.typedataRender && React.createElement(
+	    	types.get(typeId)?.typedataRender,
 				{ onChange: onChangeSolceryType }
 			)}
 	  </div>
-	)
-}
+	);
+};
+
+TypeSelector.defaultProps = {
+  label: 'Type',
+	excludeContainers: false
+};
 
 declare module "borsh" {
   interface BinaryReader {

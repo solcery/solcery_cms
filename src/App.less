@@ -5,6 +5,10 @@ body {
   --row-highlight: @background-color-base;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  margin: 0px !important;
+}
+
 .app-title {
   font-family: "FF Oxide Solid";
   font-style: normal;
@@ -13,7 +17,6 @@ body {
 
   h2 {
     font-size: 20px;
-    margin: 0px;
   }
 }
 
@@ -201,10 +204,12 @@ em {
   }
 }
 
-.ant-table-cell {
-  .ant-input-number, .ant-select, .ant-btn, .solcery-image-container {
-    margin: 5px;
-  }
+.ant-input-number, .ant-select, .ant-btn, .solcery-image-container {
+  margin: 5px;
+}
+
+.ant-input-number, .ant-select {
+  min-width: 100px;
 }
 
 .solcery-image-container {

@@ -63,9 +63,9 @@ export const SArraySubtypeRender = (props: {
 }) => {
   const onChange = (newValue: SType) => {
     props.onChange && props.onChange(new SArray({ subtype: newValue }));
-  }
+  };
   return (
-    <TypeSelector onChange={onChange}/>
+    <TypeSelector label='Element type' excludeContainers onChange={onChange} />
   );
 };
 
