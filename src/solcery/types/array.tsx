@@ -5,62 +5,69 @@ import { SType, TypeSelector, solceryTypes } from "./index";
 import { Select, Button } from 'antd';
 import { BinaryReader, BinaryWriter } from 'borsh';
 
-
-export const SArrayRender = (props: { 
+export const SArrayRender = (props: {
   subtype: SType,
   defaultValue?: any, 
   onChange?: (newValue: any) => void,
   readonly?: boolean,
 }) => {
+  const [value, setValue] = useState(props.defaultValue || []);
+  const [valueSize, setValueSize] = useState(props.defaultValue?.length || 0);
 
-
-  var [value, setValue] = useState(props.defaultValue || [])
-  var [valueSize, setValueSize] = useState(props.defaultValue?.length || 0);
   const onChange = (newValue: any, index: number) => {
     value[index] = newValue;
     setValue(value)
-    var res = value.filter((value: any) => value != undefined)
+    const res = value.filter((value: any) => value != undefined)
     props.onChange && props.onChange(res)
-  }
+  };
 
   const addNewElement = () => {
-    value.push(undefined)
-    setValueSize(valueSize + 1)
-    setValue(value)
-  }
+    value.push(undefined);
+    setValueSize(valueSize + 1);
+    setValue(value);
+  };
 
-  if (props.readonly)
-    return (<p>Array</p>) // TODO
+  const removeElement = (index: number) => {
+    value.splice(index, 1);
+    setValueSize(valueSize - 1);
+    setValue(value);
+  };
+
+  if (props.readonly) return (<p>Array</p>); // TODO
+
+  // TODO: key={timestamp + index} below is dirty way to make unique key
+  // but using plain index produces wrong behavior on list re-render in React,
+  // because indices get shifted on element removal.
+  // Ideally, some unique array element ID needs to be used as key.
+  const timestamp = Date.now();
+
   return (
     <div>
-      {value.map((val: any, index: number) => <div key={index}>
-        {
-          React.createElement(props.subtype.valueRender, 
-            {
-              defaultValue: val,
-              onChange: (newValue: any) => { onChange(newValue, index) }, readonly: props.readonly,
-            }
-          )
-        }
-      </div>)}
+      {value.map((val: any, index: number) =>
+      <div key={timestamp + index}>
+        {React.createElement(props.subtype.valueRender, {
+          defaultValue: val,
+          onChange: (newValue: any) => { onChange(newValue, index) }, readonly: props.readonly,
+        })}
+        <Button onClick={() => { removeElement(index) }}>-</Button>
+      </div>
+      )}
       <Button onClick={addNewElement}>+</Button>
     </div>
   );
-}
-
+};
 
 export const SArraySubtypeRender = (props: {
   defaultValue?: any, 
   onChange?: (newValue: any) => void,
 }) => {
   const onChange = (newValue: SType) => {
-    props.onChange && props.onChange(new SArray({ subtype: newValue }))
+    props.onChange && props.onChange(new SArray({ subtype: newValue }));
   }
   return (
     <TypeSelector onChange={onChange}/>
-  )
-}
-
+  );
+};
 
 export class SArray extends SType {
   id = 7;
@@ -90,6 +97,7 @@ export class SArray extends SType {
     }
     return result
   }
+  
   writeValue = (value: any[], writer: BinaryWriter) => { 
     writer.writeU32(value.length)
     value.forEach((val) => this.subtype.writeValue(val, writer))
@@ -104,4 +112,3 @@ export class SArray extends SType {
     writer.writeSType(this.subtype)
   }
 }
-

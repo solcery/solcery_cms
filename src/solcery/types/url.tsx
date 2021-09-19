@@ -15,23 +15,15 @@ export const SUrlRender = (props: {
     props.onChange && props.onChange(newValue)
   }
 
-	if (!props.onChange)
-    return ( <Image
-      width={200}
-      src={value}
-    />)
+	if (!props.onChange) return (<Image src={value}/>);
 
-  return (<div>
-    <Image
-      width={200}
-      src={value}
-    />
-    <Input 
-      type = "text" 
-      defaultValue={ value }
-      onChange={(event) => { onChange(event.target.value) } }
-   />
-    </div>);
+  return (
+    <div className="solcery-image-container">
+      <Image src={value} />
+      <Input type = "text" defaultValue={value}
+             onChange={(event) => { onChange(event.target.value) } } />
+    </div>
+  );
 }
 
 export class SUrl extends SType {
