@@ -11,42 +11,26 @@ import { BinaryWriter } from "borsh";
 import { programId } from "../../../solcery/engine";
 import { solceryTypes, SType, TypeSelector } from "../../../solcery/types";
 
-export const AddFieldPopup = (props: { templateKey: string }) => {
-
+export const AddFieldPopup = (props: {
+  onAdd: (fieldType : SType | undefined, fieldName: string) => void
+}) => {
   const { Option } = Select;
   const { TextArea } = Input;
   var [ visible, setVisible ] = useState(false);
 
-  var [ fieldType, setFieldType ] = useState<SType|undefined>(undefined); //TODO: new field component
+  var [ fieldType, setFieldType ] = useState <SType | undefined> (undefined); //TODO: new field component
   var [ fieldName, setFieldName ] = useState('Unnamed field');
   var [ customData, setFieldCustomData ] = useState('');
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
 
-  const toggleAddFieldMenu = () => {
-    setVisible(!visible);
+  const onAddClicked = () => {
+    setVisible(false);
+    props.onAdd(fieldType, fieldName);
   };
 
-  const addField = async () => {
-    if (!publicKey || wallet === undefined) return;
-    if (fieldType == undefined) return;
-
-    const templatePublicKey = new PublicKey(props.templateKey);
-    const data = Buffer.concat([
-      Buffer.from([0, 1]),
-      fieldType?.toBuffer(),
-      Buffer.from([fieldName.length, 0, 0, 0]), //TODO
-      Buffer.from(fieldName),
-      Buffer.from([1, 1])
-    ]);
-    const addFieldIx = new TransactionInstruction({
-      keys: [
-        { pubkey: templatePublicKey, isSigner: false, isWritable: true },
-      ],
-      programId: programId,
-      data: data,
-    });
-    await sendTransaction(connection, wallet, [addFieldIx], []);
+  const toggleAddFieldMenu = () => {
+    setVisible(!visible);
   };
 
   return ( // TODO: edit field
@@ -58,7 +42,7 @@ export const AddFieldPopup = (props: { templateKey: string }) => {
             <TypeSelector onChange={setFieldType} />
             <div>Name</div>
             <Input defaultValue='Unnamed field' onChange={(event) => { setFieldName(event.target.value) }} />
-            <Button onClick={addField}>Add</Button>
+            <Button onClick={onAddClicked}>Add</Button>
           </div>} />
       : <Button onClick={toggleAddFieldMenu}>Add field</Button>}
     </div>

@@ -13,7 +13,7 @@ import { useParams, useHistory } from "react-router-dom";
 import { Button, Table } from "antd";
 
 import { programId, projectPublicKey, projectStoragePublicKey } from "../../solcery/engine"
-import { solceryTypes } from "../../solcery/types"
+import { solceryTypes, SType } from "../../solcery/types"
 import { TemplateData, SolcerySchema, TemplateField } from "../../solcery/classes"
 import { AddFieldPopup } from "./AddFieldPopup";
 
@@ -34,17 +34,37 @@ export const TemplateView = () => {
   const { wallet, publicKey } = useWallet();
   let history = useHistory();
   let { templateKey } = useParams<TemplateViewParams>();
-  var templatePublicKey = new PublicKey(templateKey)
-  var [ template, setTemplate ] = useState<TemplateData | undefined>()
-  var [ addFieldMenu, setAddFieldMenu ] = useState(false)
+  const templatePublicKey = new PublicKey(templateKey);
+  var [ template, setTemplate ] = useState<TemplateData | undefined>();
+  var [ addFieldMenu, setAddFieldMenu ] = useState(false);
 
+  const addField = async (fieldType : SType | undefined, fieldName: string) => {
+    if (!publicKey || wallet === undefined) return;
+    if (fieldType == undefined) return;
+
+    const data = Buffer.concat([
+      Buffer.from([0, 1]),
+      fieldType?.toBuffer(),
+      Buffer.from([fieldName.length, 0, 0, 0]), //TODO
+      Buffer.from(fieldName),
+      Buffer.from([1, 1])
+    ]);
+    const addFieldIx = new TransactionInstruction({
+      keys: [
+        { pubkey: templatePublicKey, isSigner: false, isWritable: true },
+      ],
+      programId: programId,
+      data: data,
+    });
+    await sendTransaction(connection, wallet, [addFieldIx], []);
+    load();
+  };
 
   const deleteField = async (fieldId: number) => {
     if (!publicKey || wallet === undefined) {
       return;
     }
-    var templatePublicKey = new PublicKey(templateKey)
-    var buf = Buffer.allocUnsafe(4);
+    const buf = Buffer.allocUnsafe(4);
     buf.writeUInt32LE(fieldId);
     const deleteFieldIx = new TransactionInstruction({
       keys: [
@@ -53,11 +73,11 @@ export const TemplateView = () => {
       programId: programId,
       data: Buffer.concat([Buffer.from([0, 2,]), buf ]),
     });
-    await sendTransaction(connection, wallet, [deleteFieldIx], [])
-    load()
-  }
+    await sendTransaction(connection, wallet, [deleteFieldIx], []);
+    load();
+  };
 
-  const sendChangeName = async(templateName: string, templatePublicKey: PublicKey) => {
+  const sendChangeName = async(templateName: string) => {
     if (!publicKey || wallet === undefined) {
       return;
     }
@@ -71,39 +91,38 @@ export const TemplateView = () => {
       programId: programId,
       data: Buffer.concat([Buffer.from([0, 3]), buf, Buffer.from(templateName)]),
     });
-    await sendTransaction(connection, wallet, [deleteFieldIx], [])
-    load()
-  }
+    await sendTransaction(connection, wallet, [deleteFieldIx], []);
+    load();
+  };
 
   function changeName() {
-    var templatePublicKey = new PublicKey(templateKey)
     let name = prompt("Enter new name:", "New template name");
     if (name == null || name == "") {
       
     } else {
-      sendChangeName(name, templatePublicKey)
+      sendChangeName(name);
     }
   }
 
   const load = async () => {
-    setTemplate(await TemplateData.get(connection, templatePublicKey))
-  }
+    setTemplate(await TemplateData.get(connection, templatePublicKey));
+  };
 
   useEffect(() => { 
     if (!template) {
-      load()
+      load();
     }
   });
 
   if (template) {
-    var tableData: any[] = []
+    var tableData: any[] = [];
     for (let field of template.fields) {
       tableData.push({
         key: field.id,
         id: field.id,
         fieldType: field.fieldType,
         name: field.name,
-      })
+      });
     }
 
     return (
@@ -126,13 +145,10 @@ export const TemplateView = () => {
             )}
           />
         </Table>
-        <AddFieldPopup templateKey = {templateKey}/>
+        <AddFieldPopup onAdd={addField} />
       </div>
     );
   }
-  return (
-    <div>
-      Loading
-    </div>
-  );
+  
+  return (<div>Loading</div>);
 };
