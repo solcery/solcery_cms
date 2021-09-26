@@ -30,8 +30,6 @@ export const ConnectButton = (props: ConnectButtonProps) => {
 
   var connection = useConnection();
 
-  var programId = new PublicKey("5Ds6QvdZAqwVozdu2i6qzjXm8tmBttV6uHNg4YU8rB1P");
-
   const menu = (
     <Menu>
       <Menu.Item key="3" onClick={select}>

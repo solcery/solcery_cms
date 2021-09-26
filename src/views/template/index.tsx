@@ -12,8 +12,7 @@ import './style.css';
 import { useParams, useHistory } from "react-router-dom";
 import { Button, Table } from "antd";
 
-import { programId, projectPublicKey, projectStoragePublicKey } from "../../solcery/engine"
-import { solceryTypes } from "../../solcery/types"
+import { programId } from "../../solcery/engine"
 import { TemplateData, SolcerySchema, TemplateField } from "../../solcery/classes"
 import { AddFieldPopup } from "./AddFieldPopup";
 
@@ -64,14 +63,14 @@ export const TemplateView = () => {
     // var templateName = (document.getElementById('templateName') as HTMLInputElement).value
     var buf = Buffer.allocUnsafe(4)
     buf.writeInt32LE(templateName.length)
-    const deleteFieldIx = new TransactionInstruction({
+    const changeNameIx = new TransactionInstruction({
       keys: [
         { pubkey: templatePublicKey, isSigner: false, isWritable: true },
       ],
       programId: programId,
       data: Buffer.concat([Buffer.from([0, 3]), buf, Buffer.from(templateName)]),
     });
-    await sendTransaction(connection, wallet, [deleteFieldIx], [])
+    await sendTransaction(connection, wallet, [changeNameIx], [])
     load()
   }
 
@@ -85,14 +84,43 @@ export const TemplateView = () => {
     }
   }
 
+  const sendChangeCode = async(templateCode: string, templatePublicKey: PublicKey) => {
+    if (!publicKey || wallet === undefined) {
+      return;
+    }
+    var buf = Buffer.allocUnsafe(4)
+    buf.writeInt32LE(templateCode.length)
+    const changeCodeIx = new TransactionInstruction({
+      keys: [
+        { pubkey: templatePublicKey, isSigner: false, isWritable: true },
+      ],
+      programId: programId,
+      data: Buffer.concat([Buffer.from([0, 4]), buf, Buffer.from(templateCode)]),
+    });
+    await sendTransaction(connection, wallet, [changeCodeIx], [])
+    load()
+  }
+
+
+  function changeCode() {
+    var templatePublicKey = new PublicKey(templateKey)
+    let code = prompt("Enter new code:", "newCode");
+    if (code == null || code == "") {
+      
+    } else {
+      sendChangeCode(code, templatePublicKey)
+    }
+  }
+
   const load = async () => {
-    setTemplate(await TemplateData.get(connection, templatePublicKey))
+    
   }
 
   useEffect(() => { 
-    if (!template) {
-      load()
-    }
+    if (!template || template.publicKey.toBase58() != templateKey)
+      (async () => {
+        setTemplate(await TemplateData.get(connection, templatePublicKey))
+      })()
   });
 
   if (template) {
@@ -103,16 +131,19 @@ export const TemplateView = () => {
         id: field.id,
         fieldType: field.fieldType,
         name: field.name,
+        code: field.code,
       })
     }
 
     return (
       <div style = { { width: '100%' } }>
         <h2 id="templateName" onClick = { changeName }>{template.name}</h2>
+        <h1 id="templateCode" onClick = { changeCode }>{template.code}</h1>
         <a href={"/#/storage/" + template.storages[0].toBase58()}>Objects</a>
-        <Table dataSource={tableData} >
+        <Table dataSource={tableData} pagination={false}>
           <Column title="ID" dataIndex="id" key="fieldId"/>
           <Column title="Name" dataIndex="name" key="fieldName"/>
+          <Column title="Code" dataIndex="code" key="fieldCode"/>
           <Column
             title="Type"
             key="fieldType"

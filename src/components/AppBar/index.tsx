@@ -10,33 +10,14 @@ import { SolceryMenu } from "../SolceryMenu";
 
 export const AppBar = (props: { left?: JSX.Element; right?: JSX.Element }) => {
   const { connected } = useWallet();
-
   const TopBar = (
     <div tabIndex = {1} className="App-Bar-right">
-      {connected ? (
+      {connected && (
         <CurrentUserBadge />
-      ) : (
-        <ConnectButton
-          type="text"
-          size="large"
-          allowWalletChange={true}
-          style={{ color: "#2abdd2" }}
-        />
       )}
-
-      <Popover
-        placement="topRight"
-        title={LABELS.SETTINGS_TOOLTIP}
-        content={<Settings />}
-        trigger="click"
-      >
-        <Button
-          shape="circle"
-          size="large"
-          type="text"
-          icon={<SettingOutlined />}
-        />
-      </Popover>
+      {!connected && (
+        <ConnectButton />
+      )}
       {props.right}
     </div>
   );

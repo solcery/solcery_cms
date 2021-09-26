@@ -128,6 +128,7 @@ export const StorageView = () => {
                 return React.createElement(
                   field.fieldType.valueRender,
                   { 
+                    type: field.fieldType,
                     defaultValue: object[field.id], 
                     readonly: true
                   }

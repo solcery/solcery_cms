@@ -1,5 +1,6 @@
 import { BinaryReader, BinaryWriter } from 'borsh';
 import { SType } from "./base";
+export * from "./solceryTypes"
 export * from "./base"
 export * from "./bool"
 export * from "./int"

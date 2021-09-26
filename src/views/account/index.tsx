@@ -128,11 +128,21 @@ export const AccountView = () => {
     sendTransaction(connection, wallet, [saveAccountIx], []);
   }
 
+  const airdrop = () => {
+    if (!publicKey || wallet === undefined) {
+      return;
+    }
+    connection.requestAirdrop(publicKey, 5 * LAMPORTS_PER_SOL)
+  }
+
+
   let { accountKey } = useParams<AccountViewParams>();
   if (accountKey) {
     console.log(accountKey)
     loadAccount(accountKey);
   }
+
+
 
   return (
     <div>
@@ -147,6 +157,7 @@ export const AccountView = () => {
           <Button id = 'createButton' onClick = { () => { newProject() } }>New</Button>
         </div> }
       <table id = "templateTable"></table>
+      <Button onClick={airdrop}>Airdrop</Button>
     </div>
   );
 };

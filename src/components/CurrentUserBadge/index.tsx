@@ -9,6 +9,7 @@ export const CurrentUserBadge = (props: {}) => {
   const { wallet } = useWallet();
   const { account } = useNativeAccount();
 
+
   if (!wallet?.publicKey) {
     return null;
   }

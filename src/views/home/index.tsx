@@ -27,19 +27,14 @@ type HomeViewParams = {
 export const HomeView = () => {
 
 
-
-
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
   const history = useHistory();
-
-  const getAccountData = async (publicKey: PublicKey) => {
-    var accountInfo = await connection.getAccountInfo(publicKey);
-    return accountInfo?.data
-  }
-
+  
   const constructContent = async () => {
-    construct(connection)
+    var constructed = await construct(connection)
+    console.log(constructed)
+    console.log(JSON.stringify(constructed))
   }
 
   const createTemplate = async () => {
@@ -90,8 +85,6 @@ export const HomeView = () => {
       history.push("/template/" + templateAccount.publicKey);
     })
   }
-
-
 
   return (
     <div>

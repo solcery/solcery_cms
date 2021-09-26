@@ -1,7 +1,8 @@
 import { PublicKey, Connection} from "@solana/web3.js";
 import { getAccountData, getMultipleAccountsData, getAccountObject, getAllAccountObjects} from "./engine"
 import { BinaryReader, BinaryWriter } from "borsh";
-import { solceryTypes, SType } from "./types";
+import { SType } from "./types";
+
 
 
 
@@ -50,15 +51,17 @@ export class TemplateData extends SolceryAccount {
   publicKey: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz');
   id: number = 0;
   name: string = "Template name";
+  code: string = "templateCode"
   fields: TemplateField[] = [];
   storages: PublicKey[] = [];
   maxFieldIndex: number = 0;
   customParams: any = {};
-  constructor(src: { id: number, name : string, maxFieldIndex: number, storages: PublicKey[], fields: TemplateField[], customData: Uint8Array  } | undefined = undefined) {
+  constructor(src: { id: number, name : string, code: string, maxFieldIndex: number, storages: PublicKey[], fields: TemplateField[], customData: Uint8Array  } | undefined = undefined) {
     super()
     if (src) {
       this.id = src.id;
       this.storages = src.storages;
+      this.code = src.code;
       this.maxFieldIndex = src.maxFieldIndex;
       this.name = src.name;
       this.fields = src.fields;
@@ -94,13 +97,15 @@ export class TemplateData extends SolceryAccount {
   }
 
   async construct(connection: Connection) {
-    var objects: any[] = []
-    await this.storages.forEach(async (storagePublicKey: PublicKey) => {
+    var objs: Map<string, any> = new Map()
+    for (let storagePublicKey of this.storages) {
         var tplStorage = await Storage.get(connection, storagePublicKey)
         var storageObjects = await this.getObjects(connection, tplStorage.accounts)
-        storageObjects.forEach((obj: TplObject) => objects.push(obj.construct(this)))
-    })
-    return objects
+        for (var obj of storageObjects) {
+          objs.set(obj.publicKey.toBase58(), obj.construct(this))
+        }
+    }
+    return Object.fromEntries(objs)
   }
 }
 
@@ -125,7 +130,17 @@ export class TplObject {
   }
 
   construct(tpl: TemplateData) {
-    return Object.fromEntries(this.fields)
+    var constructed: Map<string, any> = new Map();
+    for (let [fieldId, value] of this.fields) {
+      var field = tpl.getField(fieldId)
+      if (field) {
+        constructed.set(field.code, value)
+      }
+    }
+    var result = Object.fromEntries(constructed)
+    result.id = this.id
+    result.publicKey = this.publicKey.toBase58()
+    return result
   }
 
   static async getTemplate(connection: Connection, publicKey: PublicKey) {
@@ -197,9 +212,11 @@ export class TemplateField { //TODO: Template field params
   enabled = false;
   fieldType = new SType();
   name = "Field name";
-  constructor(src: { id: number, enabled: boolean, fieldType: SType, name: string } | undefined = undefined) {
+  code = "fieldName";
+  constructor(src: { id: number, code: string, enabled: boolean, fieldType: SType, name: string } | undefined = undefined) {
     if (src) {
       this.id = src.id;
+      this.code = src.code;
       this.enabled = src.enabled;
       this.fieldType = src.fieldType;
       this.name = src.name;
@@ -212,6 +229,7 @@ export const SolcerySchema = new Map()
 SolcerySchema.set(TemplateData, { kind: 'struct', fields: [
     ['id', 'u32'],
     ['name', 'string'],
+    ['code', 'string'],
     ['storages', [ 'pubkey' ]],
     ['maxFieldIndex', 'u32'],
     ['fields', [ TemplateField ]],
@@ -221,6 +239,7 @@ SolcerySchema.set(TemplateField, { kind: 'struct', fields: [
     ['id', 'u32'],
     ['fieldType', 'sType'],
     ['name', 'string'],
+    ['code', 'string'],
     ['construct_client', 'boolean'],
     ['construct_server', 'boolean'],
 ]});

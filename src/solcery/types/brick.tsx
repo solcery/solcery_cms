@@ -1,68 +1,11 @@
 import Unity, { UnityContext } from "react-unity-webgl";
 import React, { useState, useEffect } from "react";
 import { useConnection} from "../../contexts/connection";
-import { SType, SInt, SString, solceryTypes } from "./index";
-import { Select } from 'antd';
+import { SType, SInt, SString } from "./index";
+import { Select, Button } from 'antd';
 import { PublicKey } from "@solana/web3.js";
 import { BinaryReader, BinaryWriter } from 'borsh';
-import brickConfigs from './bricksConfig.json';
-import ReactFlow from 'react-flow-renderer';
-
-
-
-// export function set_unity_card_creation_signed(cardName: string, isSigned: boolean) {
-//   var data = { CardName: cardName, IsSigned: isSigned };
-//   unityContext.send("ReactToUnity", "SetCardCreationSigned", JSON.stringify(data));
-// }
-
-
-
-// var brickConfigs = [
-//   //Actions
-//   { Type: 0, Subtype: 0, FieldType: 0, Slots: 0, }, //Void
-//   { Type: 0, Subtype: 1, FieldType: 0, Slots: 2, }, //Set
-//   { Type: 0, Subtype: 2, FieldType: 0, Slots: 3, }, //Conditional
-//   { Type: 0, Subtype: 3, FieldType: 0, Slots: 2, }, //Loop
-//   { Type: 0, Subtype: 4, FieldType: 1, Slots: 0, }, //Card
-//   { Type: 0, Subtype: 5, FieldType: 2, Slots: 0, }, //Show message
-//   { Type: 0, Subtype: 6, FieldType: 2, Slots: 1, }, //Set context var
-//   { Type: 0, Subtype: 100, FieldType: 0, Slots: 1, }, //MoveTo
-//   { Type: 0, Subtype: 101, FieldType: 1, Slots: 2, }, //SetPlayerAttr
-//   { Type: 0, Subtype: 102, FieldType: 1, Slots: 2, }, //AddPlayerAttr
-//   { Type: 0, Subtype: 103, FieldType: 0, Slots: 3, }, //ApplyToPlace
-//   { Type: 0, Subtype: 104, FieldType: 1, Slots: 2, }, //SubPlayerAttr
-
-//   //Conditions
-//   { Type: 1, Subtype: 0, FieldType: 0, Slots: 0, }, //True
-//   { Type: 1, Subtype: 1, FieldType: 0, Slots: 0, }, //False
-//   { Type: 1, Subtype: 2, FieldType: 0, Slots: 2, }, //Or
-//   { Type: 1, Subtype: 3, FieldType: 0, Slots: 2, }, //And
-//   { Type: 1, Subtype: 4, FieldType: 0, Slots: 1, }, //Not
-//   { Type: 1, Subtype: 5, FieldType: 0, Slots: 2, }, //Equal
-//   { Type: 1, Subtype: 6, FieldType: 0, Slots: 2, }, //GreaterThan
-//   { Type: 1, Subtype: 7, FieldType: 0, Slots: 2, }, //LesserThan
-//   { Type: 1, Subtype: 100, FieldType: 0, Slots: 1, }, //IsAtPlace
-
-//   //Values
-//   { Type: 2, Subtype: 0, FieldType: 1, Slots: 0, }, //Const,
-//   { Type: 2, Subtype: 1, FieldType: 0, Slots: 3, }, //Conditional
-//   { Type: 2, Subtype: 2, FieldType: 0, Slots: 2, }, //Add
-//   { Type: 2, Subtype: 3, FieldType: 0, Slots: 2, }, //Sub
-//   { Type: 2, Subtype: 4, FieldType: 2, Slots: 0, }, //GetCtxVar
-//   { Type: 2, Subtype: 5, FieldType: 0, Slots: 2, }, //GetCtxVar
-//   { Type: 2, Subtype: 6, FieldType: 0, Slots: 2, }, //Mul
-//   { Type: 2, Subtype: 3, FieldType: 0, Slots: 2, }, //Div
-//   { Type: 2, Subtype: 2, FieldType: 0, Slots: 2, }, //Modulo
-//   { Type: 2, Subtype: 100, FieldType: 1, Slots: 1, }, //GetPlayerAttr
-//   { Type: 2, Subtype: 101, FieldType: 0, Slots: 0, }, //GetPlayerIndex
-//   { Type: 2, Subtype: 102, FieldType: 0, Slots: 1, }, //GetCardsAmount
-//   { Type: 2, Subtype: 103, FieldType: 0, Slots: 0, }, //CurrentPlace
-//   { Type: 2, Subtype: 105, FieldType: 0, Slots: 0, }, //CasterPlayerIndex
-// ]
-
-
-	// var elements = ;
-
+import { solceryTypes } from './solceryTypes'
 
 export const SBrickRender = (props: { 
   brickType: number, 
@@ -101,11 +44,15 @@ export const SBrickRender = (props: {
     }));
   });
 
-	var [value, setValue] = useState(props.defaultValue)
+	var [ value, setValue ] = useState(props.defaultValue)
+  var [ enabled, setEnabled ] = useState(false)
 	if (props.readonly)
 		return (<p>Brick</p>)
 	return (
-		<Unity tabIndex={3} style={{ width: 500, height: 200 }} unityContext={unityContext} />
+    <div>
+    <Button onClick = {() => { setEnabled(!enabled) }}>{ enabled ? "Disable" : "Enable" }</Button>
+    { enabled && (<Unity tabIndex={3} style={{ width: 1000, height: 800 }} unityContext={unityContext} />)}
+    </div>
 	);
 }
 
@@ -134,8 +81,7 @@ export const SBrickSubtypeRender = (props: {
 
 export class SBrick extends SType {
   id = 6;
-  typeName = "Brick";
-  nameRender = (<p>Brick</p>);
+  name = "Brick";
   valueRender = SBrickRender;
   brickType = 0;
 
@@ -162,19 +108,16 @@ export class SBrick extends SType {
     var type = reader.readU8()
     var subtype = reader.readU32()
     var brickSignature = getBrickSignature(type, subtype)
-    var params: BrickParam[] = []
+    var params: Map<number, any> = new Map()
     if (!brickSignature)
       throw new Error("Reading brick failed")
     var paramsAmount = reader.readU32()
     for (var i = 0; i < paramsAmount; i++) {
       var paramId = reader.readU32()
-      var paramSignature = getParamSignature(brickSignature, paramId)
+      var paramSignature = getParamSignatureById(brickSignature, paramId)
       if (!paramSignature)
         throw new Error("Reading brick failed")
-      params.push({
-        paramId: paramId,
-        value: paramSignature.type.readValue(reader)
-      })
+      params.set(paramId, paramSignature.type.readValue(reader))
     }
     var result: Brick = {
       type: type,
@@ -183,32 +126,34 @@ export class SBrick extends SType {
     }
     return result
   };
+
   writeValue = (value: Brick, writer: BinaryWriter) => { 
     var brickSignature = getBrickSignature(value.type, value.subtype)
     if (!brickSignature)
       throw new Error("Writing brick failed")
     writer.writeU8(value.type)
     writer.writeU32(value.subtype)
-    writer.writeU32(value.params.length)
-    for (var brickParam of value.params) {
-      var paramSignature = getParamSignature(brickSignature, brickParam.paramId)
+    writer.writeU32(value.params.size)
+    for (let param of value.params) {
+      var paramSignature = getParamSignatureById(brickSignature, param[0])
       if (paramSignature) {
-        writer.writeU32(brickParam.paramId)
-        paramSignature.type.writeValue(brickParam.value, writer)
+        writer.writeU32(param[0])
+        paramSignature.type.writeValue(param[1], writer)
       }
     }
   };
 }
 
+solceryTypes.set(6, SBrick)
 
-  function getParamSignature(brickSignature: BrickSignature, paramId: number) {
-    for (var param of brickSignature.params) {
-      if (param.id == paramId)
-        return param
-    }
+function getParamSignatureById(brickSignature: BrickSignature, paramId: number) {
+  for (var param of brickSignature.params) {
+    if (param.id == paramId)
+      return param
   }
+}
 
- declare module "borsh" {
+declare module "borsh" {
   interface BinaryReader {
     readBrick(): SBrick;
   }
@@ -231,6 +176,7 @@ export class SBrick extends SType {
 type BrickParamSignature = {
   id: number,
   name: string,
+  code: string,
   type: SType,
 }
 
@@ -238,8 +184,9 @@ type BrickSignature = {
   type: number,
   subtype: number,
   name: string,
-  description: string,
-  params: BrickParamSignature[]
+  description?: string,
+  params: any,
+  func: any,
 }
 
 const getBrickSignature = (type: number, subtype: number) => {
@@ -249,12 +196,19 @@ const getBrickSignature = (type: number, subtype: number) => {
   }
 }
 
+export const applyBrick = (brick: Brick, ctx: any) => {
+  var brickSignature = getBrickSignature(brick.type, brick.subtype)
+  if (brickSignature) {
+    return brickSignature.func(Object.fromEntries(brick.params), ctx)
+  }
+}
+
 export const solceryBricks: BrickSignature[] = [
   {
     type: 0,
     subtype: 0,
     name: 'Void',
-    description: 'Does nothing',
+    func: () => {},
     params: [],
   },
 
@@ -262,22 +216,39 @@ export const solceryBricks: BrickSignature[] = [
     type: 0,
     subtype: 1,
     name: 'Set',
-    description: 'Description',
     params: [
-      {
-        id: 1,
-        name: 'Action 1',
-        type: new SBrick({ brickType: 0 }),
-      },
-      {
-        id: 2,
-        name: 'Action 2',
-        type: new SBrick({ brickType: 0 }),
-      }
+      { id: 1, code: 'action1', name: 'Action 1', type: new SBrick({ brickType: 0 }) },
+      { id: 2, code: 'action2', name: 'Action 2', type: new SBrick({ brickType: 0 }) }
     ],
+    func: (params: any, ctx: any) => {
+      applyBrick(params[1], ctx)
+      applyBrick(params[2], ctx)
+    }
+  },
+  {
+    type: 0,
+    subtype: 100,
+    name: 'MoveTo',
+    params: [
+      { id: 1, code: 'place', name: 'Place', type: new SBrick({ brickType: 2 }) }
+    ],
+    func: (params: any, ctx: any) => {
+      ctx.object.attrs.place = applyBrick(params[1], ctx)
+    }
+  },
+
+  {
+    type: 2,
+    subtype: 0,
+    name: 'Const',
+    params: [
+      { id: 1, code: 'value', name: 'Value', type: new SInt() }
+    ],
+    func: (params: any, ctx: any) => {
+      return params[1]
+    }
   }
 ];
-
 
 function brickSignatureToBrickConfig(brick: BrickSignature) {
   var Slots = []
@@ -322,52 +293,41 @@ type OldBrick = {
   Slots: OldBrick[],
 }
 
-type BrickParam = {
-  paramId: number,
-  value: any
-}
 
 type Brick = {
-  type: number,
-  subtype: number,
-  params: BrickParam[],
+  type: number, // ACtion, Condition
+  subtype: number, // Void, Set, Conditional, MoveTo
+  params: Map<number, any>,
 }
-
 
 function parseBrick(brickData: string) {
   var oldBrick: OldBrick = JSON.parse(brickData)
-  console.log(oldBrick)
   var newBrick: Brick = {
     type: oldBrick.Type,
     subtype: oldBrick.Subtype,
-    params: [],
+    params: new Map(),
   }
 }
 
-function oldBrickToBrick(oldBrick: OldBrick) {
+export function oldBrickToBrick(oldBrick: OldBrick) {
   var result: Brick = {
     type: oldBrick.Type,
     subtype: oldBrick.Subtype,
-    params: []
+    params: new Map()
   }
   var paramId = 1
   if (oldBrick.HasField) {
-    result.params.push({
-      paramId: paramId,
-      value: oldBrick.StringField ? oldBrick.StringField : oldBrick.IntField,
-    })
+    result.params.set(paramId, oldBrick.StringField ? oldBrick.StringField : oldBrick.IntField)
     paramId++;
   }
   for (var slot of oldBrick.Slots) {
-    result.params.push({
-      paramId: paramId,
-      value: oldBrickToBrick(slot)
-    })
+    result.params.set(paramId, oldBrickToBrick(slot))
+    paramId++;
   }
   return result
 }
 
-function brickToOldBrick(brick: Brick) {
+export const brickToOldBrick = (brick: Brick) => { // TODO: construct??
   var result: OldBrick = {
     Type: brick.type,
     Subtype: brick.subtype,
@@ -380,21 +340,21 @@ function brickToOldBrick(brick: Brick) {
   if (!brickSignature)
     throw new Error('Brick to old brick failed')
   for (var param of brick.params) {
-    var paramSignature = getParamSignature(brickSignature, param.paramId)
+    var paramSignature = getParamSignatureById(brickSignature, param[0])
     if (!paramSignature)
       throw new Error('Brick to old brick failed')
     if (paramSignature.type instanceof SInt) {
       result.HasField = true
-      result.IntField = param.value
+      result.IntField = param[1]
       result.StringField = null
     }
     if (paramSignature.type instanceof SString) {
       result.HasField = true
-      result.StringField = param.value
+      result.StringField = param[1]
       result.IntField = 0
     }
     if (paramSignature.type instanceof SBrick) {
-      result.Slots.push(brickToOldBrick(param.value))
+      result.Slots.push(brickToOldBrick(param[1]))
     }
   }
   return result

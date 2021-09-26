@@ -9,7 +9,7 @@ import { Button, Select, Input } from "antd";
 import { BinaryWriter } from "borsh";
 
 import { programId } from "../../../solcery/engine"
-import { solceryTypes, SType, TypeSelector } from "../../../solcery/types"
+import { SType, TypeSelector } from "../../../solcery/types"
 
 export const AddFieldPopup = (props: { templateKey: string }) => {
 
@@ -19,6 +19,7 @@ export const AddFieldPopup = (props: { templateKey: string }) => {
 
   var [ fieldType, setFieldType ] = useState<SType|undefined>(undefined) //TODO: new field component
   var [ fieldName, setFieldName ] = useState('Unnamed field')
+  var [ fieldCode, setFieldCode ] = useState('fieldCode')
   var [ customData, setFieldCustomData ] = useState('')
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
@@ -39,6 +40,8 @@ export const AddFieldPopup = (props: { templateKey: string }) => {
       fieldType?.toBuffer(),
       Buffer.from([fieldName.length, 0, 0, 0]), //TODO
       Buffer.from(fieldName),
+      Buffer.from([fieldCode.length, 0, 0, 0]), //TODO
+      Buffer.from(fieldCode),
       Buffer.from([1, 1]), 
     ])
     console.log(data)
@@ -58,6 +61,7 @@ export const AddFieldPopup = (props: { templateKey: string }) => {
         <div>
           <TypeSelector onChange = { setFieldType }/>
           <Input defaultValue='Unnamed field' onChange={(event) => { setFieldName(event.target.value) } }></Input>
+          <Input defaultValue='fieldCode' onChange={(event) => { setFieldCode(event.target.value) } }></Input>
           
           <Button onClick={addField}>Add</Button>
         </div>

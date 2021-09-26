@@ -49,7 +49,6 @@ export const ObjectView = () => {
       programId: programId,
       data: Buffer.concat([ Buffer.from([1, 1]), buf]),
     });
-    console.log(buf)
     sendTransaction(connection, wallet, [saveObjectIx], []).then(() => {
       history.push("/object/" + objectId);
     })
@@ -98,12 +97,10 @@ export const ObjectView = () => {
     const divStyle = {
       width: '100%',
     };
-    console.log(objectData)
-    console.log(object)
     return (
     <div style={divStyle}>
       <a href={"/#/template/" + object.template.toBase58()}>Template: {template?.name}</a>
-      <Table dataSource={objectData} >
+      <Table dataSource={objectData} pagination={false}>
           <Column title="Field" dataIndex="fieldName" key="fieldName"/>
           <Column
             title="Value"
@@ -111,6 +108,7 @@ export const ObjectView = () => {
             render={(text, record: ObjectFieldData) => React.createElement(
                 record.fieldType.valueRender,
                 { 
+                  type: record.fieldType,
                   defaultValue: record.value, 
                   onChange: (newValue: any) => { 
                     setFieldValue(record.fieldId, newValue) 
