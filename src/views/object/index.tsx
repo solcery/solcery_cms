@@ -68,7 +68,7 @@ export const ObjectView = () => {
   const setFieldValue = (fieldId: number, value: any) => {
     if (!object)
       return;
-    if (value)
+    if (value) 
       object.fields.set(fieldId, value)
     else
       object.fields.delete(fieldId)

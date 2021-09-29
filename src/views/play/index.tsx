@@ -6,7 +6,8 @@ import { construct, projectPublicKey, projectStoragePublicKey } from "../../solc
 import { useParams, useHistory } from "react-router-dom";
 import Unity, { UnityContext } from "react-unity-webgl";
 import { Button, Layout, InputNumber } from "antd";
-import { oldBrickToBrick, brickToOldBrick, applyBrick } from "../../solcery/types/brick";
+import { applyBrick } from "../../solcery/types/brick";
+import { oldBrickToBrick, brickToOldBrick } from "../../solcery/types/brick/components";
 import { Game } from "../../solcery/game"
 
 // const unityContext = new UnityContext({
@@ -17,10 +18,10 @@ import { Game } from "../../solcery/game"
 // })
 
 const unityContext = new UnityContext({
-  loaderUrl: "game/ui_layout_1.loader.js",
-  dataUrl: "game/ui_layout_1.data",
-  frameworkUrl: "game/ui_layout_1.framework.js",
-  codeUrl: "game/ui_layout_1.wasm",
+  loaderUrl: "game/monkeys_1.loader.js",
+  dataUrl: "game/monkeys_1.data",
+  frameworkUrl: "game/monkeys_1.framework.js",
+  codeUrl: "game/monkeys_1.wasm",
 })
 
 const { Header, Footer, Sider, Content } = Layout;
@@ -100,7 +101,6 @@ export const PlayView = () => {
   const onCardPlaceChange = (cardId: number, place: number) => {
     game.objects.get(cardId).attrs.place = place;
     unityContext.send("ReactToUnity", "UpdateBoard", JSON.stringify(game.toBoardData()));
-    console.log('onCardPlaceChange')
     setStep(step + 1)
   }
 
@@ -112,6 +112,9 @@ export const PlayView = () => {
     var constructedContent = await construct(connection)
     var gm = new Game(constructedContent)
     setGame(gm)
+    console.log(JSON.stringify(gm.extractContent()))
+    console.log(JSON.stringify(gm.toBoardData()))
+    unityContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gm.extractContent()));
     unityContext.send("ReactToUnity", "UpdateBoard", JSON.stringify(gm.toBoardData()));
   });
 

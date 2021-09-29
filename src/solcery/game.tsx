@@ -60,6 +60,13 @@ export class Game {
 		return bd
 	}
 
+  extractContent = () => {
+    return {
+      CardTypes: constructCardTypes(this.content),
+      DisplayData: constructDisplayData(this.content),
+    }
+  }
+
 	objectsToCards = () => {
 		var result: Card[] = []
 		for (let [ gameObjectId, gameObject ] of this.objects) { 
@@ -130,8 +137,6 @@ const constructBoardData = (content: any) => {
     LastUpdate: Date.now(),
     Players: constructPlayers(),
     Cards: [],
-    CardTypes: constructCardTypes(content),
-    DisplayData: constructDisplayData(content),
     Message: {
       Nonce: 1,
       Message: "No message",
@@ -178,6 +183,7 @@ type CardType = { //TODO: from content
   Id: number,
   Metadata: {
     Picture: number,
+    PictureUrl: string,
     Coins: number,
     Name: string,
     Description: string,
@@ -189,7 +195,6 @@ type BoardData = {
   LastUpdate: number,
   Players: Player[],
   Cards: Card[],
-  CardTypes: CardType[],
   Message: {
     Nonce: number,
     Message: string,
@@ -214,11 +219,10 @@ const constructCardTypes = (content: any) => {
     let cardType = cardTypesContent[cardTypeId]
     result.push({
       Id: cardType.id,
-      BrickTree: {
-        Genesis: cardType.action
-      },
+      BrickTree: {},
       Metadata: {
         Picture: cardType.pictureNumber,
+        PictureUrl: cardType.picture,
         Coins: cardType.coins,
         Name: cardType.name,
         Description: cardType.description,

@@ -13,7 +13,6 @@ export class SLink extends SType {
 
   templatePublicKey: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz');
   
-  nameRender = (<p>Link</p>);
   readValue = (reader: BinaryReader) => { 
     return reader.readPubkey() 
   }

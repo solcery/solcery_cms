@@ -6,16 +6,17 @@ import { SInt } from '../index'
 
 export const TypeSelector = (props: { //TODO: -> Type render
 	onChange?: (newValue: SType) => void,
+	defaultValue?: SType,
 }) => {
 	const DEFAULT_STYPE = new SInt();
 	const { Option } = Select;
-	const [ typeId, setTypeId ] = useState(DEFAULT_STYPE.id);
+	const [ typeId, setTypeId ] = useState(props.defaultValue ? props.defaultValue.id : DEFAULT_STYPE.id);
 	var [loaded, setLoaded] = useState(false)
 
 	useEffect(() => {
 		if (!loaded) {
 			setLoaded(true)
-			onChangeSolceryType(DEFAULT_STYPE)
+			onChangeSolceryType(props.defaultValue ? props.defaultValue : DEFAULT_STYPE)
 		}
 	})
 
@@ -26,7 +27,7 @@ export const TypeSelector = (props: { //TODO: -> Type render
 	return (
 		<div>
 	    Add Field<br/>
-	    <Select id="fieldType" defaultValue={ DEFAULT_STYPE.id } onChange={(solceryTypeId) => { 
+	    <Select id="fieldType" defaultValue={ props.defaultValue ? props.defaultValue.id : DEFAULT_STYPE.id } onChange={(solceryTypeId) => { 
 	    	let solceryType = solceryTypes.get(solceryTypeId)
 	    	setTypeId(solceryTypeId)
 	    	if (!solceryType.typedataRender)
@@ -38,7 +39,10 @@ export const TypeSelector = (props: { //TODO: -> Type render
 	    </Select>
 	    {solceryTypes.get(typeId)?.typedataRender && React.createElement(
 	    	solceryTypes.get(typeId)?.typedataRender,
-				{ onChange: onChangeSolceryType }
+				{ 
+					onChange: onChangeSolceryType,
+					defaultValue: props.defaultValue,
+				}
 			)}
 	  </div>
 	)

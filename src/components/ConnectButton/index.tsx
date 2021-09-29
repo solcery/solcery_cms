@@ -1,18 +1,9 @@
 import { Button, Dropdown, Menu } from "antd";
 import { ButtonProps } from "antd/lib/button";
-import { createUninitializedMint, createTokenAccount } from "../../actions/account"
-import { AccountLayout, MintLayout, Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import type AuthorityType from "@solana/spl-token";
 import React, { useCallback } from "react";
-import { LABELS } from "../../constants";
-import { useWallet, WalletAdapter } from "../../contexts/wallet";
+import { useWallet } from "../../contexts/wallet";
 import { sendTransaction, useConnection } from "../../contexts/connection";
-import { Account, Connection, Transaction, TransactionInstruction, TransactionCtorFields, PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
-// import { transfer } from "@project-serum/serum/lib/token-instructions";
-import { SystemProgram, TransferParams} from "@solana/web3.js";
-import { publicKey } from "../../utils/layout";
-import { Row } from "antd";
-import { notify } from "../../utils/notifications";
+import { PublicKey } from "@solana/web3.js";
 
 export interface ConnectButtonProps
   extends ButtonProps,
@@ -43,7 +34,7 @@ export const ConnectButton = (props: ConnectButtonProps) => {
       disabled={connected && disabled}
       overlay={menu}
     >
-      {LABELS.CONNECT_LABEL}
+      Connect
     </Dropdown.Button>
   );
 };

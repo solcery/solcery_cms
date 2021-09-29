@@ -2,18 +2,16 @@ import React, { useCallback, useEffect, useState } from "react";
 import ReactDOM from 'react-dom'
 import { useConnection, sendTransaction} from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
-import { LAMPORTS_PER_SOL, PublicKey, Account, TransactionInstruction } from "@solana/web3.js";
-import { SystemProgram } from "@solana/web3.js";
-import { notify } from "../../utils/notifications";
-import { ConnectButton } from "./../../components/ConnectButton";
-import { LABELS } from "../../constants";
+import { PublicKey, Account, TransactionInstruction } from "@solana/web3.js";
 import './style.css';
 
 import { useParams, useHistory } from "react-router-dom";
-import { Button, Table } from "antd";
+import { Button, Table, Input } from "antd";
 
 import { programId } from "../../solcery/engine"
 import { TemplateData, SolcerySchema, TemplateField } from "../../solcery/classes"
+import { TypeSelector } from "../../solcery/types/base/components"
+import { SType, SInt } from "../../solcery/types"
 import { AddFieldPopup } from "./AddFieldPopup";
 
 import { deserializeUnchecked, serialize } from "borsh"
@@ -31,92 +29,70 @@ export const TemplateView = () => {
   const { Column } = Table;
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
-  let history = useHistory();
   let { templateKey } = useParams<TemplateViewParams>();
-  var templatePublicKey = new PublicKey(templateKey)
+
   var [ template, setTemplate ] = useState<TemplateData | undefined>()
-  var [ addFieldMenu, setAddFieldMenu ] = useState(false)
+  var [ revision, setRevision ] = useState(0)
 
-
-  const deleteField = async (fieldId: number) => {
+  const update = () => {
+    if (!template)
+      return
     if (!publicKey || wallet === undefined) {
       return;
     }
-    var templatePublicKey = new PublicKey(templateKey)
-    var buf = Buffer.allocUnsafe(4);
-    buf.writeUInt32LE(fieldId);
-    const deleteFieldIx = new TransactionInstruction({
-      keys: [
-        { pubkey: templatePublicKey, isSigner: false, isWritable: true },
-      ],
-      programId: programId,
-      data: Buffer.concat([Buffer.from([0, 2,]), buf ]),
-    });
-    await sendTransaction(connection, wallet, [deleteFieldIx], [])
-    load()
-  }
-
-  const sendChangeName = async(templateName: string, templatePublicKey: PublicKey) => {
-    if (!publicKey || wallet === undefined) {
-      return;
-    }
-    // var templateName = (document.getElementById('templateName') as HTMLInputElement).value
-    var buf = Buffer.allocUnsafe(4)
-    buf.writeInt32LE(templateName.length)
+    var buf = Buffer.from(serialize(SolcerySchema, template))
     const changeNameIx = new TransactionInstruction({
       keys: [
-        { pubkey: templatePublicKey, isSigner: false, isWritable: true },
+        { pubkey: template.publicKey, isSigner: false, isWritable: true },
       ],
       programId: programId,
-      data: Buffer.concat([Buffer.from([0, 3]), buf, Buffer.from(templateName)]),
+      data: Buffer.concat([Buffer.from([0, 5]), buf]),
     });
-    await sendTransaction(connection, wallet, [changeNameIx], [])
-    load()
+    sendTransaction(connection, wallet, [changeNameIx], [])
   }
 
-  function changeName() {
-    var templatePublicKey = new PublicKey(templateKey)
-    let name = prompt("Enter new name:", "New template name");
-    if (name == null || name == "") {
-      
-    } else {
-      sendChangeName(name, templatePublicKey)
+  const addField = async() => {
+    if (!template)
+      return
+    template.fields.push(new TemplateField({
+       id: template.maxFieldIndex + 1, 
+       code: 'newTemplateField', 
+       fieldType: new SInt(), 
+       name: 'New template field'
+    }));
+    template.maxFieldIndex++;
+    setRevision(revision + 1)
+  }
+
+  const deleteField = (fieldId: number) => {
+    if (!template)
+      return
+    for (let i = 0; i < template.fields.length; i++) {
+      if (template.fields[i].id == fieldId) {
+        template.fields.splice(i, 1)
+        setRevision(revision + 1)
+        return
+      }
     }
   }
 
-  const sendChangeCode = async(templateCode: string, templatePublicKey: PublicKey) => {
-    if (!publicKey || wallet === undefined) {
-      return;
-    }
-    var buf = Buffer.allocUnsafe(4)
-    buf.writeInt32LE(templateCode.length)
-    const changeCodeIx = new TransactionInstruction({
-      keys: [
-        { pubkey: templatePublicKey, isSigner: false, isWritable: true },
-      ],
-      programId: programId,
-      data: Buffer.concat([Buffer.from([0, 4]), buf, Buffer.from(templateCode)]),
-    });
-    await sendTransaction(connection, wallet, [changeCodeIx], [])
-    load()
-  }
-
-
-  function changeCode() {
-    var templatePublicKey = new PublicKey(templateKey)
-    let code = prompt("Enter new code:", "newCode");
-    if (code == null || code == "") {
-      
-    } else {
-      sendChangeCode(code, templatePublicKey)
-    }
-  }
-
-  const load = async () => {
-    
+  const setFieldParam = (fieldId: number, param: string, value: any) => {
+    if (!template)
+      return
+    let field = template.getField(fieldId)
+    if (!field)
+      return
+    if (param === 'code')
+      field.code = value
+    if (param === 'name')
+      field.name = value
+    if (param === 'fieldType')
+      field.fieldType = value
+    setRevision(revision + 1)
   }
 
   useEffect(() => { 
+    var templatePublicKey = new PublicKey(templateKey)
     if (!template || template.publicKey.toBase58() != templateKey)
       (async () => {
         setTemplate(await TemplateData.get(connection, templatePublicKey))
@@ -137,17 +113,45 @@ export const TemplateView = () => {
 
     return (
       <div style = { { width: '100%' } }>
-        <h2 id="templateName" onClick = { changeName }>{template.name}</h2>
-        <h1 id="templateCode" onClick = { changeCode }>{template.code}</h1>
+        Name: <Input defaultValue={template.name}/>
+        Code: <Input defaultValue={template.code}/>
         <a href={"/#/storage/" + template.storages[0].toBase58()}>Objects</a>
         <Table dataSource={tableData} pagination={false}>
           <Column title="ID" dataIndex="id" key="fieldId"/>
-          <Column title="Name" dataIndex="name" key="fieldName"/>
-          <Column title="Code" dataIndex="code" key="fieldCode"/>
+          <Column 
+            title="Name" 
+            key="name" 
+            render={(text, record: any) => <Input 
+              defaultValue={record.name}
+              onChange={(event) => { 
+                if (template) {
+                  let field = template?.getField(record.id); 
+                  if (field)
+                    field.name = event.target.value 
+                }
+              }}
+            />}
+          />
+          <Column 
+            title="Code" 
+            key="code" 
+            render={(text, record: any) => <Input 
+              defaultValue={record.code}
+              onChange={(event) => { 
+                if (template) {
+                  let field = template?.getField(record.id); 
+                  if (field)
+                    field.code = event.target.value 
+                }
+              }}
+            />}
+          />
           <Column
             title="Type"
-            key="fieldType"
-            render={(text, record: any) => record.fieldType.nameRender}
+            key="fieldTyp"
+            render={(text, record: any) => <TypeSelector defaultValue={record.fieldType} onChange={(value) => { 
+              setFieldParam(record.id, 'fieldType', value)
+            }}/>}
           />
           <Column
             title="Actions"
@@ -157,7 +161,8 @@ export const TemplateView = () => {
             )}
           />
         </Table>
-        <AddFieldPopup templateKey = {templateKey}/>
+        <Button onClick={addField}>Add field</Button>
+        <Button onClick={update}>Save</Button>
       </div>
     );
   }

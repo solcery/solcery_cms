@@ -68,6 +68,7 @@ declare module "borsh" {
 
 (BinaryWriter.prototype).writeSType = function writeSType(value: SType) {
 	const writer = this;
+  console.log(value)
 	writer.writeU8(value.id)
   value.writeType(writer)
 };

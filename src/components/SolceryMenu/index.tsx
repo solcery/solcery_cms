@@ -16,16 +16,17 @@ export const SolceryMenu = () => {
   const { project } = useProject();
   const connection = useConnection();
   var [ templates, setTemplates ] = useState<TemplateData[]>([]);  
+  var [ loaded, setLoaded ] = useState<boolean>(false);
 
   useEffect(() => { 
-    if (templates.length < 1) {
-      (async () => {
-          if (project) {
-            const strg = await Storage.get(connection, project?.templateStorage)
-            setTemplates(await TemplateData.getAll(connection, strg.accounts))
-          }
-        
-      })()
+    if (!loaded) {
+      if (project) {
+        (async () => {
+          const strg = await Storage.get(connection, project?.templateStorage)
+          setTemplates(await TemplateData.getAll(connection, strg.accounts))
+        })()
+        setLoaded(true)
+      }
     }
   });
 

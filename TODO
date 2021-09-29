@@ -1,0 +1,21 @@
+TODO:
+
+TypeSelector Type
+Link in brick
+Dynamic bricks
+Construct
+Setcookie
+Brick editor in modal popup
+PLAY mode event propagation
+
+
+
+Backlog:
+
+Raw storage view
+Singleton template
+String bricktree
+Field description
+StorageView->Template/Objects
+Template->Template/Schema
+GetName for module

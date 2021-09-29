@@ -55,10 +55,12 @@ export class TemplateData extends SolceryAccount {
   fields: TemplateField[] = [];
   storages: PublicKey[] = [];
   maxFieldIndex: number = 0;
+  customData: any[] = [];
   customParams: any = {};
-  constructor(src: { id: number, name : string, code: string, maxFieldIndex: number, storages: PublicKey[], fields: TemplateField[], customData: Uint8Array  } | undefined = undefined) {
+  constructor(src: { id: number, name : string, code: string, maxFieldIndex: number, storages: PublicKey[], fields: TemplateField[], customData: Uint8Array } | undefined = undefined) {
     super()
     if (src) {
+      this.customData = [];
       this.id = src.id;
       this.storages = src.storages;
       this.code = src.code;
@@ -209,15 +211,13 @@ export class TplObject {
 
 export class TemplateField { //TODO: Template field params
   id = 0;
-  enabled = false;
   fieldType = new SType();
   name = "Field name";
   code = "fieldName";
-  constructor(src: { id: number, code: string, enabled: boolean, fieldType: SType, name: string } | undefined = undefined) {
+  constructor(src: { id: number, code: string, fieldType: SType, name: string } | undefined = undefined) {
     if (src) {
       this.id = src.id;
       this.code = src.code;
-      this.enabled = src.enabled;
       this.fieldType = src.fieldType;
       this.name = src.name;
      
