@@ -1,21 +1,84 @@
 TODO:
 
-TypeSelector Type
-Link in brick
-Dynamic bricks
-Construct
-Setcookie
-Brick editor in modal popup
-PLAY mode event propagation
+Copy/Delete Object +
+Setcookie + 
+Brick editor in modal popup - cancel +
+
+StorageView->Template/Objects +
+Template->Template/Schema +
+Main menu + link in nav +
+
+Filter by field
+Airdrop button in main menu
+BrickConstruction
 
 
+
+
+Game/Forge
 
 Backlog:
 
+Construct
 Raw storage view
 Singleton template
 String bricktree
 Field description
-StorageView->Template/Objects
-Template->Template/Schema
+TypeSelector Type?
 GetName for module
+
+
+mech
+Any
+Aggr
+
+
+
+
+
+create project
+
+
+==================
+
+use admin as protocol
+
+
+===================
+
+
+
+Template forge
+
+Collection
+
+
+
+
+
+
+
+
+=================
+
+
+
+SolceryGame
+
+Инструкции 
+
+
+
+
+
+Создать игру
+
+
+
+
+
+
+
+SolceryMatchmaking
+
+

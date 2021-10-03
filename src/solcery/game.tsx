@@ -1,3 +1,4 @@
+
 import { applyBrick } from "./types/brick";
 export { programId } from "./engine"
 
@@ -86,6 +87,7 @@ class Context {
 	vars: Map<string, number> = new Map();
 	game: Game;
 	object: any;
+  args: any = {};
 	constructor(src: { game: Game, object: any, extra?: any}) {
 		this.object = src.object;
 		this.game = src.game;

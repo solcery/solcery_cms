@@ -35,7 +35,6 @@ export class SArray extends SType {
   }
 
   writeType = (writer: BinaryWriter) => {
-    console.log('array writeType')
     writer.writeSType(this.subtype)
   }
 }

@@ -1,6 +1,7 @@
 export { HomeView } from "./home";
-export { StorageView } from "./storage";
-export { AccountView } from "./account";
 export { TemplateView } from "./template";
+export { AccountView } from "./account";
+export { TemplateSchemaView } from "./templateSchema";
 export { ObjectView } from "./object";
 export { PlayView } from "./play";
+export { GameView } from "./game";

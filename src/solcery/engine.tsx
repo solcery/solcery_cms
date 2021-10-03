@@ -8,9 +8,6 @@ import { Project, Storage, TplObject, TemplateData } from './classes';
 
 export const programId = new PublicKey('DZyJMt5pQWJS9gzbeLydrwcoi6SyswKFkHhKU9c6Arij');
 
-// export const projectPublicKey = new PublicKey("Mmw8kXJm19XrKd34ue8wD1atEXDeV8sNG2PdcSPcDCh"); // TODO: context
-// export const projectStoragePublicKey = new PublicKey("6TVGtAPMTaYsWm7eGJhaURYMR9LHamihmowV3vUcVgMw")
-
 export const projectPublicKey = new PublicKey("2pVVWZHQ82As7EJuDfsAPkeMqRx1BtsN4yET5LdFut9o");
 export const projectStoragePublicKey = new PublicKey("8tZMV6PcGsE1xuioPaGMekD2A29To8X9GiYQnZGPXx81");
 
@@ -65,5 +62,6 @@ export async function construct(connection: Connection) {
     for (var tpl of templates) {
         result.set(tpl.code, await tpl.construct(connection))
     }
-    return Object.fromEntries(await result)
+    let content = Object.fromEntries(await result)
+    return content
 }

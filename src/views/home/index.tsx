@@ -1,28 +1,14 @@
-import React, { useCallback } from "react";
-import { useConnection, sendTransaction} from "../../contexts/connection";
+import React from "react";
+import { useConnection, sendTransaction } from "../../contexts/connection";
+import { useProject } from "../../contexts/project";
 import { useWallet } from "../../contexts/wallet";
-import { LAMPORTS_PER_SOL, PublicKey, Account, TransactionInstruction } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL, Account, TransactionInstruction } from "@solana/web3.js";
 import { SystemProgram } from "@solana/web3.js";
-import { notify } from "../../utils/notifications";
-import { ConnectButton } from "./../../components/ConnectButton";
-import { LABELS } from "../../constants";
-import {
-  deserializeUnchecked, BinaryReader, BinaryWriter, serialize
-} from 'borsh';
+
+import { programId } from "../../solcery/engine"
 import { Project, TemplateData, SolcerySchema, Storage} from "../../solcery/classes"
-import { getAccountObject, programId, projectPublicKey, projectStoragePublicKey, construct } from "../../solcery/engine";
-import { useParams, useHistory } from "react-router-dom";
-import { Button, Input } from "antd";
-
-
-
-export async function onWalletConnected() {
-  
-
-}
-type HomeViewParams = {
-  accountKey: string;
-};
+import { useHistory } from "react-router-dom";
+import { Button } from "antd";
 
 export const HomeView = () => {
 
@@ -30,20 +16,22 @@ export const HomeView = () => {
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
   const history = useHistory();
-  
-  const constructContent = async () => {
-    var constructed = await construct(connection)
-    console.log(constructed)
-    console.log(JSON.stringify(constructed))
+  const { project } = useProject();
+
+  const airdrop = async () => {
+    if (!publicKey)
+      return
+    connection.requestAirdrop(publicKey, LAMPORTS_PER_SOL * 10)
   }
 
   const createTemplate = async () => {
-    if (!publicKey) {
+    if (!publicKey) 
       return;
-    }
-    if (wallet === undefined) {
+    if (wallet === undefined) 
       return;
-    }
+    if (!project)
+      return;
+    
 
     var accounts = [];
     var instructions = []
@@ -72,10 +60,10 @@ export const HomeView = () => {
 
     const createTemplateIx = new TransactionInstruction({
       keys: [
-        { pubkey: projectPublicKey, isSigner: false, isWritable: true },
+        { pubkey: project.publicKey, isSigner: false, isWritable: true },
         { pubkey: templateAccount.publicKey, isSigner: false, isWritable: true },
         { pubkey: storageAccount.publicKey, isSigner: false, isWritable: true },
-        { pubkey: projectStoragePublicKey, isSigner: false, isWritable: true },
+        { pubkey: project.templateStorage, isSigner: false, isWritable: true },
       ],
       programId: programId,
       data: Buffer.from([0, 0]),
@@ -89,7 +77,7 @@ export const HomeView = () => {
   return (
     <div>
       <Button onClick = { createTemplate }>NEW TEMPLATE</Button>
-      <Button onClick = { constructContent }>CONSTRUCT CONTENT</Button>
+      <Button onClick = { airdrop }>Airdrop</Button>
     </div>
   );
 };

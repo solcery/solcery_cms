@@ -1,24 +1,14 @@
-import React, { useCallback, useEffect, useState } from "react";
-import ReactDOM from 'react-dom'
+import React, { useCallback, useState, useEffect } from "react";
 import { useConnection, sendTransaction} from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
-import { PublicKey, Account, TransactionInstruction } from "@solana/web3.js";
-import './style.css';
-
+import { LAMPORTS_PER_SOL, PublicKey, Account, TransactionInstruction } from "@solana/web3.js";
+import { SystemProgram } from "@solana/web3.js";
 import { useParams, useHistory } from "react-router-dom";
-import { Button, Table, Input } from "antd";
-
+import { Button, Table } from "antd";
+import { TemplateData, TemplateField, SolcerySchema, Storage, TplObject } from "../../solcery/classes"
 import { programId } from "../../solcery/engine"
-import { TemplateData, SolcerySchema, TemplateField } from "../../solcery/classes"
-import { TypeSelector } from "../../solcery/types/base/components"
-import { SType, SInt } from "../../solcery/types"
-import { AddFieldPopup } from "./AddFieldPopup";
-
-import { deserializeUnchecked, serialize } from "borsh"
-
-import 'reactjs-popup/dist/index.css';
-
-export async function onWalletConnected() {}
+import { useProject} from "../../contexts/project";
+import { constructBricks } from "../../solcery/types"
 
 type TemplateViewParams = {
   templateKey: string;
@@ -29,142 +19,147 @@ export const TemplateView = () => {
   const { Column } = Table;
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
+  let history = useHistory();
   let { templateKey } = useParams<TemplateViewParams>();
+  var [ objects, setObjects ] = useState<TplObject[] | undefined>(undefined);
+  var [ template, setTemplate ] = useState<TemplateData | undefined>(undefined);
+  var { project } = useProject();
 
-  var [ template, setTemplate ] = useState<TemplateData | undefined>()
-  var [ revision, setRevision ] = useState(0)
-
-  const update = () => {
-    if (!template)
-      return
-    if (!publicKey || wallet === undefined) {
+  const createObject = async (src: PublicKey | undefined = undefined) => {
+    if (!publicKey || !project || wallet === undefined || !template) {
       return;
     }
-    var buf = Buffer.from(serialize(SolcerySchema, template))
-    const changeNameIx = new TransactionInstruction({
+    var instructions = [];
+
+    if (!template.storages)
+      throw new Error("Template.createObject error - storage is empty")
+    var storagePublicKey = template.storages[0]// TODO
+
+    var storage = await Storage.get(connection, storagePublicKey)
+    var objectAccount = new Account()
+    instructions.push(SystemProgram.createAccount({
+      programId: programId,
+      space: 3200, // TODO
+      lamports: await connection.getMinimumBalanceForRentExemption(3200, 'singleGossip'),
+      fromPubkey: publicKey,
+      newAccountPubkey: objectAccount.publicKey,
+    }));
+    instructions.push(new TransactionInstruction({
       keys: [
-        { pubkey: template.publicKey, isSigner: false, isWritable: true },
+        { pubkey: project.publicKey, isSigner: false, isWritable: true },
+        { pubkey: storage.template, isSigner: false, isWritable: false },
+        { pubkey: storagePublicKey, isSigner: false, isWritable: true },
+        { pubkey: objectAccount.publicKey, isSigner: false, isWritable: true },
       ],
       programId: programId,
-      data: Buffer.concat([Buffer.from([0, 5]), buf]),
-    });
-    sendTransaction(connection, wallet, [changeNameIx], [])
-  }
-
-  const addField = async() => {
-    if (!template)
-      return
-    template.fields.push(new TemplateField({
-       id: template.maxFieldIndex + 1, 
-       code: 'newTemplateField', 
-       fieldType: new SInt(), 
-       name: 'New template field'
+      data: Buffer.from([1, 0]),
     }));
-    template.maxFieldIndex++;
-    setRevision(revision + 1)
-  }
+    if (src && template) {
+      let object = await template.getObject(connection, src)
+      let buf = await object?.serialize(connection)
+      instructions.push(new TransactionInstruction({
+        keys: [
+          { pubkey: objectAccount.publicKey, isSigner: false, isWritable: true },
+        ],
+        programId: programId,
+        data: Buffer.concat([ Buffer.from([1, 1]), buf]),
+      }));
 
-  const deleteField = (fieldId: number) => {
-    if (!template)
-      return
-    for (let i = 0; i < template.fields.length; i++) {
-      if (template.fields[i].id == fieldId) {
-        template.fields.splice(i, 1)
-        setRevision(revision + 1)
-        return
-      }
     }
+    sendTransaction(connection, wallet, instructions, [objectAccount]).then(() => {
+      history.push('/object/' + objectAccount.publicKey.toBase58());
+    })
   }
 
-  const setFieldParam = (fieldId: number, param: string, value: any) => {
+
+  const deleteObject = async(objectPublicKey: PublicKey) => {
+    if (!publicKey || wallet === undefined) 
+      return;
     if (!template)
       return
-    let field = template.getField(fieldId)
-    if (!field)
-      return
-    if (param === 'code')
-      field.code = value
-    if (param === 'name')
-      field.name = value
-    if (param === 'fieldType')
-      field.fieldType = value
-    setRevision(revision + 1)
+    if (!template.storages)
+      throw new Error("Template.createObject error - storage is empty")
+    var storagePublicKey = template.storages[0]// TODO
+    const popFromStorageIx = new TransactionInstruction({
+      keys: [
+        { pubkey: storagePublicKey, isSigner: false, isWritable: true },
+        { pubkey: objectPublicKey, isSigner: false, isWritable: false },
+      ],
+      programId: programId,
+      data: Buffer.from([2, 1]),
+    });
+    sendTransaction(connection, wallet, [popFromStorageIx], []).then(() => {
+      history.push('/template/' + templateKey);
+    })
   }
 
   useEffect(() => { 
-    var templatePublicKey = new PublicKey(templateKey)
-    if (!template || template.publicKey.toBase58() != templateKey)
-      (async () => {
-        setTemplate(await TemplateData.get(connection, templatePublicKey))
-      })()
-  });
+    if (project)
 
-  if (template) {
+      (async () => {
+        constructBricks(await project.сonstructContent(connection))
+        console.log('constructed')
+        const tpl = await TemplateData.get(connection, new PublicKey(templateKey))
+        setTemplate(tpl)
+        var storage = await Storage.get(connection, tpl.storages[0])
+        setObjects(await tpl.getObjects(connection, storage.accounts))
+      })()
+  }, [ project ]);
+
+  if (project && template && objects)
+  {
     var tableData: any[] = []
-    for (let field of template.fields) {
-      tableData.push({
-        key: field.id,
-        id: field.id,
-        fieldType: field.fieldType,
-        name: field.name,
-        code: field.code,
-      })
+    for (let objectInfo of objects) {
+      var res = Object.fromEntries(objectInfo.fields)
+      res.key = objectInfo.publicKey.toBase58()
+      res.id = objectInfo.id
+      tableData.push(res)
     }
 
+    const divStyle = {
+      width: '100%',
+    };
     return (
-      <div style = { { width: '100%' } }>
-        Name: <Input defaultValue={template.name}/>
-        Code: <Input defaultValue={template.code}/>
-        <a href={"/#/storage/" + template.storages[0].toBase58()}>Objects</a>
-        <Table dataSource={tableData} pagination={false}>
-          <Column title="ID" dataIndex="id" key="fieldId"/>
-          <Column 
-            title="Name" 
-            key="name" 
-            render={(text, record: any) => <Input 
-              defaultValue={record.name}
-              onChange={(event) => { 
-                if (template) {
-                  let field = template?.getField(record.id); 
-                  if (field)
-                    field.name = event.target.value 
-                }
-              }}
-            />}
+    <div style = {divStyle}>
+      <Table dataSource={tableData} >
+        <Column 
+          title="Object" 
+          key="objectKey"
+          render={(text, record: any) => (
+              <a href={"/#/object/"+record.key}>{record.id}</a>
+          )}
+        />
+        {template.fields.map((field: TemplateField) => { 
+          return <Column 
+            title = { field.name } 
+            key = { field.id } 
+            render = {
+              (text, object: any) => {
+                return React.createElement(
+                  field.fieldType.valueRender,
+                  { 
+                    type: field.fieldType,
+                    defaultValue: object[field.id], 
+                    readonly: true
+                  }
+                )
+              }
+            }
           />
-          <Column 
-            title="Code" 
-            key="code" 
-            render={(text, record: any) => <Input 
-              defaultValue={record.code}
-              onChange={(event) => { 
-                if (template) {
-                  let field = template?.getField(record.id); 
-                  if (field)
-                    field.code = event.target.value 
-                }
-              }}
-            />}
-          />
-          <Column
-            title="Type"
-            key="fieldTyp"
-            render={(text, record: any) => <TypeSelector defaultValue={record.fieldType} onChange={(value) => { 
-              setFieldParam(record.id, 'fieldType', value)
-            }}/>}
-          />
-          <Column
-            title="Actions"
-            key="actions"
-            render={(text, record: any) => (
-                <Button onClick={() => { deleteField(record.id)} }>Delete</Button>
-            )}
-          />
-        </Table>
-        <Button onClick={addField}>Add field</Button>
-        <Button onClick={update}>Save</Button>
-      </div>
-    );
+        })}
+        <Column 
+          title="Actions"
+          key="actions"
+          render={(text, object: any) =>
+          <div>
+            <Button onClick={() => { createObject(new PublicKey(object.key)) }}>Copy</Button>  
+            <Button onClick={() => { deleteObject(new PublicKey(object.key)) }}>Delete</Button>  
+          </div>} //TODO: delete: accountCleanup, confirmation
+        />
+      </Table>
+      <Button onClick={() => { createObject() }}>Create new object</Button>
+    </div>
+    )
   }
   return (
     <div>
@@ -172,3 +167,4 @@ export const TemplateView = () => {
     </div>
   );
 };
+

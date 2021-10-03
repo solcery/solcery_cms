@@ -12,7 +12,6 @@ import React, {
   useState,
 } from "react";
 import { notify } from "./../utils/notifications";
-import { onWalletConnected } from "./../views/home/index"
 import { useConnectionConfig } from "./connection";
 import { useLocalStorageState } from "./../utils/utils";
 import { LedgerWalletAdapter } from "../wallet-adapters/ledger";
@@ -95,28 +94,16 @@ export function WalletProvider({ children = null as any }) {
                   walletPublicKey.length
                 )}`
               : walletPublicKey;
-
-          notify({
-            message: "Wallet update",
-            description: "Connected to wallet " + keyToDisplay,
-          });
-          onWalletConnected();
         }
       });
 
       wallet.on("disconnect", () => {
         setConnected(false);
-        console.log('set disconnected');
-        notify({
-          message: "Wallet update",
-          description: "Disconnected from wallet",
-        });
       });
     }
 
     return () => {
       setConnected(false);
-      console.log('set disconnected');
       if (wallet) {
         wallet.disconnect();
       }

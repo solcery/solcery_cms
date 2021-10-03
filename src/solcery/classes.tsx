@@ -2,6 +2,8 @@ import { PublicKey, Connection} from "@solana/web3.js";
 import { getAccountData, getMultipleAccountsData, getAccountObject, getAllAccountObjects} from "./engine"
 import { BinaryReader, BinaryWriter } from "borsh";
 import { SType } from "./types";
+import { constructBricks } from './types/brick'
+
 
 
 
@@ -24,14 +26,25 @@ export class Project extends SolceryAccount {
   publicKey: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz');
   owner: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz'); //TODO: dumb
   templateStorage: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz');
-  constructor( src : { name: string, owner: PublicKey, templateStorage: PublicKey } | undefined = undefined) {
+  constructor( src : { name: string, owner: PublicKey, templateStorage: PublicKey } ) {
     super()
-    if (src) {
-      this.name = src.name
-      this.owner = src.owner
-      this.templateStorage = src.templateStorage
-    }
+    console.log('construct')
+    this.name = src.name
+    this.owner = src.owner
+    this.templateStorage = src.templateStorage
   }
+
+  async сonstructContent(connection: Connection) {
+    let result: Map<number, any> = new Map()
+    const projectStorage = await Storage.get(connection, this.templateStorage)
+    var templates = await TemplateData.getAll(connection, projectStorage.accounts)
+    for (var tpl of templates) {
+      result.set(tpl.code, await tpl.construct(connection))
+    }
+    let content = Object.fromEntries(await result)
+    return content
+  }
+
 }
 
 export class Storage extends SolceryAccount {
@@ -83,7 +96,7 @@ export class TemplateData extends SolceryAccount {
   async getObject(connection: Connection, publicKey: PublicKey) {
     var objectData = await getAccountData(connection, publicKey)
     if (!objectData)
-      return undefined
+      throw new Error("Template.getObject failed")
     return TplObject.build(publicKey, objectData, this)
   }
 

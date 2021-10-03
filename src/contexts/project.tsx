@@ -28,6 +28,12 @@ export function ProjectProvider({ children = null as any }) {
 	const [ project, setProject ] = useState<Project|undefined>(undefined)
 	// console.log(connected)
 
+	const login = async () => {
+		if (!projectKey)
+			return
+		cookies.set('projectKey', projectKey)
+		setProject(await Project.get(connection, new PublicKey(projectKey)))
+	}
 
 	if (project)
 		return (
@@ -49,7 +55,7 @@ export function ProjectProvider({ children = null as any }) {
 			okButtonProps={!connected ? { style: { display: "none" }} : {}}
 			closable={false}
 			width={400}
-			onOk={ async () => { setProject(await Project.get(connection, new PublicKey(projectKey))) }}
+			onOk={login}
 		>
 		<Input hidden={!connected} onChange ={(event) => { setProjectKey(event.target.value) }} defaultValue={projectKey}/>
 		{!connected && <ConnectButton/>}

@@ -6,9 +6,9 @@ import { construct, projectPublicKey, projectStoragePublicKey } from "../../solc
 import { useParams, useHistory } from "react-router-dom";
 import Unity, { UnityContext } from "react-unity-webgl";
 import { Button, Layout, InputNumber } from "antd";
-import { applyBrick } from "../../solcery/types/brick";
-import { oldBrickToBrick, brickToOldBrick } from "../../solcery/types/brick/components";
+import { applyBrick, brickToOldBrick, oldBrickToBrick } from "../../solcery/types/brick";
 import { Game } from "../../solcery/game"
+import { Project } from "../../solcery/classes"
 
 // const unityContext = new UnityContext({
 //   loaderUrl: "play/play_4.loader.js",
@@ -74,16 +74,19 @@ const { Header, Footer, Sider, Content } = Layout;
 //   }
 
 export const GameObjectView = (props: { 
-  object: any,
-  onChange: (objectId: number, value: number) => void,
+  objectId: number,
+  defaultValue: number,
+  onChange: (value: number) => void,
 }) => {
   return(
-    <div key={props.object.id}>
-      Card: { props.object.id } <InputNumber 
-      key={props.object.id} 
-      precision={0} 
-      defaultValue={ props.object.place } 
-      onChange={ (newValue) => { props.onChange(props.object.id, newValue) } } />
+    <div key={props.objectId}>
+      Card: { props.objectId } 
+      <InputNumber 
+        key={props.objectId} 
+        precision={0} 
+        value={props.defaultValue}
+        onChange={props.onChange} 
+      />
     </div>)
 }
 
@@ -97,6 +100,17 @@ export const PlayView = () => {
   const [ game, setGame ] = useState<any>(undefined)
   const [ step, setStep ] = useState(0)
   
+  useEffect(() => {
+    if (game)
+      return
+    if (!project)
+      return
+    (async () => {
+      var constructedContent = await project.сonstructContent(connection)
+      setGame(new Game(constructedContent))
+    })()
+    return () => { unityContext.quitUnityInstance() }
+  })
 
   const onCardPlaceChange = (cardId: number, place: number) => {
     game.objects.get(cardId).attrs.place = place;
@@ -104,18 +118,14 @@ export const PlayView = () => {
     setStep(step + 1)
   }
 
+
   unityContext.on("OnUnityLoaded", async () => {
 
     var data = { IsConnected: true };
     unityContext.send("ReactToUnity", "SetWalletConnected", JSON.stringify(data));
 
-    var constructedContent = await construct(connection)
-    var gm = new Game(constructedContent)
-    setGame(gm)
-    console.log(JSON.stringify(gm.extractContent()))
-    console.log(JSON.stringify(gm.toBoardData()))
-    unityContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gm.extractContent()));
-    unityContext.send("ReactToUnity", "UpdateBoard", JSON.stringify(gm.toBoardData()));
+    unityContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(game.extractContent()));
+    unityContext.send("ReactToUnity", "UpdateBoard", JSON.stringify(game.toBoardData()));
   });
 
 
@@ -130,14 +140,16 @@ export const PlayView = () => {
       }
     }
   });
-  console.log('test')
   return (
     <Layout>
       <Sider>
         { game && game.objects && Array.from(game.objects.values()).map((elem: any) => 
-          // { console.log(elem.attrs)}
+          
           <div key={elem.id}>
-            <GameObjectView object={elem} onChange={onCardPlaceChange}/>
+            <GameObjectView 
+              objectId={elem.id} 
+              defaultValue={ elem.attrs.place } 
+              onChange={(value) => { onCardPlaceChange(elem.id, value) } }/>
           </div>
           // <div key={elem.id}>
           //   Card: { elem.id } <InputNumber key={elem.id} precision={0} defaultValue={ elem.attrs.place } onChange={(value) => { onCardPlaceChange(elem.id, value) }} />
@@ -145,7 +157,7 @@ export const PlayView = () => {
         )}
       </Sider>
       <Content>
-         {project && <Unity tabIndex={3} style={{ width: '100%', height: '100%' }} unityContext={unityContext} />}
+         { game && project && <Unity tabIndex={3} style={{ width: '100%', height: '100%' }} unityContext={unityContext} />}
       </Content>
     </Layout>
   );

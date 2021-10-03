@@ -7,6 +7,7 @@ import { BinaryReader, BinaryWriter } from 'borsh';
 import { solceryTypes } from '../solceryTypes'
 import { ValueRender, TypedataRender } from './components'
 
+
 export class SBrick extends SType {
   id = 6;
   name = "Brick";
@@ -76,6 +77,46 @@ export const getParamSignatureById = (brickSignature: BrickSignature, paramId: n
   }
 }
 
+const getBrickTypeName = (brickType: number) => {
+  if (brickType == 0)
+    return 'action'
+  if (brickType == 1)
+    return 'condition'
+  if (brickType == 2)
+    return 'value'
+  return 'unknown'
+}
+
+const exportArgsAsParams = (brick: Brick, result: BrickParamSignature[]) => {
+  let brickSignature = getBrickSignature(brick.type, brick.subtype)
+  if (!brickSignature)
+    return //throw error?
+  if (brickSignature.name == 'Arg') { //TODO: proper check
+    let paramName = brick.params.get(1)
+    if (paramName) {
+      let paramCode = 'arg.' + getBrickTypeName(brick.type) + '.' + camelize(paramName)
+      result.push({
+        id: result.length + 1,
+        code: paramCode,
+        name: paramName,
+        type: new SBrick({ brickType: brick.type })
+      })
+    }
+  } else {
+    for (let [ paramId, param ] of brick.params) {
+      if (param) {
+        exportArgsAsParams(param, result)
+      }
+    }
+  }
+}
+
+function camelize(str: string) {
+  return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
+    return index === 0 ? word.toLowerCase() : word.toUpperCase();
+  }).replace(/\s+/g, '');
+}
+
 declare module "borsh" {
   interface BinaryReader {
     readBrick(): SBrick;
@@ -119,7 +160,6 @@ export type BrickSignature = {
 }
 
 export const getBrickSignature = (type: number, subtype: number) => {
-  console.log(solceryBricks)
   for (let solceryBrick of solceryBricks) {
     if (solceryBrick.type == type && solceryBrick.subtype == subtype)
       return solceryBrick
@@ -129,38 +169,179 @@ export const getBrickSignature = (type: number, subtype: number) => {
 export const applyBrick = (brick: Brick, ctx: any) => {
   var brickSignature = getBrickSignature(brick.type, brick.subtype)
   if (brickSignature) {
-    return brickSignature.func(Object.fromEntries(brick.params), ctx)
+    let parsedParams: any = {}
+    for (let [ paramId, param ] of brick.params) {
+      let paramSignature = getParamSignatureById(brickSignature, paramId)
+      if (paramSignature) {
+        parsedParams[paramSignature.code] = param
+      }
+    }
+    return brickSignature.func(parsedParams, ctx)
   }
 }
 
 export const solceryBricks: BrickSignature[] = [];
+export const solceryCustomBricks: BrickSignature[] = [];
 
-    // //Conditions
-    // { Type: 1, Subtype: 0, FieldType: 0, Slots: 0, }, //True
-    // { Type: 1, Subtype: 1, FieldType: 0, Slots: 0, }, //False
-    // { Type: 1, Subtype: 2, FieldType: 0, Slots: 2, }, //Or
-    // { Type: 1, Subtype: 3, FieldType: 0, Slots: 2, }, //And
-    // { Type: 1, Subtype: 4, FieldType: 0, Slots: 1, }, //Not
-    // { Type: 1, Subtype: 5, FieldType: 0, Slots: 2, }, //Equal
-    // { Type: 1, Subtype: 6, FieldType: 0, Slots: 2, }, //GreaterThan
-    // { Type: 1, Subtype: 7, FieldType: 0, Slots: 2, }, //LesserThan
-    // { Type: 1, Subtype: 100, FieldType: 0, Slots: 1, }, //IsAtPlace
 
-    // //Values
-    // { Type: 2, Subtype: 0, FieldType: 1, Slots: 0, }, //Const,
-    // { Type: 2, Subtype: 1, FieldType: 0, Slots: 3, }, //Conditional
-    // { Type: 2, Subtype: 2, FieldType: 0, Slots: 2, }, //Add
-    // { Type: 2, Subtype: 3, FieldType: 0, Slots: 2, }, //Sub
-    // { Type: 2, Subtype: 4, FieldType: 2, Slots: 0, }, //GetCtxVar
-    // { Type: 2, Subtype: 5, FieldType: 0, Slots: 2, }, //GetCtxVar
-    // { Type: 2, Subtype: 6, FieldType: 0, Slots: 2, }, //Mul
-    // { Type: 2, Subtype: 3, FieldType: 0, Slots: 2, }, //Div
-    // { Type: 2, Subtype: 2, FieldType: 0, Slots: 2, }, //Modulo
-    // { Type: 2, Subtype: 100, FieldType: 1, Slots: 1, }, //GetPlayerAttr
-    // { Type: 2, Subtype: 101, FieldType: 0, Slots: 0, }, //GetPlayerIndex
-    // { Type: 2, Subtype: 102, FieldType: 0, Slots: 1, }, //GetCardsAmount
-    // { Type: 2, Subtype: 103, FieldType: 0, Slots: 0, }, //CurrentPlace
-    // { Type: 2, Subtype: 105, FieldType: 0, Slots: 0, }, //CasterPlayerIndex
+function brickSignatureToBrickConfig(brick: BrickSignature) {
+  var Slots = []
+  var lastField = {
+    HasField: false,
+    FieldType: 0,
+    FieldName: "",
+  }
+  for (var brickParam of brick.params) {
+    if (brickParam.type instanceof SBrick) {
+      var paramBrick = brickParam.type as SBrick
+      Slots.push({
+        Type: paramBrick.brickType,
+        Name: brickParam.name
+      })
+    }
+    else {
+      lastField.HasField = true
+      lastField.FieldType = (brickParam.type instanceof SInt) ? 0 : 1
+      lastField.FieldName = brickParam.name
+    }
+  }
+  return {
+    Name: brick.name,
+    Type: brick.type,
+    Subtype: brick.subtype,
+    Description: brick.description,
+    HasField: lastField.HasField,
+    FieldType: lastField.FieldType,
+    FieldName: lastField.FieldName,
+    HasObjectSelection: false,
+    Slots: Slots
+  }
+}
+
+export type OldBrick = {
+  Type: number,
+  Subtype: number,
+  HasField: boolean,
+  IntField: number,
+  StringField: string | null,
+  Slots: OldBrick[],
+}
+
+export function oldBrickToBrick(oldBrick: OldBrick) {
+  var result: Brick = {
+    type: oldBrick.Type,
+    subtype: oldBrick.Subtype,
+    params: new Map()
+  }
+  var paramId = 1
+  if (oldBrick.HasField) {
+    result.params.set(paramId, oldBrick.StringField ? oldBrick.StringField : oldBrick.IntField)
+    paramId++;
+  }
+  for (var slot of oldBrick.Slots) {
+    result.params.set(paramId, oldBrickToBrick(slot))
+    paramId++;
+  }
+  return result
+}
+
+export function getBrickConfigs() {
+  var actions = []
+  var conditions = []
+  var values = []
+  for (var brickSignature of solceryBricks) {
+    var brickConfig = brickSignatureToBrickConfig(brickSignature)
+    if (brickConfig.Type == 0)
+      actions.push(brickConfig)
+    if (brickConfig.Type == 1)
+      conditions.push(brickConfig)
+    if (brickConfig.Type == 2)
+      values.push(brickConfig)
+  }
+  return {
+    ConfigsByType: {
+      Action: actions,
+      Condition: conditions,
+      Value: values,
+    }
+  }
+}
+
+export const brickToOldBrick = (brick: Brick) => { // TODO: construct??
+  var result: OldBrick = {
+    Type: brick.type,
+    Subtype: brick.subtype,
+    HasField: false,
+    IntField: 0,
+    StringField: null,
+    Slots: [],
+  }
+  var brickSignature = getBrickSignature(brick.type, brick.subtype)
+  if (!brickSignature)
+    throw new Error('Brick to old brick failed')
+  for (var param of brick.params) {
+    var paramSignature = getParamSignatureById(brickSignature, param[0])
+    if (!paramSignature)
+      throw new Error('Brick to old brick failed')
+    if (paramSignature.type instanceof SInt) {
+      result.HasField = true
+      result.IntField = param[1]
+      result.StringField = null
+    }
+    if (paramSignature.type instanceof SString) {
+      result.HasField = true
+      result.StringField = param[1]
+      result.IntField = 0
+    }
+    if (paramSignature.type instanceof SBrick) {
+      result.Slots.push(brickToOldBrick(param[1]))
+    }
+  }
+  return result
+}
+
+
+
+const constructBrickType = (content: any, brickType: number, brickTypeName: string) => {
+  let brickTypeTemplate = content[brickTypeName]
+  if (brickTypeTemplate) {
+    for (let objectKey of Object.keys(brickTypeTemplate)) {
+      let argParams: BrickParamSignature[] = []
+      let object = brickTypeTemplate[objectKey]
+      exportArgsAsParams(object.brick, argParams)
+      solceryBricks.push({
+        type: 0,
+        subtype: 10000 + object.id,
+        name: object.name,
+        params: argParams,
+        func: (params: any, ctx: any) => {
+          Object.keys(params).forEach(paramCode => { 
+            ctx.args[paramCode] = params[paramCode] 
+          });
+          applyBrick(ctx.game.content.actions[objectKey].brick, ctx) // closure?
+        }
+      })
+    }
+  }
+}
+
+
+
+export const constructBricks = (content: any) => {
+  constructBrickType(content, 0, 'actions')
+  constructBrickType(content, 1, 'conditions')
+  constructBrickType(content, 2, 'values')
+}
+
+solceryBricks.push({
+  type: 0,
+  subtype: 10017,
+  name: 'MoveTo',
+  func: () => {},
+  params: [
+    { id: 1, code: 'place', name: 'Place', type: new SBrick({ brickType: 2 }) },
+  ],
+})
 
 
 solceryBricks.push({
@@ -181,8 +362,8 @@ solceryBricks.push({
     { id: 2, code: 'action2', name: 'Action 2', type: new SBrick({ brickType: 0 }) }
   ],
   func: (params: any, ctx: any) => {
-    applyBrick(params[1], ctx)
-    applyBrick(params[2], ctx)
+    applyBrick(params.action1, ctx)
+    applyBrick(params.action2, ctx)
   }
 })
 
@@ -197,10 +378,10 @@ solceryBricks.push({
     { id: 3, code: 'negative', name: 'Negative', type: new SBrick({ brickType: 0 }) }
   ],
   func: (params: any, ctx: any) => {
-    if (applyBrick(params[1], ctx))
-      applyBrick(params[2], ctx)
+    if (applyBrick(params.condition, ctx))
+      applyBrick(params.positive, ctx)
     else
-      applyBrick(params[3], ctx)
+      applyBrick(params.negative, ctx)
   }
 })
 
@@ -213,16 +394,16 @@ solceryBricks.push({
     { id: 2, code: 'action', name: 'Action', type: new SBrick({ brickType: 0 }) }
   ],
   func: (params: any, ctx: any) => {
-    let iter = applyBrick(params[1], ctx)
+    let iter = applyBrick(params.iterations, ctx)
     for (let i = 0; i < iter; i++)
-      applyBrick(params[2], ctx)
+      applyBrick(params.action, ctx)
   }
 })
 
 solceryBricks.push({
   type: 0,
   subtype: 4,
-  name: 'Link',
+  name: 'Arg',
   params: [
     
   ],
@@ -241,17 +422,15 @@ solceryBricks.push({
     { id: 3, code: 'limit', name: 'Limit', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
-    let limit = applyBrick(params[3], ctx)
+    let limit = applyBrick(params.limit, ctx)
     let objs: any[] = []
     let oldOlbj = ctx.object 
     let amount = 0
-    console.log('Iterator')
-    console.log(limit)
     for (let object of ctx.game.objects) { // TODO: shuffle
       let obj = object[1]
       if (amount < limit) {
         ctx.object = obj
-        if (applyBrick(params[1], ctx)) {
+        if (applyBrick(params.condition, ctx)) {
           amount++;
           console.log(amount)
           objs.push(obj)
@@ -260,8 +439,7 @@ solceryBricks.push({
     }
     for (let obj of objs) {
       ctx.object = obj
-      console.log('applyBrick')
-      applyBrick(params[2], ctx)
+      applyBrick(params.action, ctx)
     }
     ctx.object = oldOlbj
   }
@@ -276,8 +454,8 @@ solceryBricks.push({
     { id: 2, code: 'value', name: 'Value', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
-    let varName = params[1]
-    let value = params[2]
+    let varName = params.varName
+    let value = params.value
     ctx.vars[varName] = applyBrick(value, ctx)
   }
 })
@@ -291,8 +469,8 @@ solceryBricks.push({
     { id: 2, code: 'value', name: 'Value', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
-    let attrName = params[1]
-    let value = params[2]
+    let attrName = params.attrName
+    let value = params.value
     ctx.object.attrs[attrName] = applyBrick(value, ctx)
   }
 })
@@ -307,7 +485,7 @@ solceryBricks.push({
     { id: 1, code: 'value', name: 'Value', type: new SInt() }, //TODO
   ],
   func: (params: any, ctx: any) => {
-    return params[1] != 0
+    return params.value != 0
   }
 })
 
@@ -320,7 +498,7 @@ solceryBricks.push({
     { id: 1, code: 'condition', name: 'Condition', type: new SBrick({ brickType: 1 }) }, //TODO
   ],
   func: (params: any, ctx: any) => {
-    return !applyBrick(params[1], ctx)
+    return !applyBrick(params.condition, ctx)
   }
 })
 
@@ -334,7 +512,7 @@ solceryBricks.push({
     { id: 2, code: 'value2', name: 'Value2', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
-    return applyBrick(params[1], ctx) == applyBrick(params[2], ctx)
+    return applyBrick(params.value1, ctx) == applyBrick(params.value2, ctx)
   }
 })
 
@@ -348,7 +526,7 @@ solceryBricks.push({
     { id: 2, code: 'value2', name: 'Value2', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
-    return applyBrick(params[1], ctx) > applyBrick(params[2], ctx)
+    return applyBrick(params.value1, ctx) > applyBrick(params.value2, ctx)
   }
 })
 
@@ -362,7 +540,19 @@ solceryBricks.push({
     { id: 2, code: 'value2', name: 'Value2', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
-    return applyBrick(params[1], ctx) < applyBrick(params[2], ctx)
+    return applyBrick(params.value1, ctx) < applyBrick(params.value2, ctx)
+  }
+})
+
+solceryBricks.push({
+  type: 1,
+  subtype: 5,
+  name: 'Arg',
+  params: [
+    
+  ],
+  func: (params: any, ctx: any) => {
+    // TODO
   }
 })
 
@@ -375,7 +565,7 @@ solceryBricks.push({
     { id: 1, code: 'value', name: 'Value', type: new SInt() }
   ],
   func: (params: any, ctx: any) => {
-    return params[1]
+    return params.value
   }
 })
 
@@ -388,7 +578,7 @@ solceryBricks.push({
     { id: 1, code: 'varName', name: 'Var', type: new SString() }
   ],
   func: (params: any, ctx: any) => {
-    return ctx.vars[params[1]]
+    return ctx.vars[params.varName]
   }
 })
 
@@ -401,20 +591,19 @@ solceryBricks.push({
     { id: 1, code: 'attrName', name: 'Attr', type: new SString() }
   ],
   func: (params: any, ctx: any) => {
-    return ctx.object.attrs[params[1]]
+    return ctx.object.attrs[params.attrName]
   }
 })
 
 solceryBricks.push({
   type: 2,
   subtype: 3,
-  name: 'Rand',
+  name: 'Arg',
   params: [
-    { id: 1, code: 'value', name: 'From', type: new SBrick({ brickType: 2 }) },
-    { id: 2, code: 'value', name: 'To', type: new SBrick({ brickType: 2 }) }
+    { id: 1, code: 'name', name: 'Name', type: new SString() },
   ],
   func: (params: any, ctx: any) => {
-    return 1 // TODO: 
+    return applyBrick(ctx.args[params.name], ctx)
   }
 })
 
@@ -429,10 +618,10 @@ solceryBricks.push({
     { id: 3, code: 'negative', name: 'Negative', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
-    if (applyBrick(params[1], ctx))
-      return applyBrick(params[2], ctx)
+    if (applyBrick(params.condition, ctx))
+      return applyBrick(params.positive, ctx)
     else
-      return applyBrick(params[3], ctx)
+      return applyBrick(params.negative, ctx)
   }
 })
 
@@ -445,8 +634,8 @@ solceryBricks.push({
     { id: 2, code: 'value2', name: 'Value2', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
-    let v1 = applyBrick(params[1], ctx)
-    let v2 = applyBrick(params[2], ctx)
+    let v1 = applyBrick(params.value1, ctx)
+    let v2 = applyBrick(params.value2, ctx)
     return v1 + v2  
   }
 })
@@ -460,8 +649,8 @@ solceryBricks.push({
     { id: 2, code: 'value2', name: 'Value2', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
-    let v1 = applyBrick(params[1], ctx)
-    let v2 = applyBrick(params[2], ctx)
+    let v1 = applyBrick(params.value1, ctx)
+    let v2 = applyBrick(params.value2, ctx)
     return v1 - v2
   }
 })
@@ -475,8 +664,8 @@ solceryBricks.push({
     { id: 2, code: 'value2', name: 'Value2', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
-    let v1 = applyBrick(params[1], ctx)
-    let v2 = applyBrick(params[2], ctx)
+    let v1 = applyBrick(params.value1, ctx)
+    let v2 = applyBrick(params.value2, ctx)
     return v1 * v2
   }
 })
@@ -490,8 +679,8 @@ solceryBricks.push({
     { id: 2, code: 'value2', name: 'Value2', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
-    let v1 = applyBrick(params[1], ctx)
-    let v2 = applyBrick(params[2], ctx)
+    let v1 = applyBrick(params.value1, ctx)
+    let v2 = applyBrick(params.value2, ctx)
     return Math.floor(v1 / v2) 
   }
 })
@@ -505,8 +694,21 @@ solceryBricks.push({
     { id: 2, code: 'value2', name: 'Value2', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
-    let v1 = applyBrick(params[1], ctx)
-    let v2 = applyBrick(params[2], ctx)
+    let v1 = applyBrick(params.value1, ctx)
+    let v2 = applyBrick(params.value2, ctx)
     return v1 - Math.floor(v1 / v2) 
+  }
+})
+
+solceryBricks.push({
+  type: 2,
+  subtype: 10,
+  name: 'Rand',
+  params: [
+    { id: 1, code: 'value', name: 'From', type: new SBrick({ brickType: 2 }) },
+    { id: 2, code: 'value', name: 'To', type: new SBrick({ brickType: 2 }) }
+  ],
+  func: (params: any, ctx: any) => {
+    return 1 // TODO: 
   }
 })
