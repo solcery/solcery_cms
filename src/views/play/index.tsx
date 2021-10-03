@@ -5,10 +5,11 @@ import { useWallet } from "../../contexts/wallet";
 import { construct, projectPublicKey, projectStoragePublicKey } from "../../solcery/engine";
 import { useParams, useHistory } from "react-router-dom";
 import Unity, { UnityContext } from "react-unity-webgl";
-import { Button, Layout, InputNumber } from "antd";
+import { Button, Layout, InputNumber, Collapse, Divider } from "antd";
 import { applyBrick, brickToOldBrick, oldBrickToBrick } from "../../solcery/types/brick";
 import { Game } from "../../solcery/game"
 import { Project } from "../../solcery/classes"
+
 
 // const unityContext = new UnityContext({
 //   loaderUrl: "play/play_4.loader.js",
@@ -25,6 +26,7 @@ const unityContext = new UnityContext({
 })
 
 const { Header, Footer, Sider, Content } = Layout;
+const { Panel } = Collapse
 
 
 // public class PlaceDisplayData
@@ -112,8 +114,8 @@ export const PlayView = () => {
     return () => { unityContext.quitUnityInstance() }
   })
 
-  const onCardPlaceChange = (cardId: number, place: number) => {
-    game.objects.get(cardId).attrs.place = place;
+  const onCardAttrChange = (cardId: number, attrName: string, value: number) => {
+    game.objects.get(cardId).attrs[attrName] = value;
     unityContext.send("ReactToUnity", "UpdateBoard", JSON.stringify(game.toBoardData()));
     setStep(step + 1)
   }
@@ -140,21 +142,33 @@ export const PlayView = () => {
       }
     }
   });
+            // <div key={elem.id}>
+            //   Card: { elem.id } <InputNumber key={elem.id} precision={0} defaultValue={ elem.attrs.place } onChange={(value) => { onCardPlaceChange(elem.id, value) }} />
+            // </div>
+              // <GameObjectView 
+              //   objectId={elem.id} 
+              //   defaultValue={ elem.attrs.place } 
+              //   onChange={(value) => { onCardPlaceChange(elem.id, value) } }
+              // />
   return (
     <Layout>
-      <Sider>
-        { game && game.objects && Array.from(game.objects.values()).map((elem: any) => 
-          
-          <div key={elem.id}>
-            <GameObjectView 
-              objectId={elem.id} 
-              defaultValue={ elem.attrs.place } 
-              onChange={(value) => { onCardPlaceChange(elem.id, value) } }/>
-          </div>
-          // <div key={elem.id}>
-          //   Card: { elem.id } <InputNumber key={elem.id} precision={0} defaultValue={ elem.attrs.place } onChange={(value) => { onCardPlaceChange(elem.id, value) }} />
-          // </div>
-        )}
+      <Sider width='300'>
+        <Collapse>
+          { game && game.objects && Array.from(game.objects.values()).map((elem: any) => 
+            <Panel header={ "Card " + elem.id} key={elem.id}>
+              { Object.keys(elem.attrs).map((attrName: string) => 
+                <div key={"" + elem.id + "." + attrName}>
+                  {attrName} : <InputNumber 
+                    precision={0}
+                    value={ elem.attrs[attrName] }
+                    onChange={(value) => { onCardAttrChange(elem.id, attrName, value) }} 
+                  />
+                  <Divider />
+                </div>
+              )}
+            </Panel>
+          )}
+        </Collapse>
       </Sider>
       <Content>
          { game && project && <Unity tabIndex={3} style={{ width: '100%', height: '100%' }} unityContext={unityContext} />}

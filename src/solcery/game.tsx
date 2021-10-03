@@ -20,16 +20,21 @@ export class Game {
 	  if (!cardsContent)
 	    return
 	  var cardId = 0
+    var attributes = content.attributes
 	  for (let cardPackId in cardsContent) { 
 	    let cardPack = cardsContent[cardPackId]
 	    for (let i = 0; i < cardPack.amount; i++) {
 	      var cardType = content.cardTypes[cardPack.cardType.toBase58()]
+        var attrs: any = {}
+        for (let contentAttrId of Object.keys(attributes)) {
+          let contentAttr = attributes[contentAttrId]
+          attrs[contentAttr.code] = 0
+        }
+        attrs.place = cardPack.place
 	      this.objects.set(cardId, {
 	      	id: cardId,
 	        tplId: cardType.id,
-	        attrs: { 
-	        	place: cardPack.place
-	        },
+	        attrs: attrs
 	      })
 	      cardId++;
 	    }

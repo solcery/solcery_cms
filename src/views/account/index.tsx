@@ -138,7 +138,6 @@ export const AccountView = () => {
 
   let { accountKey } = useParams<AccountViewParams>();
   if (accountKey) {
-    console.log(accountKey)
     loadAccount(accountKey);
   }
 
@@ -146,6 +145,7 @@ export const AccountView = () => {
 
   return (
     <div>
+      <ConnectButton />
       { accountKey ? 
         <div>
           <Button id = 'saveButton' onClick = { () => { saveAccount(accountKey) } }>Save</Button>

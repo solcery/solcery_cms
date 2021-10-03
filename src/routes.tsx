@@ -2,7 +2,6 @@ import { HashRouter, Route, Switch, Link } from "react-router-dom";
 import React from "react";
 import { WalletProvider } from "./contexts/wallet";
 import { ConnectionProvider } from "./contexts/connection";
-// import { PrivateRoute } from "./components";
 import { AccountsProvider } from "./contexts/accounts";
 import { ProjectProvider } from "./contexts/project";
 import { AppLayout } from "./components/Layout";
@@ -17,6 +16,8 @@ export function Routes() {
           <WalletProvider>
             <Switch>
               <Route exact path="/game/:gameId" component={() => <GameView />} />
+              <Route exact path="/account" component={() => <AccountView/>} />
+              <Route path="/account/:accountKey" component={() => <AccountView/>} />
               <Route path ="/" component={() => 
                 <ProjectProvider> 
                   <AccountsProvider>
@@ -24,8 +25,6 @@ export function Routes() {
                       <Switch>
                         <Route exact path="/play" component={() => <PlayView/>} />
                         <Route exact path="/template/:templateKey" component={() => <TemplateView/>} />
-                        <Route exact path="/account" component={() => <AccountView/>} />
-                        <Route path="/account/:accountKey" component={() => <AccountView/>} />
                         <Route path="/object/:objectId" component={() => <ObjectView/>} />
                         <Route path="/template/schema/:templateKey" component={() => <TemplateSchemaView/>} />
                         <Route exact path="/" component={() => <HomeView />} />

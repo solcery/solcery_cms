@@ -56,7 +56,7 @@ export const GameView = () => {
       let multipleAccounts = await connection.getMultipleAccountsInfo(mintPubkeys);
 
       let nftMetadata = multipleAccounts.filter(account => account !== null).map(account => decodeMetadata(account!.data));
-      console.log(nftMetadata)
+
       for (let bae of nftMetadata) {
         if (bae) {
           var resp = await axios.get(bae.data?.uri) 
@@ -66,7 +66,6 @@ export const GameView = () => {
         }
       }
       return result
-      // console.log(nftMetadata)
   }
 
 

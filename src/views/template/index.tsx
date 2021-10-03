@@ -95,10 +95,7 @@ export const TemplateView = () => {
 
   useEffect(() => { 
     if (project)
-
       (async () => {
-        constructBricks(await project.сonstructContent(connection))
-        console.log('constructed')
         const tpl = await TemplateData.get(connection, new PublicKey(templateKey))
         setTemplate(tpl)
         var storage = await Storage.get(connection, tpl.storages[0])
