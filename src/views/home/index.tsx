@@ -21,7 +21,7 @@ export const HomeView = () => {
   const airdrop = async () => {
     if (!publicKey)
       return
-    connection.requestAirdrop(publicKey, LAMPORTS_PER_SOL * 10)
+    connection.requestAirdrop(publicKey, LAMPORTS_PER_SOL * 1)
   }
 
   const createTemplate = async () => {
