@@ -9,12 +9,10 @@ Template->Template/Schema +
 Main menu + link in nav +
 Airdrop button in main menu +
 GameInspector - attrs + 
+getBricks static method
 
 
-
-Filter by field
-BrickConstruction
-
+enum readonly
 
 
 
@@ -22,6 +20,14 @@ Game/Forge
 
 Backlog:
 
+BrickConstruction
+
+Copy project
+Filter by field
+
+Project full unconstructed content model?
+Prohibit arg usage in cards
+Fix typedata usage and compilation problems
 Construct
 Raw storage view
 Singleton template
@@ -29,6 +35,7 @@ String bricktree
 Field description
 TypeSelector Type?
 GetName for module
+
 
 
 mech

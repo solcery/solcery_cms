@@ -9,6 +9,10 @@ import * as ArrayComponents from '../array/components';
 export const ValueRender = (props: ValueRenderParams) => {
   const { Option } = Select;
   const enumType = props.type as SEnum
+  if (!props.onChange) {
+    var defaultValue = props.defaultValue ? props.defaultValue : 0;
+    return (<p>{enumType.values[defaultValue]}</p>)
+  }
   return (
     <div>
       <Select defaultValue={ props.defaultValue ? props.defaultValue : 0 } onChange={(value) => { 

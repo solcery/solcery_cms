@@ -2,7 +2,7 @@ import Unity, { UnityContext } from "react-unity-webgl";
 import { useProject } from "../../../contexts/project"
 import { useConnection } from "../../../contexts/connection"
 import React, { useState, useEffect } from "react";
-import { OldBrick, oldBrickToBrick, getBrickConfigs, brickToOldBrick, constructBricks } from "./index"
+import { OldBrick, oldBrickToBrick, getBrickConfigs, brickToOldBrick, getBricks } from "./index"
 import { Select, Button, Modal } from 'antd';
 import { SInt, SString, ValueRenderParams, SBrick } from '../index'
 
@@ -38,8 +38,11 @@ export const ValueRender = (props: ValueRenderParams) => {
       })
 
       unityContext.on("OnNodeEditorLoaded", async () => {
-        var configs = getBrickConfigs()
-        console.log(configs)
+        if (!project)
+          throw new Error("No project on node editor, panic")
+        await project.updateBricks(connection)
+        var configs = getBrickConfigs(getBricks())
+
         var brickData = {
           Genesis: value ? brickToOldBrick(value) : null
         }

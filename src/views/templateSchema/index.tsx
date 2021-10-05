@@ -18,6 +18,10 @@ import { deserializeUnchecked, serialize } from "borsh"
 
 import 'reactjs-popup/dist/index.css';
 
+
+const { TextArea } = Input;
+const { Column } = Table;
+
 export async function onWalletConnected() {}
 
 type TemplateSchemaViewParams = {
@@ -26,7 +30,6 @@ type TemplateSchemaViewParams = {
 
 export const TemplateSchemaView = () => {
 
-  const { Column } = Table;
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
   let { templateKey } = useParams<TemplateSchemaViewParams>();
@@ -161,6 +164,12 @@ export const TemplateSchemaView = () => {
             )}
           />
         </Table>
+        <TextArea rows={4} defaultValue={template && template.customData} onChange={(e) => { 
+          if (template) {
+            template.customData = e.target.value
+            console.log(template)
+          }
+        }} />
         <Button onClick={addField}>Add field</Button>
         <Button onClick={update}>Save</Button>
       </div>

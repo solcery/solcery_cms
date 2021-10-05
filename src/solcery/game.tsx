@@ -54,6 +54,8 @@ export class Game {
 		for (let cardTypeKey in cardTypes) {
 			var cardType = cardTypes[cardTypeKey]
 			if (cardType.id == object.tplId) {
+        console.log('cardType')
+        console.log(cardType)
 				applyBrick(cardType.action, ctx)
 			}
 		}
@@ -92,7 +94,7 @@ class Context {
 	vars: Map<string, number> = new Map();
 	game: Game;
 	object: any;
-  args: any = {};
+  args: any[] = []
 	constructor(src: { game: Game, object: any, extra?: any}) {
 		this.object = src.object;
 		this.game = src.game;
@@ -135,8 +137,6 @@ const constructPlaces = (content: any) => {
   }
   return result
 }
-
-
 
 
 const constructBoardData = (content: any) => {

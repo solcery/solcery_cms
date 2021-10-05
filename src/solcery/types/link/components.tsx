@@ -35,8 +35,8 @@ export const ValueRender = (props: any) => {
     }
   });
 
-  if (props.readonly && object) {
-    return (<a href={'/#/object/'+props.defaultValue?.toBase58()}>{ object.getName() }</a>)
+  if (!props.onChange) {
+    return (<a href={'/#/object/'+ props.defaultValue?.toBase58()}>{ object ? object.getName() : props.defaultValue?.toBase58() }</a>)
   }
 
   if (objects) {

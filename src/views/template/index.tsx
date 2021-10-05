@@ -8,7 +8,6 @@ import { Button, Table } from "antd";
 import { TemplateData, TemplateField, SolcerySchema, Storage, TplObject } from "../../solcery/classes"
 import { programId } from "../../solcery/engine"
 import { useProject} from "../../contexts/project";
-import { constructBricks } from "../../solcery/types"
 
 type TemplateViewParams = {
   templateKey: string;
