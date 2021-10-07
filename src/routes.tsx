@@ -14,14 +14,14 @@ export function Routes() {
       <HashRouter basename={"/"}>
         <ConnectionProvider>
           <WalletProvider>
-            <Switch>
-              <Route exact path="/game/:gameId" component={() => <GameView />} />
-              <Route exact path="/account" component={() => <AccountView/>} />
-              <Route path="/account/:accountKey" component={() => <AccountView/>} />
-              <Route path ="/" component={() => 
-                <ProjectProvider> 
-                  <AccountsProvider>
-                    <AppLayout>
+            <AccountsProvider>
+              <AppLayout>
+                <Switch>
+                  <Route exact path="/account" component={() => <AccountView/>} />
+                  <Route exact path="/game/:gameId" component={() => <GameView />} />
+                  <Route path="/account/:accountKey" component={() => <AccountView/>} />
+                  <Route path ="/" component={() => 
+                    <ProjectProvider> 
                       <Switch>
                         <Route exact path="/play" component={() => <PlayView/>} />
                         <Route exact path="/template/:templateKey" component={() => <TemplateView/>} />
@@ -29,11 +29,11 @@ export function Routes() {
                         <Route path="/template/schema/:templateKey" component={() => <TemplateSchemaView/>} />
                         <Route exact path="/" component={() => <HomeView />} />
                       </Switch>
-                    </AppLayout>
-                  </AccountsProvider>
-                </ProjectProvider>}
-              />
-            </Switch>
+                    </ProjectProvider>} 
+                  />
+                </Switch>
+              </AppLayout>
+            </AccountsProvider>
           </WalletProvider>
         </ConnectionProvider>
       </HashRouter>

@@ -19,9 +19,8 @@ class SolceryAccount {
 
 export class Project extends SolceryAccount {
   name: string = 'No name';
-  publicKey: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz');
-  owner: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz'); //TODO: dumb
-  templateStorage: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz');
+  owner: PublicKey; //TODO: dumb
+  templateStorage: PublicKey;
   constructor( src : { name: string, owner: PublicKey, templateStorage: PublicKey } ) {
     super()
     this.name = src.name
@@ -53,6 +52,7 @@ export class Project extends SolceryAccount {
 
   async сonstructContent(connection: Connection) {
     let result: Map<number, any> = new Map()
+    await this.updateBricks(connection)
     await this.updateBricks(connection)
     const projectStorage = await Storage.get(connection, this.templateStorage)
     var templates = await TemplateData.getAll(connection, projectStorage.accounts)

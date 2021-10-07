@@ -16,7 +16,6 @@ import { Button, Input } from "antd";
 
 export async function onWalletConnected() {
   
-
 }
 
 
@@ -26,13 +25,11 @@ type AccountViewParams = {
 
 export const AccountView = () => {
 
-
-
   const connection = useConnection();
-  const { wallet, publicKey } = useWallet();
+  const { connected, wallet, publicKey } = useWallet();
   const history = useHistory();
 
-  const createEmptyAccount = async (accountSize: number) => {
+  const createEmptyAccount = async (accountSize: number, ownerProgramId: PublicKey = programId) => {
     if (!publicKey) {
       return;
     }
@@ -43,7 +40,7 @@ export const AccountView = () => {
     var newAccount = new Account()
     connection.requestAirdrop(publicKey, accountCost)
     var createAccountIx = SystemProgram.createAccount({
-      programId: programId,
+      programId: ownerProgramId,
       space: accountSize, // TODO
       lamports: accountCost,
       fromPubkey: publicKey,
@@ -63,7 +60,8 @@ export const AccountView = () => {
 
   const createAccount = async () => {
     var size = parseInt((document.getElementById('accountSize') as HTMLInputElement).value)
-    window.location.replace("/#/account/" + await createEmptyAccount(size) );
+    var programPublicKey = new PublicKey((document.getElementById('programId') as HTMLInputElement).value)
+    history.push("/account/" + await createEmptyAccount(size, programPublicKey))
   }
 
   const newProject = async () => {
@@ -145,7 +143,7 @@ export const AccountView = () => {
 
   return (
     <div>
-      <ConnectButton />
+      {!connected && <ConnectButton />}
       { accountKey ? 
         <div>
           <Button id = 'saveButton' onClick = { () => { saveAccount(accountKey) } }>Save</Button>
@@ -153,10 +151,10 @@ export const AccountView = () => {
         </div>
         : 
         <div>
-          <Input id = "accountSize"></Input>
-          <Button id = 'createButton' onClick = { () => { newProject() } }>New</Button>
+          Program: <Input defaultValue={programId.toBase58()} id="programId"/>
+          Size: <Input id="accountSize"/>
+          <Button id = 'createButton' onClick = { () => { createAccount() } }>New</Button>
         </div> }
-      <table id = "templateTable"></table>
       <Button onClick={airdrop}>Airdrop</Button>
     </div>
   );

@@ -1,5 +1,6 @@
-
 import { applyBrick } from "./types/brick";
+import { BinaryReader, BinaryWriter } from "borsh";
+import { PublicKey } from "@solana/web3.js";
 export { programId } from "./engine"
 
 type GameObject = {
@@ -8,23 +9,63 @@ type GameObject = {
 	attrs: any,
 }
 
+
+export class Player {
+  publicKey: PublicKey
+  online: boolean;
+
+  constructor(src: { publicKey: PublicKey, online: boolean}) {
+    this.publicKey = src.publicKey
+    this.online = src.online
+  }
+}
+
 export class Game {
+  project: PublicKey;
+  state: PublicKey;
+  step: number;
+  players: Player[];
+  finished: boolean;
+  winners: PublicKey[];
+
+  constructor(src: { project: PublicKey, state: PublicKey, step: number, players: Player[], finished: boolean, winners: PublicKey[] }) {
+    this.project = src.project
+    this.state = src.state
+    this.step = src.step
+    this.players = src.players
+    this.finished = src.finished
+    this.winners = src.winners
+  }
+}
+
+export const GameSchema = new Map()
+GameSchema.set(Game, { kind: 'struct', fields: [
+    ['project', 'pubkey'],
+    ['state', 'pubkey'],
+    ['step', 'u32'],
+    ['players', [ Player ]],
+    ['finished', 'boolean'],
+    ['winners', [ 'pubkey' ]],
+]});
+GameSchema.set(Player, { kind: 'struct', fields: [
+    ['publicKey', 'pubkey'],
+    ['online', 'boolean'],
+]});
+
+export class GameState {
 	objects: Map<number, GameObject> = new Map();
 	content: any = undefined;
 
-	constructor(content: any) {
-	  this.content = content
-	  if (!content)
-	  	return
-	  var cardsContent = content.cards
-	  if (!cardsContent)
-	    return
+  initObjects = () => {
+    if (!this.content || !this.content.attributes || !this.content.cards)
+      return
+	  var cards = this.content.cards
+    var attributes = this.content.attributes
 	  var cardId = 0
-    var attributes = content.attributes
-	  for (let cardPackId in cardsContent) { 
-	    let cardPack = cardsContent[cardPackId]
+	  for (let cardPackId in cards) { 
+	    let cardPack = cards[cardPackId]
 	    for (let i = 0; i < cardPack.amount; i++) {
-	      var cardType = content.cardTypes[cardPack.cardType.toBase58()]
+	      var cardType = this.content.cardTypes[cardPack.cardType.toBase58()]
         var attrs: any = {}
         for (let contentAttrId of Object.keys(attributes)) {
           let contentAttr = attributes[contentAttrId]
@@ -39,7 +80,44 @@ export class Game {
 	      cardId++;
 	    }
 	  }
-	}
+  }
+
+  constructor(content: any = undefined) {
+    if (content) {
+      this.content = content
+      this.initObjects()
+    }
+  }
+
+  write = (writer: BinaryWriter) => {
+    writer.writeU32(this.objects.size)
+    for (let [_, object ] of this.objects) {
+      writer.writeU32(object.tplId)
+      for (let value of Object.values(object.attrs)) {
+        writer.writeU32(parseInt(value as string))
+      }
+    }
+  }
+
+  read = (reader: BinaryReader) => {
+    if (!this.content)
+      throw new Error("Error loading gameState from buffer!")
+    this.objects = new Map()
+    let attrs = Object.values(this.content.attributes).map((elem: any) => { return elem.code })
+    let objectsNumber = reader.readU32()
+    for (let id = 1; id <= objectsNumber; id++) {
+      let attrMap = new Map()
+      let tplId = reader.readU32()
+      attrs.forEach((attr) => {
+        attrMap.set(attr, reader.readU32())
+      })
+      this.objects.set(id, {
+        id: id,
+        tplId: tplId,
+        attrs: Object.fromEntries(attrMap)
+      })
+    }
+  }
 
 	useCard = (cardId: number, playerId: number) => {
 		let object = this.objects.get(cardId)
@@ -54,12 +132,10 @@ export class Game {
 		for (let cardTypeKey in cardTypes) {
 			var cardType = cardTypes[cardTypeKey]
 			if (cardType.id == object.tplId) {
-        console.log('cardType')
-        console.log(cardType)
 				applyBrick(cardType.action, ctx)
 			}
 		}
-		
+		console.log(this.objects)
 	}
 
 	toBoardData = () => {
@@ -92,17 +168,15 @@ export class Game {
 
 class Context {
 	vars: Map<string, number> = new Map();
-	game: Game;
+	game: GameState;
 	object: any;
   args: any[] = []
-	constructor(src: { game: Game, object: any, extra?: any}) {
+	constructor(src: { game: GameState, object: any, extra?: any}) {
 		this.object = src.object;
 		this.game = src.game;
 		this.vars = src.extra?.vars
 	}
 }
-
-
 
 const constructDisplayData = (content: any) => {
   return {
@@ -177,7 +251,7 @@ type Card = { // TODO: from content
   CardPlace: number,
 }
 
-type Player = {
+type OldPlayer = {
   Address: string,
   IsActive: boolean,
   HP: number,
@@ -200,7 +274,7 @@ type CardType = { //TODO: from content
 
 type BoardData = {
   LastUpdate: number,
-  Players: Player[],
+  Players: OldPlayer[],
   Cards: Card[],
   Message: {
     Nonce: number,

@@ -1,0 +1,11 @@
+.scroller {
+	display: flex;   
+    overflow-y: hidden;
+    overflow-x: scroll;
+}
+
+.scroller { overflow: -moz-scrollbars-none; }
+
+.scroller::-webkit-scrollbar {
+    display: none;
+}

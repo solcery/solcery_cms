@@ -7,7 +7,7 @@ import { useParams, useHistory } from "react-router-dom";
 import Unity, { UnityContext } from "react-unity-webgl";
 import { Button, Layout, InputNumber, Collapse, Divider } from "antd";
 import { applyBrick, brickToOldBrick, oldBrickToBrick } from "../../solcery/types/brick";
-import { Game } from "../../solcery/game"
+import { GameState } from "../../solcery/game"
 import { Project } from "../../solcery/classes"
 
 
@@ -18,62 +18,9 @@ import { Project } from "../../solcery/classes"
 //   codeUrl: "play/play_4.wasm",
 // })
 
-const unityContext = new UnityContext({
-  loaderUrl: "game/monkeys_1.loader.js",
-  dataUrl: "game/monkeys_1.data",
-  frameworkUrl: "game/monkeys_1.framework.js",
-  codeUrl: "game/monkeys_1.wasm",
-})
 
 const { Header, Footer, Sider, Content } = Layout;
 const { Panel } = Collapse
-
-
-// public class PlaceDisplayData
-//     {
-//         public string PlaceName;
-//         public int PlaceId = 3;
-
-//         public PlacePlayer Player;
-//         // id +- (playerId - 1) * number
-//         // common = 0, player = 1, enemy = 2
-
-//         public bool AreCardsInteractableIfMeIsActive; // bool BehaveAsSummonerShop => cards are interactable if Me is active player
-        
-//         public bool IsVisible;
-
-//         public PlaceDisplayAnchors HorizontalAnchors; // 0 - 1
-//         public PlaceDisplayAnchors VerticalAnchors;
-
-
-//         public PlaceDisplayAnchors(float min, float max)
-//         {
-//             Min = min;
-//             Max = max;
-//         }
-
-//         public CardFaceOption CardFaceOption;
-
-
-//         public enum CardFaceOption
-//         {
-//             Up,
-//             Down
-//         }
-
-
-//         public enum CardLayoutOption
-//         {
-//             Stacked,
-//             LayedOut,
-//             Map, //card name : amount
-//             Title //name of the top card
-//         }
-
-//         public CardLayoutOption CardLayoutOption;
-//     }
-
-//   }
 
 export const GameObjectView = (props: { 
   objectId: number,
@@ -92,6 +39,12 @@ export const GameObjectView = (props: {
     </div>)
 }
 
+const unityPlayContext = new UnityContext({
+  loaderUrl: "game/monkeys_1.loader.js",
+  dataUrl: "game/monkeys_1.data",
+  frameworkUrl: "game/monkeys_1.framework.js",
+  codeUrl: "game/monkeys_1.wasm",
+})
 
 export const PlayView = () => {
 
@@ -99,62 +52,54 @@ export const PlayView = () => {
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
   const history = useHistory();
-  const [ game, setGame ] = useState<any>(undefined)
+  const [ gameState, setGameState ] = useState<any>(undefined)
   const [ step, setStep ] = useState(0)
   
   useEffect(() => {
-    if (game)
+    if (gameState)
       return
     if (!project)
       return
     (async () => {
       var constructedContent = await project.сonstructContent(connection)
-      setGame(new Game(constructedContent))
+      setGameState(new GameState(constructedContent))
     })()
-    return () => { unityContext.quitUnityInstance() }
+    return () => { unityPlayContext.quitUnityInstance() }
   })
 
   const onCardAttrChange = (cardId: number, attrName: string, value: number) => {
-    game.objects.get(cardId).attrs[attrName] = value;
-    unityContext.send("ReactToUnity", "UpdateBoard", JSON.stringify(game.toBoardData()));
+    gameState.objects.get(cardId).attrs[attrName] = value;
+    unityPlayContext.send("ReactToUnity", "UpdateBoard", JSON.stringify(gameState.toBoardData()));
     setStep(step + 1)
   }
 
 
-  unityContext.on("OnUnityLoaded", async () => {
-
+  unityPlayContext.on("OnUnityLoaded", async () => {
     var data = { IsConnected: true };
-    unityContext.send("ReactToUnity", "SetWalletConnected", JSON.stringify(data));
+    unityPlayContext.send("ReactToUnity", "SetWalletConnected", JSON.stringify(data));
 
-    unityContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(game.extractContent()));
-    unityContext.send("ReactToUnity", "UpdateBoard", JSON.stringify(game.toBoardData()));
+    unityPlayContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
+    unityPlayContext.send("ReactToUnity", "UpdateBoard", JSON.stringify(gameState.toBoardData()));
   });
 
 
-  unityContext.on("LogAction", async (log: string) => {
+  unityPlayContext.on("LogAction", async (log: string) => {
     var logToApply = JSON.parse(log)
     for (let logEntry of logToApply.Steps) {
       if (logEntry.actionType == 0)
       {
-        game.useCard(logEntry.data, logEntry.playerId)
-        unityContext.send("ReactToUnity", "UpdateBoard", JSON.stringify(game.toBoardData()));
+        gameState.useCard(logEntry.data, logEntry.playerId)
+        unityPlayContext.send("ReactToUnity", "UpdateBoard", JSON.stringify(gameState.toBoardData()));
         setStep(step + 1)
       }
     }
   });
-            // <div key={elem.id}>
-            //   Card: { elem.id } <InputNumber key={elem.id} precision={0} defaultValue={ elem.attrs.place } onChange={(value) => { onCardPlaceChange(elem.id, value) }} />
-            // </div>
-              // <GameObjectView 
-              //   objectId={elem.id} 
-              //   defaultValue={ elem.attrs.place } 
-              //   onChange={(value) => { onCardPlaceChange(elem.id, value) } }
-              // />
+
   return (
     <Layout>
       <Sider width='300'>
         <Collapse>
-          { game && game.objects && Array.from(game.objects.values()).map((elem: any) => 
+          { gameState && gameState.objects && Array.from(gameState.objects.values()).map((elem: any) => 
             <Panel header={ "Card " + elem.id} key={elem.id}>
               { Object.keys(elem.attrs).map((attrName: string) => 
                 <div key={"" + elem.id + "." + attrName}>
@@ -171,7 +116,7 @@ export const PlayView = () => {
         </Collapse>
       </Sider>
       <Content>
-         { game && project && <Unity tabIndex={3} style={{ width: '100%', height: '100%' }} unityContext={unityContext} />}
+         { gameState && project && <Unity tabIndex={3} style={{ width: '100%', height: '100%' }} unityContext={unityPlayContext} />}
       </Content>
     </Layout>
   );
