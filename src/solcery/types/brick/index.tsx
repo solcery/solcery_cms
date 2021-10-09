@@ -366,10 +366,13 @@ basicBricks.push({
   subtype: 4,
   name: 'Arg',
   params: [
-    
+    { id: 1, code: 'name', name: 'Name', type: new SString() },
   ],
   func: (params: any, ctx: any) => {
-    // TODO
+    var args = ctx.args.pop()
+    var result = applyBrick(args[params[1]], ctx)
+    ctx.args.push(args)
+    return result
   }
 })
 
@@ -529,10 +532,13 @@ basicBricks.push({
   subtype: 5,
   name: 'Arg',
   params: [
-    
+    { id: 1, code: 'name', name: 'Name', type: new SString() },
   ],
   func: (params: any, ctx: any) => {
-    // TODO
+    var args = ctx.args.pop()
+    var result = applyBrick(args[params[1]], ctx)
+    ctx.args.push(args)
+    return result
   }
 })
 
