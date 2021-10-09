@@ -104,12 +104,6 @@ const exportArgsAsParams = (brick: Brick, result: BrickParamSignature[]) => {
   }
 }
 
-function camelize(str: string) {
-  return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
-    return index === 0 ? word.toLowerCase() : word.toUpperCase();
-  }).replace(/\s+/g, '');
-}
-
 export type Brick = {
   type: number, // ACtion, Condition
   subtype: number, // Void, Set, Conditional, MoveTo
@@ -146,7 +140,7 @@ export const applyBrick = (brick: Brick, ctx: any) => {
     for (let [ paramId, param ] of brick.params) {
       let paramSignature = getParamSignatureById(brickSignature, paramId)
       if (paramSignature) {
-        parsedParams[paramSignature.code] = param
+        parsedParams[paramSignature.id] = param
       }
     }
     return brickSignature.func(parsedParams, ctx)
@@ -328,6 +322,7 @@ basicBricks.push({
     { id: 2, code: 'action2', name: 'Action 2', type: new SBrick({ brickType: 0 }) }
   ],
   func: (params: any, ctx: any) => {
+    console.log(params)
     applyBrick(params[1], ctx)
     applyBrick(params[2], ctx)
   }
@@ -434,9 +429,31 @@ basicBricks.push({
     { id: 2, code: 'value', name: 'Value', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
-    ctx.object.attrs[params.attrName] = applyBrick(params.value, ctx)
+    ctx.object.attrs[params[1]] = applyBrick(params[2], ctx)
   }
 })
+
+
+basicBricks.push({
+  type: 0,
+  subtype: 8,
+  name: 'Action',
+  params: [],
+  func: (params: any, ctx: any) => {
+    let tplId = ctx.object.tplId
+    let cardTypes = ctx.game.conent.cardTypes
+    for (let cardTypeId in cardTypes) {
+      let cardType = cardTypes[cardTypeId]
+      if (cardType.id == tplId) {
+        if (cardType.action) {
+          applyBrick(cardType.action, ctx)
+        }
+        return
+      }
+    }
+  }
+})
+
 
 
 //condition.const
@@ -528,7 +545,7 @@ basicBricks.push({
     { id: 1, code: 'value', name: 'Value', type: new SInt() }
   ],
   func: (params: any, ctx: any) => {
-    return params.value
+    return params[1]
   }
 })
 
@@ -567,7 +584,7 @@ basicBricks.push({
   ],
   func: (params: any, ctx: any) => {
     var args = ctx.args.pop()
-    var result = applyBrick(args[params.name], ctx)
+    var result = applyBrick(args[params[1]], ctx)
     ctx.args.push(args)
     return result
   }
@@ -676,5 +693,25 @@ basicBricks.push({
   ],
   func: (params: any, ctx: any) => {
     return 1 // TODO: 
+  }
+})
+
+basicBricks.push({
+  type: 2,
+  subtype: 11,
+  name: 'Id',
+  params: [],
+  func: (params: any, ctx: any) => {
+    return ctx.object.id
+  }
+})
+
+basicBricks.push({
+  type: 2,
+  subtype: 12,
+  name: 'TplId',
+  params: [],
+  func: (params: any, ctx: any) => {
+    return ctx.object.tplId
   }
 })

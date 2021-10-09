@@ -2,9 +2,51 @@ TODO:
 
 Copy project
 Filter by field
+Pubkey type
+Filter by name
+
+
+фильтр для слотов
+фейковые кардтайпы
+обновление геймстейта
+
+
+Victory state
+
+
+
+Initiators on cards
+
+UNITY - art override
+
+
+Some?
+
+
+more types?
+
+
+Пора придумывать какой-то контекст
+
+
+Iterator
+
+
+GlobalVars?
+
+
+
+
+
 Game/Forge
 
+
+
 Backlog:
+
+
+
+Nested templates (arrays)
 
 
 Project full unconstructed content model?
@@ -66,7 +108,7 @@ create project
 
 ==================
 
-use admin as protocol
+use admin as protocol - BorshSchema
 
 
 ===================
@@ -80,8 +122,9 @@ Collection
 
 
 
+Hey! Everything's fine - pacing forward with the development and the hackathon submission. 
 
-
+Can't say we're working directly with Tommy, we had a nice call and discussed possible future of game-oriented NFTs on Solana. We had a meeting with Metaplex focused on the same topic too. We decided that the best way to showcase our standard it to use it in Solcery, so there aren't any particular collaboration plans yet
 
 
 =================
@@ -158,3 +201,66 @@ project - это контент, скачиваем его -> собираем �
 
 
 По юнити плейкард отправляем новый стейт
+
+
+{"CardTypes":[{"Id":8,"BrickTree":{},"Metadata":{"PictureUrl":"https://arweave.net/5-L71209IxVqlr_QANYz9MjniPWTOm1DFg7NRw7UR0w","Name":"Degen Ape","Description":"Moves to another place"}}],"DisplayData":{"PlaceDisplayDatas":[{"PlaceName":"Bottom","PlaceId":1,"AreCardsInteractableIfMeIsActive":true,"IsVisible":true,"HorizontalAnchors":{"Min":0.1,"Max":0.9},"VerticalAnchors":{"Min":0.1,"Max":0.3},"CardFaceOption":1,"CardLayoutOption":1},{"PlaceName":"Top","PlaceId":2,"AreCardsInteractableIfMeIsActive":true,"IsVisible":true,"HorizontalAnchors":{"Min":0.1,"Max":0.9},"VerticalAnchors":{"Min":0.7,"Max":0.9},"CardFaceOption":1,"CardLayoutOption":1}]}}
+index.tsx:85 {"LastUpdate":1633568441123,"Players":[{"Address":"None","IsActive":true,"HP":25,"Coins":0,"IsMe":true,"Attrs":[0,0,0,0,0,0,0,0,0,0]},{"Address":"None","IsActive":false,"HP":25,"Coins":0,"IsMe":false,"Attrs":[0,0,0,0,0,0,0,0,0,0]}],"Cards":[{"CardId":0,"CardType":8,"CardPlace":1},{"CardId":1,"CardType":8,"CardPlace":1},{"CardId":2,"CardType":8,"CardPlace":1}],"Message":{"Nonce":1,"Message":"No message","Duration":5},"Random":{"x":1,"y":2,"z":3,"w":4},"EndTurnCardId":5}
+
+{"CardTypes":[{"Id":8,"BrickTree":{},"Metadata":{"PictureUrl":"https://arweave.net/5-L71209IxVqlr_QANYz9MjniPWTOm1DFg7NRw7UR0w","Name":"Degen Ape","Description":"Moves to another place"}}],"DisplayData":{"PlaceDisplayDatas":[{"PlaceName":"Bottom","PlaceId":1,"AreCardsInteractableIfMeIsActive":true,"IsVisible":true,"HorizontalAnchors":{"Min":0.1,"Max":0.9},"VerticalAnchors":{"Min":0.1,"Max":0.3},"CardFaceOption":1,"CardLayoutOption":1},{"PlaceName":"Top","PlaceId":2,"AreCardsInteractableIfMeIsActive":true,"IsVisible":true,"HorizontalAnchors":{"Min":0.1,"Max":0.9},"VerticalAnchors":{"Min":0.7,"Max":0.9},"CardFaceOption":1,"CardLayoutOption":1}]}}
+index.tsx:85 {"LastUpdate":1633568489328,"Players":[{"Address":"None","IsActive":true,"HP":25,"Coins":0,"IsMe":true,"Attrs":[0,0,0,0,0,0,0,0,0,0]},{"Address":"None","IsActive":false,"HP":25,"Coins":0,"IsMe":false,"Attrs":[0,0,0,0,0,0,0,0,0,0]}],"Cards":[{"CardId":1,"CardType":8,"CardPlace":1},{"CardId":2,"CardType":8,"CardPlace":1},{"CardId":3,"CardType":8,"CardPlace":1}],"Message":{"Nonce":1,"Message":"No message","Duration":5},"Random":{"x":1,"y":2,"z":3,"w":4},"EndTurnCardId":5}
+
+
+import { HomeView, TemplateView, AccountView, TemplateSchemaView, ObjectView, PlayView, GameView } from "./views";
+export function Routes() {
+  return (
+    <>
+      <HashRouter basename={"/"}>
+        <ConnectionProvider>
+          <WalletProvider>
+            <Switch>
+              <Route exact path="/account" component={() => <AccountView/>} />
+              <Route exact path="/game/:gameId" component={() => <GameView />} />
+              <Route path="/account/:accountKey" component={() => <AccountView/>} />
+              <Route path ="/" component={() => 
+                <ProjectProvider> 
+                  <AccountsProvider>
+                    <AppLayout>
+                      <Switch>
+                        <Route exact path="/play" component={() => <PlayView/>} />
+                        <Route exact path="/template/:templateKey" component={() => <TemplateView/>} />
+                        <Route path="/object/:objectId" component={() => <ObjectView/>} />
+                        <Route path="/template/schema/:templateKey" component={() => <TemplateSchemaView/>} />
+                        <Route exact path="/" component={() => <HomeView />} />
+                      </Switch>
+                    </AppLayout>
+                  </AccountsProvider>
+                </ProjectProvider>}
+              />
+            </Switch>
+          </WalletProvider>
+        </ConnectionProvider>
+      </HashRouter>
+    </>
+  );
+}
+
+
+Game from Content что делает
+
+
+Собирает все кардтайпы в одну кучу
+
+
+Для каждого из слотов создаем геймобжект с tplId ведущим на Slots и дефолтным id в порядке очередности.
+
+Когда игрок джойнится, мы смотрим, какой по очередности это игрок и берем все слоты с этим номером. Известно что на момент взятия для каждого из слотов есть ровно один геймобжект с его tplId, получаем массив tplId и геймобъектов.
+
+
+Предлагаем в реакте собрать массив пар [ gameObjectId, mintAccountPubkey ]. 
+Когда собрали - всем выделенным геймобъектам проставляем правильный tplId, он указан на коллекции и мы по нему фильтровали.
+Всем невыделенным тоже проставляем default. Отправляем массив пар и новый игровой стейт.
+
+
+Имея игру и стейт можем собрать инфу для клиента. Для этого для каждого игрока пробегаем по его собственности и видим массив пар 
+[ gameObjectId, mintAccountPubkey ]. Для каждого такого объекта создаем фейковый темплейт для клиента, в который подставляем метадату в картинку.
+

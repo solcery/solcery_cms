@@ -6,6 +6,8 @@ import React, {
 } from "react";
 import { Button, Modal, Input } from "antd";
 import { ConnectButton } from "../components/ConnectButton";
+
+import { SolceryMenu } from "../components/SolceryMenu";
 import { useConnection } from "./connection";
 import { useWallet, WalletProvider } from "./wallet";
 import { Project } from "../solcery/classes";
@@ -32,7 +34,10 @@ export function ProjectProvider({ children = null as any }) {
 		if (!projectKey)
 			return
 		cookies.set('projectKey', projectKey)
-		setProject(await Project.get(connection, new PublicKey(projectKey)))
+		let prj = await Project.get(connection, new PublicKey(projectKey))
+		prj.сonstructContent(connection)
+		setProject(prj)
+
 	}
 
 	if (project)
@@ -42,6 +47,7 @@ export function ProjectProvider({ children = null as any }) {
 				project: project
 			}}
 			>
+			<SolceryMenu/>
 			{children}
 			</ProjectContext.Provider>
 		);

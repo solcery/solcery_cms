@@ -41,11 +41,16 @@ export const ValueRender = (props: ValueRenderParams) => {
         if (!project)
           throw new Error("No project on node editor, panic")
         await project.updateBricks(connection)
+        console.log(getBricks())
         var configs = getBrickConfigs(getBricks())
-
         var brickData = {
           Genesis: value ? brickToOldBrick(value) : null
         }
+        console.log(configs)
+        console.log(JSON.stringify({ 
+          BrickConfigsData: configs,
+          BrickTree: brickData,
+        }))
         unityContext.send("NodeEditorReactToUnity", "SetNodeEditorData", JSON.stringify({ 
           BrickConfigsData: configs,
           BrickTree: brickData,

@@ -9,14 +9,25 @@ type GameObject = {
 	attrs: any,
 }
 
+export class PlayerItem {
+  tplId: number;
+  publicKey: PublicKey;
+
+  constructor(src: { tplId: number, publicKey: PublicKey }) {
+    this.tplId = src.tplId
+    this.publicKey = src.publicKey
+  }
+}
 
 export class Player {
-  publicKey: PublicKey
+  publicKey: PublicKey;
   online: boolean;
+  items: PlayerItem[];
 
-  constructor(src: { publicKey: PublicKey, online: boolean}) {
+  constructor(src: { publicKey: PublicKey, online: boolean, items: PlayerItem[] }) {
     this.publicKey = src.publicKey
     this.online = src.online
+    this.items = src.items
   }
 }
 
@@ -50,6 +61,11 @@ GameSchema.set(Game, { kind: 'struct', fields: [
 GameSchema.set(Player, { kind: 'struct', fields: [
     ['publicKey', 'pubkey'],
     ['online', 'boolean'],
+    ['items', [ PlayerItem ]]
+]});
+GameSchema.set(PlayerItem, { kind: 'struct', fields: [
+    ['tplId', 'u32'],
+    ['publicKey', 'pubkey'],
 ]});
 
 export class GameState {
@@ -72,14 +88,41 @@ export class GameState {
           attrs[contentAttr.code] = 0
         }
         attrs.place = cardPack.place
+
 	      this.objects.set(cardId, {
 	      	id: cardId,
 	        tplId: cardType.id,
 	        attrs: attrs
 	      })
+        if (cardPack.initializer) {
+          console.log(cardPack.initializer)
+          let ctx = new Context({
+            game: this,
+            object: this.objects.get(cardId),
+            extra: {},
+          })
+          applyBrick(cardPack.initializer, ctx)
+        }
 	      cardId++;
 	    }
 	  }
+    let slots = this.content.slots
+    if (slots) {
+      for (let slotId of Object.keys(slots)) {
+        var attrs: any = {}
+        for (let contentAttrId of Object.keys(attributes)) {
+          let contentAttr = attributes[contentAttrId]
+          attrs[contentAttr.code] = 0
+        }
+        attrs.place = slots[slotId].place
+        this.objects.set(cardId, {
+          id: cardId,
+          tplId: slots[slotId].id,
+          attrs: attrs
+        })
+        cardId++;
+      }
+    }
   }
 
   constructor(content: any = undefined) {
@@ -94,7 +137,7 @@ export class GameState {
     for (let [_, object ] of this.objects) {
       writer.writeU32(object.tplId)
       for (let value of Object.values(object.attrs)) {
-        writer.writeU32(parseInt(value as string))
+        writer.writeI32(parseInt(value as string))
       }
     }
   }
@@ -109,7 +152,7 @@ export class GameState {
       let attrMap = new Map()
       let tplId = reader.readU32()
       attrs.forEach((attr) => {
-        attrMap.set(attr, reader.readU32())
+        attrMap.set(attr, reader.readI32())
       })
       this.objects.set(id, {
         id: id,
@@ -135,7 +178,6 @@ export class GameState {
 				applyBrick(cardType.action, ctx)
 			}
 		}
-		console.log(this.objects)
 	}
 
 	toBoardData = () => {

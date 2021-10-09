@@ -64,19 +64,20 @@ export const TypedataRender = (props: {
 
   var [ templates, setTemplates ] = useState<TemplateData[]>([]);
   useEffect(() => { 
-    if (templates.length <= 0 && project)
-      (async () => {
-        let strg = await Storage.get(connection, project.templateStorage)
-        var tpls = await TemplateData.getAll(connection, strg.accounts)
-        props.onChange && props.onChange(new SLink({templatePublicKey: tpls[0].publicKey}))
-        setTemplates(tpls)
-      })()
-  });
+    if (!project)
+      return
+    (async () => {
+      let strg = await Storage.get(connection, project.templateStorage)
+      var tpls = await TemplateData.getAll(connection, strg.accounts)
+      props.onChange && props.onChange(new SLink({templatePublicKey: tpls[0].publicKey}))
+      setTemplates(tpls)
+    })()
+  }, []);
 
 
   if (templates.length > 0) {
     return (
-      <Select defaultValue={ templates[0].publicKey.toBase58() } onChange={(templateKey) => { 
+      <Select defaultValue={ props.defaultValue ? props.defaultValue.templatePublicKey.toBase58() : templates[0].publicKey.toBase58() } onChange={(templateKey) => { 
         props?.onChange && props.onChange(new SLink({templatePublicKey: new PublicKey(templateKey)})) 
       }}>
       {templates.map((tpl) => {

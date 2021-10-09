@@ -31,6 +31,7 @@ export const ValueRender = (props: ValueRenderParams) => {
           React.createElement(array.subtype.valueRender, 
             {
               defaultValue: val,
+              type: array.subtype,
               onChange: (newValue: any) => { onChange(newValue, index) }, 
             }
           )
@@ -50,6 +51,6 @@ export const TypedataRender = (props: {
     props.onChange && props.onChange(new SArray({ subtype: newValue }))
   }
   return (
-    <TypeSelector onChange={onChange}/>
+    <TypeSelector defaultValue={props.defaultValue && props.defaultValue.subtype} onChange={onChange}/>
   )
 }
