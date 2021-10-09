@@ -18,8 +18,8 @@ import { TokenListProvider, ENV as ChainID, TokenInfo } from "@solana/spl-token-
 export type ENV =
   // | "mainnet-beta"
   // | "testnet"
-  // | "devnet"
-  | "localnet";
+  | "devnet"
+  // | "localnet";
 
 export const ENDPOINTS = [
   // {
@@ -32,16 +32,16 @@ export const ENDPOINTS = [
   //   endpoint: clusterApiUrl("testnet"),
   //   chainID: ChainID.Testnet,
   // },
-  // {
-  //   name: "devnet" as ENV,
-  //   endpoint: clusterApiUrl("devnet"),
-  //   chainID: ChainID.Devnet,
-  // },
   {
-    name: "localnet" as ENV,
-    endpoint: "http://127.0.0.1:8899",
+    name: "devnet" as ENV,
+    endpoint: clusterApiUrl("devnet"),
     chainID: ChainID.Devnet,
   },
+  // {
+  //   name: "localnet" as ENV,
+  //   endpoint: "http://127.0.0.1:8899",
+  //   chainID: ChainID.Devnet,
+  // },
 ];
 
 const DEFAULT = ENDPOINTS[0].endpoint;
