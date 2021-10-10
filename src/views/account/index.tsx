@@ -13,6 +13,8 @@ import {
 import { useParams, useHistory } from "react-router-dom";
 import { getAccountObject, programId, projectPublicKey, projectStoragePublicKey, getAccountData } from "../../solcery/engine";
 import { Button, Input } from "antd";
+import Cookies from 'universal-cookie';
+
 
 export async function onWalletConnected() {
   
@@ -25,6 +27,7 @@ type AccountViewParams = {
 
 export const AccountView = () => {
 
+  var cookies = new Cookies()
   const connection = useConnection();
   const { connected, wallet, publicKey } = useWallet();
   const history = useHistory();
@@ -101,6 +104,7 @@ export const AccountView = () => {
       data: Buffer.from([4, 0]),
     });
     await sendTransaction(connection, wallet, [createProjectAccountIx, createStorageAccountIx, createProjectIx], [projectAccount, storageAccount]).then(() => {
+      cookies.set('projectKey', projectAccount.publicKey.toBase58())
       history.push("/#/account/" + storageAccount.publicKey.toBase58());
     })
   }
@@ -154,6 +158,7 @@ export const AccountView = () => {
           Program: <Input defaultValue={programId.toBase58()} id="programId"/>
           Size: <Input id="accountSize"/>
           <Button id = 'createButton' onClick = { () => { createAccount() } }>New</Button>
+          <Button id = 'newProject' onClick = { () => { newProject() } }>New project</Button>
         </div> }
       <Button onClick={airdrop}>Airdrop</Button>
     </div>

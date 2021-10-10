@@ -8,10 +8,10 @@ import { SInt, SString, ValueRenderParams, SBrick } from '../index'
 
 
 const unityContext = new UnityContext({
-  loaderUrl: "node_editor/node_editor_10.loader.js",
-  dataUrl: "node_editor/node_editor_10.data",
-  frameworkUrl: "node_editor/node_editor_10.framework.js",
-  codeUrl: "node_editor/node_editor_10.wasm",
+  loaderUrl: "node_editor/node_editor_11.loader.js",
+  dataUrl: "node_editor/node_editor_11.data",
+  frameworkUrl: "node_editor/node_editor_11.framework.js",
+  codeUrl: "node_editor/node_editor_11.wasm",
 })
 
 export const ValueRender = (props: ValueRenderParams) => {
@@ -41,18 +41,14 @@ export const ValueRender = (props: ValueRenderParams) => {
         if (!project)
           throw new Error("No project on node editor, panic")
         await project.updateBricks(connection)
-        console.log(getBricks())
         var configs = getBrickConfigs(getBricks())
         var brickData = {
           Genesis: value ? brickToOldBrick(value) : null
         }
-        console.log(configs)
-        console.log(JSON.stringify({ 
-          BrickConfigsData: configs,
-          BrickTree: brickData,
-        }))
+        console.log((props.type as SBrick).brickType)
         unityContext.send("NodeEditorReactToUnity", "SetNodeEditorData", JSON.stringify({ 
           BrickConfigsData: configs,
+          GenesisBrickType: (props.type as SBrick).brickType,
           BrickTree: brickData,
         }));
       });
@@ -115,15 +111,15 @@ export const TypedataRender = (props: {
 	const { Option } = Select;
 	useEffect(() => {
 		if (props.onChange)
-			props.onChange(new SBrick({brickType: 1}))
+			props.onChange(props.defaultValue ? props.defaultValue : new SBrick({ brickType: 0 }))
 	}, [])
 	return (
-		<Select defaultValue={1} onChange={(brickType) => { 
+		<Select defaultValue={0} onChange={(brickType) => { 
       props?.onChange && props.onChange(new SBrick({brickType: brickType}) )
     }}>
-	  	<Option value={1} key={1}>Action</Option>
-	  	<Option value={2} key={2}>Condition</Option>
-	  	<Option value={3} key={3}>Value</Option>
+	  	<Option value={0} key={0}>Action</Option>
+	  	<Option value={1} key={1}>Condition</Option>
+	  	<Option value={2} key={2}>Value</Option>
 		</Select>
 	)
 }

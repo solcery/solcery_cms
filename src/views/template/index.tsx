@@ -4,10 +4,12 @@ import { useWallet } from "../../contexts/wallet";
 import { LAMPORTS_PER_SOL, PublicKey, Account, TransactionInstruction } from "@solana/web3.js";
 import { SystemProgram } from "@solana/web3.js";
 import { useParams, useHistory } from "react-router-dom";
-import { Button, Table } from "antd";
+import { Button, Table, Input } from "antd";
 import { TemplateData, TemplateField, SolcerySchema, Storage, TplObject } from "../../solcery/classes"
 import { programId } from "../../solcery/engine"
 import { useProject} from "../../contexts/project";
+import Cookies from 'universal-cookie';
+
 
 type TemplateViewParams = {
   templateKey: string;
@@ -15,6 +17,7 @@ type TemplateViewParams = {
 
 export const TemplateView = () => {
 
+  const cookies = new Cookies()
   const { Column } = Table;
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
@@ -23,6 +26,7 @@ export const TemplateView = () => {
   var [ objects, setObjects ] = useState<TplObject[] | undefined>(undefined);
   var [ template, setTemplate ] = useState<TemplateData | undefined>(undefined);
   var { project } = useProject();
+  let [ filter, setFilter ] = useState<any>(undefined)
 
   const createObject = async (src: PublicKey | undefined = undefined) => {
     if (!publicKey || !project || wallet === undefined || !template) {
@@ -92,6 +96,15 @@ export const TemplateView = () => {
     })
   }
 
+  const applyFilter = (value: string) => {
+    setFilter(value)
+    cookies.set(templateKey + '.filter.name', value)
+  }
+
+  useEffect(() => {
+    setFilter(cookies.get(templateKey + '.filter.name'))
+  }, [])
+
   useEffect(() => { 
     if (project)
       (async () => {
@@ -107,9 +120,11 @@ export const TemplateView = () => {
     var tableData: any[] = []
     for (let objectInfo of objects) {
       var res = Object.fromEntries(objectInfo.fields)
-      res.key = objectInfo.publicKey.toBase58()
-      res.id = objectInfo.id
-      tableData.push(res)
+      if (filter === undefined || res[1].includes(filter)) {
+        res.key = objectInfo.publicKey.toBase58()
+        res.id = objectInfo.id
+        tableData.push(res)
+      }
     }
 
     const divStyle = {
@@ -127,8 +142,9 @@ export const TemplateView = () => {
         />
         {template.fields.map((field: TemplateField) => { 
           return <Column 
-            title = { field.name } 
+            title = { field.name + ((field.id === 1 && filter) ? ' : [' + filter + ']' : '') } 
             key = { field.id } 
+            filterDropdown={field.id === 1 && <Input defaultValue={filter} onChange={(event: any) => { applyFilter(event.target.value) }}/>}
             render = {
               (text, object: any) => {
                 return React.createElement(

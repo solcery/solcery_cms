@@ -22,7 +22,7 @@ const ProjectContext = React.createContext<ProjectContextInterface>({
 });
 
 export function ProjectProvider({ children = null as any }) {
-
+	
 	var cookies = new Cookies()
 	const connection = useConnection()
 	const { connected } = useWallet();

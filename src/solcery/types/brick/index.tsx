@@ -322,7 +322,6 @@ basicBricks.push({
     { id: 2, code: 'action2', name: 'Action 2', type: new SBrick({ brickType: 0 }) }
   ],
   func: (params: any, ctx: any) => {
-    console.log(params)
     applyBrick(params[1], ctx)
     applyBrick(params[2], ctx)
   }

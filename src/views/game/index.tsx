@@ -74,8 +74,6 @@ export const SlotSelector = (props: {
     handleOk()
   }
 
-  console.log(props.slot)
-
   return ( 
     <div>
       <CardRender 
