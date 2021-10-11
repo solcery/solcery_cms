@@ -443,7 +443,7 @@ basicBricks.push({
   params: [],
   func: (params: any, ctx: any) => {
     let tplId = ctx.object.tplId
-    let cardTypes = ctx.game.conent.cardTypes
+    let cardTypes = ctx.game.content.cardTypes
     for (let cardTypeId in cardTypes) {
       let cardType = cardTypes[cardTypeId]
       if (cardType.id == tplId) {
@@ -697,7 +697,9 @@ basicBricks.push({
     { id: 2, code: 'value', name: 'To', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
-    return 1 // TODO: 
+    let min = applyBrick(params[1], ctx)
+    let max = applyBrick(params[2], ctx)
+    return min + Math.floor(Math.random() * max);
   }
 })
 
