@@ -316,10 +316,10 @@ basicBricks.push({
 basicBricks.push({
   type: 0,
   subtype: 1,
-  name: 'Set',
+  name: 'Two actions',
   params: [
-    { id: 1, code: 'action1', name: 'Action 1', type: new SBrick({ brickType: 0 }) },
-    { id: 2, code: 'action2', name: 'Action 2', type: new SBrick({ brickType: 0 }) }
+    { id: 1, name: 'Action #1', type: new SBrick({ brickType: 0 }) },
+    { id: 2, name: 'Action #2', type: new SBrick({ brickType: 0 }) }
   ],
   func: (params: any, ctx: any) => {
     applyBrick(params[1], ctx)
@@ -331,11 +331,11 @@ basicBricks.push({
 basicBricks.push({
   type: 0,
   subtype: 2,
-  name: 'Conditional',
+  name: 'If-Then-Else',
   params: [
-    { id: 1, code: 'condition', name: 'Condition', type: new SBrick({ brickType: 1 }) },
-    { id: 2, code: 'positive', name: 'Positive', type: new SBrick({ brickType: 0 }) },
-    { id: 3, code: 'negative', name: 'Negative', type: new SBrick({ brickType: 0 }) }
+    { id: 1, name: 'If', type: new SBrick({ brickType: 1 }) },
+    { id: 2, name: 'Then', type: new SBrick({ brickType: 0 }) },
+    { id: 3, name: 'Else', type: new SBrick({ brickType: 0 }) }
   ],
   func: (params: any, ctx: any) => {
     if (applyBrick(params[1], ctx))
@@ -350,8 +350,8 @@ basicBricks.push({
   subtype: 3,
   name: 'Loop',
   params: [
-    { id: 1, code: 'iterations', name: 'Iterations', type: new SBrick({ brickType: 2 }) },
-    { id: 2, code: 'action', name: 'Action', type: new SBrick({ brickType: 0 }) }
+    { id: 1, name: 'Iterations', type: new SBrick({ brickType: 2 }) },
+    { id: 2, name: 'Action', type: new SBrick({ brickType: 0 }) }
   ],
   func: (params: any, ctx: any) => {
     let iter = applyBrick(params[1], ctx)
@@ -363,9 +363,9 @@ basicBricks.push({
 basicBricks.push({
   type: 0,
   subtype: 4,
-  name: 'Arg',
+  name: 'Argument',
   params: [
-    { id: 1, code: 'name', name: 'Name', type: new SString() },
+    { id: 1, name: 'Name', type: new SString() },
   ],
   func: (params: any, ctx: any) => {
     var args = ctx.args.pop()
@@ -375,28 +375,36 @@ basicBricks.push({
   }
 })
 
+function shuffleArray(array: any[]) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+}
+
 basicBricks.push({
   type: 0,
   subtype: 5,
   name: 'Iterator',
   params: [
-    { id: 1, code: 'condition', name: 'Condition', type: new SBrick({ brickType: 1 }) },
-    { id: 2, code: 'action', name: 'Action', type: new SBrick({ brickType: 0 }) },
-    { id: 3, code: 'limit', name: 'Limit', type: new SBrick({ brickType: 2 }) }
+    { id: 1, name: 'Condition', type: new SBrick({ brickType: 1 }) },
+    { id: 2, name: 'Action', type: new SBrick({ brickType: 0 }) },
+    { id: 3, name: 'Limit', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
     let limit = applyBrick(params[3], ctx)
     let objs: any[] = []
     let oldOlbj = ctx.object 
     let amount = 0
-    for (let object of ctx.game.objects) { // TODO: shuffle
-      let obj = object[1]
-      if (amount < limit) {
-        ctx.object = obj
-        if (applyBrick(params[1], ctx)) {
-          amount++;
-          objs.push(obj)
-        }
+    let objects = [...ctx.game.objects.values()]
+    shuffleArray(objects)
+    while (limit > 0 && objects.length > 0) {
+      ctx.object = objects.pop()
+      if (applyBrick(params[1], ctx)) {
+        objs.push(ctx.object)
+        limit--;
       }
     }
     for (let obj of objs) {
@@ -410,7 +418,7 @@ basicBricks.push({
 basicBricks.push({
   type: 0,
   subtype: 6,
-  name: 'SetVar',
+  name: 'Set variable',
   params: [
     { id: 1, code: 'varName', name: 'Var', type: new SString() },
     { id: 2, code: 'value', name: 'Value', type: new SBrick({ brickType: 2 }) }
@@ -425,7 +433,7 @@ basicBricks.push({
 basicBricks.push({
   type: 0,
   subtype: 7,
-  name: 'SetAttr',
+  name: 'Set attribute',
   params: [
     { id: 1, code: 'attrName', name: 'Attr', type: new SString() },
     { id: 2, code: 'value', name: 'Value', type: new SBrick({ brickType: 2 }) }
@@ -439,7 +447,7 @@ basicBricks.push({
 basicBricks.push({
   type: 0,
   subtype: 8,
-  name: 'Action',
+  name: 'Use card',
   params: [],
   func: (params: any, ctx: any) => {
     let tplId = ctx.object.tplId
@@ -462,7 +470,7 @@ basicBricks.push({
 basicBricks.push({
   type: 1,
   subtype: 0,
-  name: 'Const',
+  name: 'Constant',
   params: [
     { id: 1, code: 'value', name: 'Value', type: new SInt() }, //TODO
   ],
@@ -529,7 +537,7 @@ basicBricks.push({
 basicBricks.push({
   type: 1,
   subtype: 5,
-  name: 'Arg',
+  name: 'Argument',
   params: [
     { id: 1, code: 'name', name: 'Name', type: new SString() },
   ],
@@ -545,7 +553,7 @@ basicBricks.push({
 basicBricks.push({
   type: 2,
   subtype: 0,
-  name: 'Const',
+  name: 'Constant',
   params: [
     { id: 1, code: 'value', name: 'Value', type: new SInt() }
   ],
@@ -558,9 +566,9 @@ basicBricks.push({
 basicBricks.push({
   type: 2,
   subtype: 1,
-  name: 'Var',
+  name: 'Local variavle',
   params: [
-    { id: 1, code: 'varName', name: 'Var', type: new SString() }
+    { id: 1, code: 'varName', name: 'Variable name', type: new SString() }
   ],
   func: (params: any, ctx: any) => {
     return ctx.vars[params[1]]
@@ -571,9 +579,9 @@ basicBricks.push({
 basicBricks.push({
   type: 2,
   subtype: 2,
-  name: 'Attr',
+  name: 'Attribute',
   params: [
-    { id: 1, code: 'attrName', name: 'Attr', type: new SString() }
+    { id: 1, code: 'attrName', name: 'Attribute name', type: new SString() }
   ],
   func: (params: any, ctx: any) => {
     return ctx.object.attrs[params[1]]
@@ -583,9 +591,9 @@ basicBricks.push({
 basicBricks.push({
   type: 2,
   subtype: 3,
-  name: 'Arg',
+  name: 'Argument',
   params: [
-    { id: 1, code: 'name', name: 'Name', type: new SString() },
+    { id: 1, name: 'Name', type: new SString() },
   ],
   func: (params: any, ctx: any) => {
     var args = ctx.args.pop()
@@ -599,11 +607,11 @@ basicBricks.push({
 basicBricks.push({
   type: 2,
   subtype: 4,
-  name: 'Conditional',
+  name: 'If-Then-Else',
   params: [
-    { id: 1, code: 'condition', name: 'Condition', type: new SBrick({ brickType: 1 }) },
-    { id: 2, code: 'positive', name: 'Positive', type: new SBrick({ brickType: 2 }) },
-    { id: 3, code: 'negative', name: 'Negative', type: new SBrick({ brickType: 2 }) }
+    { id: 1, name: 'If', type: new SBrick({ brickType: 1 }) },
+    { id: 2, name: 'Then', type: new SBrick({ brickType: 2 }) },
+    { id: 3, name: 'Else', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
     if (applyBrick(params[1], ctx))
@@ -616,10 +624,10 @@ basicBricks.push({
 basicBricks.push({
   type: 2,
   subtype: 5,
-  name: 'Add',
+  name: 'Addition',
   params: [
-    { id: 1, code: 'value1', name: 'Value1', type: new SBrick({ brickType: 2 }) },
-    { id: 2, code: 'value2', name: 'Value2', type: new SBrick({ brickType: 2 }) }
+    { id: 1, name: 'Value #1', type: new SBrick({ brickType: 2 }) },
+    { id: 2, name: 'Value #2', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
     let v1 = applyBrick(params[1], ctx)
@@ -631,10 +639,10 @@ basicBricks.push({
 basicBricks.push({
   type: 2,
   subtype: 6,
-  name: 'Sub',
+  name: 'Subtraction',
   params: [
-    { id: 1, code: 'value1', name: 'Value1', type: new SBrick({ brickType: 2 }) },
-    { id: 2, code: 'value2', name: 'Value2', type: new SBrick({ brickType: 2 }) }
+    { id: 1, name: 'Value #1', type: new SBrick({ brickType: 2 }) },
+    { id: 2, name: 'Value #2', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
     let v1 = applyBrick(params[1], ctx)
@@ -646,10 +654,10 @@ basicBricks.push({
 basicBricks.push({
   type: 2,
   subtype: 7,
-  name: 'Mul',
+  name: 'Multiplication',
   params: [
-    { id: 1, code: 'value1', name: 'Value1', type: new SBrick({ brickType: 2 }) },
-    { id: 2, code: 'value2', name: 'Value2', type: new SBrick({ brickType: 2 }) }
+    { id: 1, name: 'Value #1', type: new SBrick({ brickType: 2 }) },
+    { id: 2, name: 'Value #2', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
     let v1 = applyBrick(params[1], ctx)
@@ -661,10 +669,10 @@ basicBricks.push({
 basicBricks.push({
   type: 2,
   subtype: 8,
-  name: 'Div',
+  name: 'Division',
   params: [
-    { id: 1, code: 'value1', name: 'Value1', type: new SBrick({ brickType: 2 }) },
-    { id: 2, code: 'value2', name: 'Value2', type: new SBrick({ brickType: 2 }) }
+    { id: 1, name: 'Value #1', type: new SBrick({ brickType: 2 }) },
+    { id: 2, name: 'Value #2', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
     let v1 = applyBrick(params[1], ctx)
@@ -676,10 +684,10 @@ basicBricks.push({
 basicBricks.push({
   type: 2,
   subtype: 9,
-  name: 'Mod',
+  name: 'Modulo',
   params: [
-    { id: 1, code: 'value1', name: 'Value1', type: new SBrick({ brickType: 2 }) },
-    { id: 2, code: 'value2', name: 'Value2', type: new SBrick({ brickType: 2 }) }
+    { id: 1, name: 'Value #1', type: new SBrick({ brickType: 2 }) },
+    { id: 2, name: 'Value #2', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
     let v1 = applyBrick(params[1], ctx)
@@ -691,7 +699,7 @@ basicBricks.push({
 basicBricks.push({
   type: 2,
   subtype: 10,
-  name: 'Rand',
+  name: 'Random',
   params: [
     { id: 1, code: 'value', name: 'From', type: new SBrick({ brickType: 2 }) },
     { id: 2, code: 'value', name: 'To', type: new SBrick({ brickType: 2 }) }
@@ -706,7 +714,7 @@ basicBricks.push({
 basicBricks.push({
   type: 2,
   subtype: 11,
-  name: 'Id',
+  name: 'Card Id',
   params: [],
   func: (params: any, ctx: any) => {
     return ctx.object.id
@@ -716,7 +724,7 @@ basicBricks.push({
 basicBricks.push({
   type: 2,
   subtype: 12,
-  name: 'TplId',
+  name: 'Card type Id',
   params: [],
   func: (params: any, ctx: any) => {
     return ctx.object.tplId
