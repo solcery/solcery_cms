@@ -10,9 +10,10 @@ import { TplObject } from '../../classes'
 
 export class SBrick extends SType {
   id = 6;
-  name = "Brick";
+  static typename = "Brick";
+  typename = "Brick";
   valueRender = ValueRender;
-  brickType = 0;
+  brickType: number;
 
   static typedataRender = TypedataRender;
    constructor(src: { brickType: number }) {

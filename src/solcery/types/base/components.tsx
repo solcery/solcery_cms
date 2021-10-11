@@ -34,7 +34,7 @@ export const TypeSelector = (props: { //TODO: -> Type render
 	    		onChangeSolceryType(new solceryType())
 	    }} >
 	    {Array.from(solceryTypes.keys()).map((solceryTypeId) => 
-	      <Option key={solceryTypeId} value={solceryTypeId}>{solceryTypes.get(solceryTypeId).name}</Option>
+	      <Option key={solceryTypeId} value={solceryTypeId}>{solceryTypes.get(solceryTypeId).typename}</Option>
 	    )}
 	    </Select>
 	    {solceryTypes.get(typeId)?.typedataRender && React.createElement(
@@ -51,5 +51,5 @@ export const TypeSelector = (props: { //TODO: -> Type render
 export const NameRender = (props: {
 	type: SType
 }) => {
-	return (<p>{props.type.name}</p>)
+	return (<p>{props.type.typename}</p>)
 }

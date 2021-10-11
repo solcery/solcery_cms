@@ -4,7 +4,9 @@ import { ValueRender } from './components';
 
 export class SString extends SType {
   id = 3;
-  name = "String";
+  static typename = 'String';
+  typename = 'String';
+  
   valueRender = ValueRender;
   readValue = (reader: BinaryReader) => { return reader.readString() }
   writeValue = (value: string, writer: BinaryWriter) => { writer.writeString(value) }

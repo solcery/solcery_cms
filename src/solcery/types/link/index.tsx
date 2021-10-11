@@ -9,7 +9,8 @@ import { ValueRender, TypedataRender, NameRender } from "./components"
 
 export class SLink extends SType {
   id = 5;
-  name = "Link";
+  static typename = "Link";
+  typename = "Link";
 
   templatePublicKey: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz');
   

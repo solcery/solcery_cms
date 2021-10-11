@@ -14,7 +14,8 @@ export interface ValueRenderParams {
 
 export class SType {
   id: number = 0;
-  name = "Empty type";
+  static typename = "Empty type";
+  typename = "Empty type";
   nameRender = (<NameRender type={this}/>);
 
   // static typedataRender: any = (<p>Error</p>);

@@ -31,8 +31,8 @@ declare module "borsh" {
 
 export class SInt extends SType {
   id = 2;
-  name = "Integer";
-  
+  static typename = "Integer";
+  typename = "Integer";
   valueRender = ValueRender;
 
   readValue = (reader: BinaryReader) => { 

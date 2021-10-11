@@ -5,16 +5,17 @@ import { ValueRender, TypedataRender } from './components'
 
 export class SEnum extends SType {
   id = 8;
-  name = "Enum";
+  static typename = 'Enum';
+  typename = "Brick";
+  
   values: string[];
-
   valueRender = ValueRender;
   static typedataRender = TypedataRender;
 
   constructor(src: { values: string[] }) {
     super()
     this.values = src.values;
-    this.nameRender = (<p>Enum: {this.values.toString()}</p>); 
+    this.nameRender = (<p>{this.typename}: {this.values.toString()}</p>); 
   }
 
   readValue = (reader: BinaryReader) => { 

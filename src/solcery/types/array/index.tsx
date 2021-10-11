@@ -5,7 +5,8 @@ import { ValueRender, TypedataRender } from './components'
 
 export class SArray extends SType {
   id = 7;
-  name = "Array";
+  static typename = "Array";
+  typename = "Array";
   subtype: SType;
 
   valueRender = ValueRender;
