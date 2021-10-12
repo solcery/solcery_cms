@@ -38,7 +38,7 @@ export const ObjectView = () => {
   const saveObject = async () => {
     if (!publicKey || wallet === undefined)
       return;
-    if (!object)
+    if (!object || !template)
       return;
     var buf = await object.serialize(connection)
 
@@ -50,7 +50,7 @@ export const ObjectView = () => {
       data: Buffer.concat([ Buffer.from([1, 1]), buf]),
     });
     sendTransaction(connection, wallet, [saveObjectIx], []).then(() => {
-      history.push("/object/" + objectId);
+      history.push("/template/" + template?.publicKey.toBase58());
     })
   }
 
@@ -99,7 +99,7 @@ export const ObjectView = () => {
     };
     return (
     <div style={divStyle}>
-      <a href={"/#/template/" + object.template.toBase58()}>Template: {template?.name}</a>
+      <p>{ 'Object [ ' + object.id + ' ]' }</p>
       <Table dataSource={objectData} pagination={false}>
           <Column title="Field" dataIndex="fieldName" key="fieldName"/>
           <Column

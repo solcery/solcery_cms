@@ -19,7 +19,7 @@ class SolceryAccount {
 
 export class Project extends SolceryAccount {
   name: string = 'No name';
-  owner: PublicKey; //TODO: dumb
+  owner: PublicKey; 
   templateStorage: PublicKey;
   constructor( src : { name: string, owner: PublicKey, templateStorage: PublicKey } ) {
     super()
@@ -146,7 +146,9 @@ export class TemplateData extends SolceryAccount {
     var constructedObjects: Map<string, any> = new Map()
     let objects = await this.getAllObjects(connection)
     for (let object of objects) {
-      constructedObjects.set(object.publicKey.toBase58(), object.construct(this))
+      if (object.fields.get(2)) { // enabled
+        constructedObjects.set(object.publicKey.toBase58(), object.construct(this))
+      }
     }
     return Object.fromEntries(constructedObjects)
   }
@@ -225,6 +227,7 @@ export class TplObject {
     }
     var rawData = reader.readFixedArray(reader.readU32())
     var fields = new Map()
+
     for (let fieldOffset of fieldOffsets) {
       var field = template.getField(fieldOffset.fieldId)
       if (!field)

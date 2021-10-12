@@ -174,22 +174,27 @@ export class GameState {
 		let cardTypes = this.content.cardTypes
 		for (let cardTypeKey in cardTypes) {
 			var cardType = cardTypes[cardTypeKey]
-			if (cardType.id == object.tplId) {
+			if (cardType.id == object.tplId || cardType.action) {
 				applyBrick(cardType.action, ctx)
 			}
 		}
 	}
 
-	toBoardData = () => {
-		var bd: BoardData = constructBoardData(this.content)
-		bd.Cards = this.objectsToCards()
-		return bd
+	extractGameState = () => {
+		return {
+      Cards: this.objectsToCards()
+    }
 	}
 
   extractContent = () => {
     return {
       CardTypes: constructCardTypes(this.content),
-      DisplayData: constructDisplayData(this.content),
+    }
+  }
+
+  extractDisplayData = () => {
+    return {
+      PlaceDisplayDatas: constructPlaces(this.content)
     }
   }
 
@@ -205,7 +210,6 @@ export class GameState {
 		return result
 	}	
 
-
 }
 
 class Context {
@@ -220,12 +224,6 @@ class Context {
 	}
 }
 
-const constructDisplayData = (content: any) => {
-  return {
-    PlaceDisplayDatas: constructPlaces(content)
-  }
-}
-
 const constructPlaces = (content: any) => {
   var result = []
   var placesContent = content.places
@@ -237,15 +235,15 @@ const constructPlaces = (content: any) => {
       PlaceName: place.name,
       PlaceId: place.placeId,
       PlacePlayer: place.playerMode,
-      AreCardsInteractableIfMeIsActive: place.interactableForActiveLocalPlayer,
+      IsInteractable: place.interactableForActiveLocalPlayer,
       IsVisible: place.visible,
       HorizontalAnchors: {
-        Min: place.x1 / 10000,
-        Max: place.x2 / 10000,
+        Min: (place.x1 ? place.x1 : 0) / 10000,
+        Max: (place.x2 ? place.x2 : 0) / 10000,
       },
       VerticalAnchors: {
-        Min: place.y1 / 10000,
-        Max: place.y2 / 10000,
+        Min: (place.y1 ? place.y1 : 0) / 10000,
+        Max: (place.y2 ? place.y2 : 0) / 10000,
       },
       CardFaceOption: place.face ? place.face : 0,
       CardLayoutOption: place.layout ? place.layout : 0,

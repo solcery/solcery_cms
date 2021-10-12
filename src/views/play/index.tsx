@@ -10,15 +10,6 @@ import { applyBrick, brickToOldBrick, oldBrickToBrick } from "../../solcery/type
 import { GameState } from "../../solcery/game"
 import { Project } from "../../solcery/classes"
 
-
-// const unityContext = new UnityContext({
-//   loaderUrl: "play/play_4.loader.js",
-//   dataUrl: "play/play_4.data",
-//   frameworkUrl: "play/play_4.framework.js",
-//   codeUrl: "play/play_4.wasm",
-// })
-
-
 const { Header, Footer, Sider, Content } = Layout;
 const { Panel } = Collapse
 
@@ -40,10 +31,10 @@ export const GameObjectView = (props: {
 }
 
 const unityPlayContext = new UnityContext({
-  loaderUrl: "game/monkeys_1.loader.js",
-  dataUrl: "game/monkeys_1.data",
-  frameworkUrl: "game/monkeys_1.framework.js",
-  codeUrl: "game/monkeys_1.wasm",
+  loaderUrl: "game/game_4.loader.js",
+  dataUrl: "game/game_4.data",
+  frameworkUrl: "game/game_4.framework.js",
+  codeUrl: "game/game_4.wasm",
 })
 
 export const PlayView = () => {
@@ -69,19 +60,31 @@ export const PlayView = () => {
 
   const onCardAttrChange = (cardId: number, attrName: string, value: number) => {
     gameState.objects.get(cardId).attrs[attrName] = value;
-    unityPlayContext.send("ReactToUnity", "UpdateBoard", JSON.stringify(gameState.toBoardData()));
+    unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
     setStep(step + 1)
   }
 
+  const testSend = () => {
+     var data = { IsConnected: true };
+    unityPlayContext.send("ReactToUnity", "SetWalletConnected", JSON.stringify(data));
+    unityPlayContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
+    unityPlayContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData()));
+    unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
+  }
 
   unityPlayContext.on("OnUnityLoaded", async () => {
     var data = { IsConnected: true };
     unityPlayContext.send("ReactToUnity", "SetWalletConnected", JSON.stringify(data));
-
     unityPlayContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
-    unityPlayContext.send("ReactToUnity", "UpdateBoard", JSON.stringify(gameState.toBoardData()));
+    unityPlayContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData()));
+    unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
   });
 
+  unityPlayContext.on("CastCard", async (cardId: number) => {
+    gameState.useCard(cardId, 1)
+    unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
+    setStep(step + 1)
+  });
 
   unityPlayContext.on("LogAction", async (log: string) => {
     var logToApply = JSON.parse(log)
@@ -89,7 +92,7 @@ export const PlayView = () => {
       if (logEntry.actionType == 0)
       {
         gameState.useCard(logEntry.data, logEntry.playerId)
-        unityPlayContext.send("ReactToUnity", "UpdateBoard", JSON.stringify(gameState.toBoardData()));
+        unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
         setStep(step + 1)
       }
     }
@@ -98,9 +101,10 @@ export const PlayView = () => {
   return (
     <Layout>
       <Sider width='300'>
+        <Button onClick={testSend}>send</Button>
         <Collapse>
           { gameState && gameState.objects && Array.from(gameState.objects.values()).map((elem: any) => 
-            <Panel header={ "Card " + elem.id} key={elem.id}>
+            <Panel header={ "Card " + elem.id } key={elem.id}>
               { Object.keys(elem.attrs).map((attrName: string) => 
                 <div key={"" + elem.id + "." + attrName}>
                   {attrName} : <InputNumber 

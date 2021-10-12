@@ -377,7 +377,7 @@ export const GameView = () => {
   useEffect(() => {
     if (!gameState)
       return
-    unityGameContext.send("ReactToUnity", "UpdateBoard", JSON.stringify(gameState.toBoardData()));
+    unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
   }, [ gameState ])
 
   const createPlayerState = async() => {
@@ -517,9 +517,9 @@ export const GameView = () => {
     var data = { IsConnected: true };
     unityGameContext.send("ReactToUnity", "SetWalletConnected", JSON.stringify(data));
 
-
     unityGameContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
-    unityGameContext.send("ReactToUnity", "UpdateBoard", JSON.stringify(gameState.toBoardData()));
+    unityGameContext.send("ReactToUnity", "UpdateDisplayData", JSON.stringify(gameState.extractDisplayData()));
+    unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
   });
 
 

@@ -30,7 +30,7 @@ export class SBrick extends SType {
   }
 
   readValue = (reader: BinaryReader) => { // reading ignoring brick signatures
-    var type = reader.readU8()
+    var type = reader.readU32()
     var subtype = reader.readU32()
     var params: Map<number, any> = new Map()
     var paramsAmount = reader.readU32()
@@ -52,7 +52,7 @@ export class SBrick extends SType {
     var brickSignature = getBrickSignature(value.type, value.subtype)
     if (!brickSignature)
       throw new Error("Writing brick failed")
-    writer.writeU8(value.type)
+    writer.writeU32(value.type)
     writer.writeU32(value.subtype)
     writer.writeU32(value.params.size)
     for (let param of value.params) {
