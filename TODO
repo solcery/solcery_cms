@@ -8,6 +8,8 @@ BrickTree to string
 card names in play mode
 
 
+Карты без экшенов
+Убрать кнопку send
 
 util.get
 редирект обратно на сохранении

@@ -87,7 +87,7 @@ const getBrickTypeName = (brickType: number) => {
 
 const exportArgsAsParams = (brick: Brick, result: BrickParamSignature[]) => {
   let brickSignature = getBrickSignature(brick.type, brick.subtype)
-  if (brickSignature && brickSignature.name === 'Arg') { //TODO: proper check
+  if (brickSignature && brickSignature.name === 'Argument') { //TODO: proper check
     let paramName = brick.params.get(1)
     if (!paramName)
       throw new Error("Error loading bricks")

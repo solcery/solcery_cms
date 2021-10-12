@@ -174,7 +174,7 @@ export class GameState {
 		let cardTypes = this.content.cardTypes
 		for (let cardTypeKey in cardTypes) {
 			var cardType = cardTypes[cardTypeKey]
-			if (cardType.id == object.tplId || cardType.action) {
+			if ((cardType.id == object.tplId) || cardType.action) {
 				applyBrick(cardType.action, ctx)
 			}
 		}
