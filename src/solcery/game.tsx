@@ -95,13 +95,12 @@ export class GameState {
 	        attrs: attrs
 	      })
         if (cardPack.initializer) {
-          console.log(cardPack.initializer)
-          let ctx = new Context({
-            game: this,
-            object: this.objects.get(cardId),
-            extra: {},
-          })
+          let ctx = new Context({ game: this, object: this.objects.get(cardId), extra: {} })
           applyBrick(cardPack.initializer, ctx)
+        }
+        if (cardType.initializer) {
+          let ctx = new Context({ game: this, object: this.objects.get(cardId), extra: {} })
+          applyBrick(cardType.initializer, ctx)
         }
 	      cardId++;
 	    }
@@ -174,7 +173,7 @@ export class GameState {
 		let cardTypes = this.content.cardTypes
 		for (let cardTypeKey in cardTypes) {
 			var cardType = cardTypes[cardTypeKey]
-			if ((cardType.id == object.tplId) || cardType.action) {
+			if ((cardType.id == object.tplId) && cardType.action) {
 				applyBrick(cardType.action, ctx)
 			}
 		}
@@ -201,12 +200,19 @@ export class GameState {
 	objectsToCards = () => {
 		var result: Card[] = []
 		for (let [ gameObjectId, gameObject ] of this.objects) { 
+      let cardAttrs: CardAttr[] = []
+      for (let attr of Object.keys(gameObject.attrs)) {
+        cardAttrs.push({ Name: attr, Value: gameObject.attrs[attr] })
+      }
 			result.push({
 				CardId: gameObjectId,
 				CardType: gameObject.tplId,
 				CardPlace: gameObject.attrs.place,
+        Attrs: cardAttrs,
+        //CardAttrs: Object.entries(gameObject.attrs).map(([ k ,v ]) => { Name: k, Value: v}),
 			})
 		}
+    console.log(result)
 		return result
 	}	
 
@@ -289,6 +295,12 @@ type Card = { // TODO: from content
   CardId: number,
   CardType: number,
   CardPlace: number,
+  Attrs: CardAttr[],
+}
+
+type CardAttr = {
+  Name: string,
+  Value: number,
 }
 
 type OldPlayer = {
