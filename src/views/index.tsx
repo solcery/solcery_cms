@@ -5,3 +5,4 @@ export { TemplateSchemaView } from "./templateSchema";
 export { ObjectView } from "./object";
 export { PlayView } from "./play";
 export { GameView } from "./game";
+export { StoreView } from "./store";

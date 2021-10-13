@@ -7,7 +7,7 @@ import { ProjectProvider } from "./contexts/project";
 import { AppLayout } from "./components/Layout";
 import { SolceryMenu } from "./components/SolceryMenu";
 
-import { HomeView, TemplateView, AccountView, TemplateSchemaView, ObjectView, PlayView, GameView } from "./views";
+import { HomeView, TemplateView, AccountView, TemplateSchemaView, ObjectView, PlayView, GameView, StoreView } from "./views";
 export function Routes() {
   return (
     <>
@@ -16,22 +16,23 @@ export function Routes() {
           <WalletProvider>
             <AccountsProvider>
               <AppLayout>
-                <Switch>
-                  <Route exact path="/account" component={() => <AccountView/>} />
-                  <Route exact path="/game/:gameId" component={() => <GameView />} />
-                  <Route path="/account/:accountKey" component={() => <AccountView/>} />
-                  <Route path ="/" component={() => 
-                    <ProjectProvider> 
-                      <Switch>
-                        <Route exact path="/play" component={() => <PlayView/>} />
-                        <Route exact path="/template/:templateKey" component={() => <TemplateView/>} />
-                        <Route path="/object/:objectId" component={() => <ObjectView/>} />
-                        <Route path="/template/schema/:templateKey" component={() => <TemplateSchemaView/>} />
-                        <Route exact path="/" component={() => <HomeView />} />
-                      </Switch>
-                    </ProjectProvider>} 
-                  />
-                </Switch>
+              <Switch>
+                <Route exact path="/account" component={() => <AccountView/>} />
+                <Route exact path="/store" component={() => <StoreView/>} />
+                <Route exact path="/game/:gameId" component={() => <GameView />} />
+                <Route path="/account/:accountKey" component={() => <AccountView/>} />
+                <Route path ="/" component={() => 
+                  <ProjectProvider> 
+                    <Switch>
+                      <Route exact path="/play" component={() => <PlayView/>} />
+                      <Route exact path="/template/:templateKey" component={() => <TemplateView/>} />
+                      <Route path="/object/:objectId" component={() => <ObjectView/>} />
+                      <Route path="/template/schema/:templateKey" component={() => <TemplateSchemaView/>} />
+                      <Route exact path="/" component={() => <HomeView />} />
+                    </Switch>
+                  </ProjectProvider>} 
+                />
+              </Switch>
               </AppLayout>
             </AccountsProvider>
           </WalletProvider>
