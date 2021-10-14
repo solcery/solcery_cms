@@ -65,10 +65,10 @@ export const CardRotator = (props: {
 
             $(".cover", this).css({
                 transform: `rotate3d(${posY / hypotenuseCursor}, ${-posX / hypotenuseCursor}, 0, ${ratio * maxTilt}deg)`,
-                filter: `brightness(${1.3 - bounding.y / bounding.height * 0.5})` // 0.6 = offset, brightness will be from 0.6 to 1.6
+                filter: `brightness(${1.5 - bounding.y / bounding.height * 1})` // 0.6 = offset, brightness will be from 0.6 to 1.6
             });
             $(".gloss", this).css({
-                transform: `translateX(${posX * ratio * 0.95}px) translateY(${posY * ratio}px)` // 0.75 = offset
+                transform: `translateX(${posX * ratio * 0.97}px) translateY(${posY * ratio}px)` // 0.75 = offset
             });
         })
         .mouseleave(function() {
@@ -108,6 +108,7 @@ export const CardRotator = (props: {
           picture={props.picture}
           card={props.card}
         />
+        <div className="gloss"></div>
       </div>
     </div>)
 }
@@ -146,7 +147,7 @@ export const SlotSelector = (props: {
       </div>}
       {isModalVisible && <div className="modal" onClick={handleCancel}>
         <Row>
-          <h1>CHOOSE AN NFT</h1>
+          <h1 className="animate__animated animate__fadeIn">CHOOSE AN NFT</h1>
         </Row>
         <Row>
         </Row>
@@ -165,7 +166,6 @@ export const SlotSelector = (props: {
                   picture={elem.picture}
                 />)
               }
-              
             })}
           </div>
         </Row>
@@ -319,15 +319,15 @@ export const NftSelector = (props: {
 }
 
 const unityGameContext = new UnityContext({
-  loaderUrl: "game/game_4.loader.js",
-  dataUrl: "game/game_4.data",
-  frameworkUrl: "game/game_4.framework.js",
-  codeUrl: "game/game_4.wasm",
+  loaderUrl: "game/game_6.loader.js",
+  dataUrl: "game/game_6.data",
+  frameworkUrl: "game/game_6.framework.js",
+  codeUrl: "game/game_6.wasm",
 })
 
 export const GameView = () => {
 
-  const { connected, wallet, publicKey } = useWallet();
+  const { connected, wallet, publicKey, connect } = useWallet();
   const connection = useConnection();
   const { gameId } = useParams<GameViewParams>();
   const projectPublicKey = new PublicKey(gameId);
@@ -337,6 +337,8 @@ export const GameView = () => {
   const [ gameState, setGameState ] = useState<GameState|undefined>(undefined);
   const [ gamePublicKey, setGamePublicKey ] = useState<PublicKey|undefined>(undefined);
   const [ items, setItems ] = useState<any>([]);
+  const [ unityLoaded, setUnityLoaded ] = useState(false)
+  const [ unityLoadProgression, setUnityLoadProgression ] = useState(0)
 
   const playerStatePublicKey = new PublicKey('9RCmNwyM49CPyWqXgwgrPjtHVewMBLBYyS5MqGZUupe2')
 
@@ -437,7 +439,6 @@ export const GameView = () => {
             })
           }
           else {
-            console.log('empty')
             state.objects.forEach((card: any) => {
               if (card.tplId == slot.id) 
                 card.tplId = state.content.cardTypes[slot.default].id
@@ -453,7 +454,10 @@ export const GameView = () => {
   useEffect(() => {
     if (!gameState)
       return
-    unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
+    // unityGameContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
+    // unityGameContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData()));
+    // unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
+    // unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
   }, [ gameState ])
 
   const createPlayerState = async() => {
@@ -590,108 +594,121 @@ export const GameView = () => {
   unityGameContext.on("OnUnityLoaded", async () => {
     if (!gameState)
       return
-    // var data = { IsConnected: true };
-    // unityPlayContext.send("ReactToUnity", "SetWalletConnected", JSON.stringify(data));
-    console.log(JSON.stringify(gameState.extractContent()))
-    console.log(JSON.stringify(gameState.extractDisplayData()))
-    console.log(JSON.stringify(gameState.extractGameState()))
     unityGameContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
     unityGameContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData()));
     unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
   });
 
+  useEffect(function () {
+    unityGameContext.on("progress", function (progression) {
+      console.log(progression)
+      setUnityLoadProgression(Math.floor(progression * 100))
+    });
+  }, []);
+
+  useEffect(function () {
+    unityGameContext.on("loaded", function () {
+      setUnityLoaded(true)
+    });
+  }, []);
+
   unityGameContext.on("CastCard", async (cardId: number) => {
     if (!gameState)
       return
-    console.log('CAST CARD')
     gameState.useCard(cardId, 1)
     unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
   });
 
   unityGameContext.on("LogAction", async (log: string) => {
-    if (!gameState)
-      return
+    if (!gameState || !game || !gamePublicKey)
+      return;
+    if (!publicKey || wallet === undefined) 
+      return;
     var logToApply = JSON.parse(log)
     for (let logEntry of logToApply.Steps) {
+      if (logEntry.actionType == 2) {
+        leaveGame()
+      }
       if (logEntry.actionType == 0)
       {
+        let writer = new BinaryWriter()
         gameState.useCard(logEntry.data, logEntry.playerId)
-        unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
+        gameState.write(writer)
+
+        let step = game.step
+        let stepBuffer = Buffer.allocUnsafe(4)
+        stepBuffer.writeUInt32LE(step)
+
+        let setStateIx = new TransactionInstruction({
+          keys: [
+            { pubkey: publicKey, isSigner: true, isWritable: false },
+            { pubkey: gamePublicKey, isSigner: false, isWritable: true },
+            { pubkey: game.state, isSigner: false, isWritable: true },
+          ],
+          programId: programId,
+          data: Buffer.concat([
+            Buffer.from([2]),
+            Buffer.from(stepBuffer),
+            writer.buf.slice(0, writer.length),
+          ])
+        });
+        sendTransaction(connection, wallet, [setStateIx], [])
       }
     }
   });
-
-  // unityGameContext.on("LogAction", async (log: string) => {
-  //   if (!gameState || !game || !gamePublicKey)
-  //     return;
-  //   if (!publicKey || wallet === undefined) 
-  //     return;
-  //   var logToApply = JSON.parse(log)
-  //   for (let logEntry of logToApply.Steps) {
-  //     if (logEntry.actionType == 2) {
-  //       leaveGame()
-  //     }
-  //     if (logEntry.actionType == 0)
-  //     {
-  //       let writer = new BinaryWriter()
-  //       gameState.useCard(logEntry.data, logEntry.playerId)
-  //       gameState.write(writer)
-
-  //       let step = game.step
-  //       let stepBuffer = Buffer.allocUnsafe(4)
-  //       stepBuffer.writeUInt32LE(step)
-
-  //       let setStateIx = new TransactionInstruction({
-  //         keys: [
-  //           { pubkey: publicKey, isSigner: true, isWritable: false },
-  //           { pubkey: gamePublicKey, isSigner: false, isWritable: true },
-  //           { pubkey: game.state, isSigner: false, isWritable: true },
-  //         ],
-  //         programId: programId,
-  //         data: Buffer.concat([
-  //           Buffer.from([2]),
-  //           Buffer.from(stepBuffer),
-  //           writer.buf.slice(0, writer.length),
-  //         ])
-  //       });
-  //       sendTransaction(connection, wallet, [setStateIx], [])
-  //     }
-  //   }
-  // });
 
 
 return(
   connected ?
 
-      <div>
+      <div style={{ width: '100%', height: '100%', verticalAlign: "middle", overflow:"hidden"}}>
         { gamePublicKey ? 
-          
-          <Unity tabIndex={3} style={{ width: '100%', height: '100%' }} unityContext={unityGameContext} />
-          :
-          <div>
-            <Row align="top">
-              <Col span={12}>
-                <img className="game_logo animate__animated animate__fadeInLeft" 
-                    src="https://cdn.discordapp.com/attachments/863663744194183198/895676013814624276/Summoner_Logo.png"/>
-                <div className="game_info">
-                  <h1 className="game_title animate__animated animate__fadeInUp">Summoner</h1>
-                  <Divider className="divider"/>
-                  <p className="game_description animate__animated animate__fadeInUp">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
+            <div style={{ width: '100%', height: '100%', top: '70vh' }}>
+              {!unityLoaded && <div className="unity_loading">
+                <div className="progress">
+                  <div className="progress-value" style={{width: "" + unityLoadProgression + "%" }}></div>
                 </div>
-              </Col>
-              <Col span={12}>
-                <NftSelector onChange={(result: any) => {
-                  setItems(result)
-                }}/>
-                <div className="one" onClick={createGame}><span>START GAME</span></div>
-              </Col>
-            </Row>
-          </div>
+                <p>Loading</p>
+              </div>}
+              {true && <Unity tabIndex={3} style={{ width: '100%', height: '100%', visibility: unityLoaded ? 'visible' : 'hidden'  }} unityContext={unityGameContext} />}
+            </div>
+          :
+            <div>
+              <Row align="top">
+                <Col span={12}>
+                  <img className="game_logo animate__animated animate__fadeInLeft" 
+                      src="https://cdn.discordapp.com/attachments/863663744194183198/895676013814624276/Summoner_Logo.png"/>
+                  <div className="game_info">
+                    <h1 className="game_title animate__animated animate__fadeInUp">Summoner</h1>
+                    <Divider className="divider"/>
+                    <p className="game_description animate__animated animate__fadeInUp">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <NftSelector onChange={(result: any) => {
+                    setItems(result)
+                  }}/>
+                  <div className="one" onClick={createGame}><span>START GAME</span></div>
+                </Col>
+              </Row>
+            </div>
         }
       </div>
   :
-    <ConnectButton/>    
-  );
-};
+    <div className="login_page">
+      <video autoPlay muted loop className='bgvideo'>
+        <source src="/gameplay.mp4" type="video/mp4"/>
+      </video>
+      <Row align='middle'>
+         <Col offset={8} span={8}>
+          <img className="solcery_text animate__animated animate__slideInDown" src="/solcery.png"/>
+          <div className="btn-container">
+            <a onClick={connect} className="btn effect01"><span>Connect & play</span></a>
+          </div>
+        </Col>
+      </Row>
+    </div>
+  )
+}
 
 

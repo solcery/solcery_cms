@@ -31,7 +31,8 @@ h2 {
 
 .one {
   animation: fadeIn; 
-  animation-duration: 5s;
+  animation-duration: 0.5s;
+  animation-delay: 0.1s;
   top: 70%;
   margin: auto;
   margin-top: 4%;

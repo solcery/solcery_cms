@@ -5,7 +5,7 @@ import { useWallet } from "../../contexts/wallet";
 import { construct, projectPublicKey, projectStoragePublicKey } from "../../solcery/engine";
 import { useParams, useHistory } from "react-router-dom";
 import Unity, { UnityContext } from "react-unity-webgl";
-import { Button, Layout, InputNumber, Collapse, Divider } from "antd";
+import { Button, Layout, InputNumber, Collapse, Divider, Space, Input } from "antd";
 import { applyBrick, brickToOldBrick, oldBrickToBrick } from "../../solcery/types/brick";
 import { GameState } from "../../solcery/game"
 import { Project } from "../../solcery/classes"
@@ -47,7 +47,20 @@ export const PlayView = () => {
   const history = useHistory();
   const [ gameState, setGameState ] = useState<any>(undefined)
   const [ step, setStep ] = useState(0)
-  
+  const [ cardTypeNamesById, setCardTypeNamesById ] = useState<any>(undefined)
+  const [ filter, setFilter ] = useState<any>({ attrs: {} })
+
+
+  const onHeaderFilterChange = (value: string) => {
+    filter.header = value
+    setStep(step + 1)
+  }
+
+  const onAttrFilterChange = (attr: string, value: number) => {
+    filter.attrs[attr] = value
+    setStep(step + 1)
+  }
+
   useEffect(() => {
     if (gameState)
       return
@@ -59,6 +72,17 @@ export const PlayView = () => {
     })()
     return () => { unityPlayContext.quitUnityInstance() }
   })
+
+  useEffect(() => {
+    if (!gameState)
+      return
+    let result = new Map()
+    for (let cardTypeId of Object.keys(gameState.content.cardTypes)) {
+      let cardType: any = gameState.content.cardTypes[cardTypeId]
+      result.set(cardType.id, cardType.name)
+    }
+    setCardTypeNamesById(Object.fromEntries(result))
+  }, [ gameState])
 
   const onCardAttrChange = (cardId: number, attrName: string, value: number) => {
     gameState.objects.get(cardId).attrs[attrName] = value;
@@ -90,28 +114,58 @@ export const PlayView = () => {
     }
   });
 
+  if (!gameState || !gameState.objects || !project)
+    return (<div></div>)
+
+  let data = Array.from(gameState.objects.values()).map((elem: any) => {
+    return {
+      header: (cardTypeNamesById && cardTypeNamesById[elem.tplId]) + " [" + elem.id + "]",
+      object: elem,
+    }
+  }).filter((elem: any) => {
+    for (let attr of Object.keys(filter.attrs)) {
+      if (elem.object.attrs[attr] != filter.attrs[attr])
+        return false
+    }
+    return filter.header === undefined || elem.header.includes(filter.header)
+  })
+
   return (
     <Layout>
       <Sider width='300'>
+        <Input onChange={(e:any) => { onHeaderFilterChange(e.target.value) }}/>
+        {Object.values(gameState.content.attributes).map((attr: any) => (
+          <div>
+            { attr.name  } 
+            <InputNumber 
+              precision={0}
+              value={ filter.attrs[attr.code] }
+              onChange={(value) => { onAttrFilterChange(attr.code, value) }} 
+            />
+          </div>)
+        )}
+        
         <Collapse>
-          { gameState && gameState.objects && Array.from(gameState.objects.values()).map((elem: any) => 
-            <Panel header={ "Card " + elem.id } key={elem.id}>
-              { Object.keys(elem.attrs).map((attrName: string) => 
-                <div key={"" + elem.id + "." + attrName}>
-                  {attrName} : <InputNumber 
-                    precision={0}
-                    value={ elem.attrs[attrName] }
-                    onChange={(value) => { onCardAttrChange(elem.id, attrName, value) }} 
-                  />
-                  <Divider />
-                </div>
-              )}
+          {data.map((elem: any) => 
+            <Panel header={elem.header} key={elem.object.id}>
+              <Space direction="vertical">
+                {Object.keys(elem.object.attrs).map((attrName: string) => 
+                  <div key={"" + elem.object.id + "." + attrName}>
+                    {attrName} : <InputNumber 
+                      precision={0}
+                      value={ elem.object.attrs[attrName] }
+                      onChange={(value) => { onCardAttrChange(elem.object.id, attrName, value) }} 
+                    />
+                   
+                  </div>
+                )}
+              </Space>
             </Panel>
           )}
         </Collapse>
       </Sider>
       <Content className="unityFrame">
-         { gameState && project && <Unity tabIndex={3} style={{ width: '100%' }} unityContext={unityPlayContext} />}
+         {/*<Unity tabIndex={3} style={{ width: '100%' }} unityContext={unityPlayContext} />*/}
       </Content>
     </Layout>
   );

@@ -1,9 +1,4 @@
 @charset "UTF-8";
-body {
-  background: -webkit-linear-gradient(top, #000 0%, #131621 100%);
-  height: 100vh;
-  overflow: hidden;
-}
 
 .cardholder {
   -webkit-filter: grayscale(50%);
@@ -49,7 +44,7 @@ body {
 
 .cardimage {
   left: 1%;
-  width: 98%;
+  width: 97%;
   position:absolute;
   top: 1%;
 }
@@ -73,7 +68,7 @@ body {
   height: 20%;
   left: 0;
   text-align: center;
-  width: 95%;
+  width: 90%;
   font-size: 120%;
   /*background-color: green;*/
   z-index: 2;
@@ -133,3 +128,103 @@ body {
   font-size: 1.4em;
 }
 
+.login_page {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  /*background: -webkit-linear-gradient(top, #000 0%, #131621 100%);*/
+}
+
+
+.btn-container {
+  margin-top: 10%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn {
+  width: 370px;
+  height: 60px;
+  text-decoration: none;
+  border: 1px solid rgb(146, 148, 248);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn span {
+  font-size: 2.4em;
+}
+
+.btn:hover {
+  box-shadow: 1px 1px 25px 10px rgba(146, 148, 248, 0.4);
+}
+
+.btn:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(146, 148, 248, 0.4),
+    transparent
+  );
+  transition: all 650ms;
+}
+
+.btn:hover:before {
+  left: 100%;
+}
+
+.unity_loading {
+  margin: auto;
+  position: absolute;
+  top: 70vh;
+  width: 100%;
+}
+
+.progress {
+  background: rgba(255,255,255,0.1);
+  justify-content: flex-start;
+  border-radius: 100px;
+  align-items: center;
+  position: relative;
+  margin: auto;
+  display: flex;
+  height: 40px;
+  width: 500px;
+}
+
+.progress-value {
+  box-shadow: 0 10px 40px -10px #fff;
+  border-radius: 100px;
+  background: #fff;
+  height: 30px;
+  width: 0;
+}
+
+.bgvideo {
+  position: fixed;
+  margin: auto;
+  left: 0;
+  right: 0;
+  width: 100%;
+  filter: brightness(15%);
+}
+
+.solcerer {
+  width: 100%;
+}
+
+.solcery_logo {
+  width: 100%;
+}
+
+.solcery_text {
+  margin-top: 60%;
+  width: 80%;
+}

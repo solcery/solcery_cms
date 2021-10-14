@@ -1,22 +1,28 @@
 TODO:
 
+Создание playerState добавить в гейм
 
 create account state
-
-
 BrickTree to string
+
+
+фильтр для плей мода
 card names in play mode
 
 
-Карты без экшенов
-Убрать кнопку send
+Карты без экшенов - проверить что работают
+Убрать кнопку send из play
+Юнити-фрейм
+ошибка на выполнении механики
+ошибка на выполнении транзации?
+Генерировать cardType
+фильтр по enabled
+
 
 util.get
 редирект обратно на сохранении
 нули
-enabled для construct
-ошибка на выполнении механики
-ошибка на выполнении транзации?
+
 
 
 
@@ -39,6 +45,9 @@ UNITY - art override
 
 Iterator
 
+
+
+Player в GameState
 
 GlobalVars?
 
