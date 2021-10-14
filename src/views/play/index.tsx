@@ -165,7 +165,7 @@ export const PlayView = () => {
         </Collapse>
       </Sider>
       <Content className="unityFrame">
-         {/*<Unity tabIndex={3} style={{ width: '100%' }} unityContext={unityPlayContext} />*/}
+         <Unity tabIndex={3} style={{ width: '100%' }} unityContext={unityPlayContext} />
       </Content>
     </Layout>
   );

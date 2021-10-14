@@ -1,17 +1,9 @@
 TODO:
 
-Создание playerState добавить в гейм
-
-create account state
 BrickTree to string
 
 
-фильтр для плей мода
-card names in play mode
-
-
 Карты без экшенов - проверить что работают
-Убрать кнопку send из play
 Юнити-фрейм
 ошибка на выполнении механики
 ошибка на выполнении транзации?
@@ -22,8 +14,6 @@ card names in play mode
 util.get
 редирект обратно на сохранении
 нули
-
-
 
 
 dictionary
@@ -428,3 +418,59 @@ GameContent
 
 
 GameContent
+
+
+
+
+
+Challenges we ran into
+
+Трудно онбордить новых сотрудников. Порог входа в блокчейн высокий. Иногда приходится объяснять что блокчейн это добро и будущее, иногда долго объяснять что вообще происходит. 
+
+- Солана предоставляет очень быстрый, но при этом очень ограниченный в разных смыслах рантайм. Каждое из ее ограничений так или иначе требовало внимания.
+- Максимальный размер транзакции был побежден с помощью компиляции. Все, необходимое рантайму, подготавливаем заранее.
+- Ограничение на количество вычислений для одной транзакции - побороли с помощью виртуальной машины, которая умеет быстро сериализоваться и становиться на паузу.
+- Один из наших продуктов - база данных. Невозможность за раз пройтись по всем ее аккаунтам полечили с помощью: а) изобретение избыточного, но бесконечно обратно-совместимого формата данных и б) представлением базы данных в виде, в достаточной степени удобном для VM.
+- Отсутствие игровых разработчиков. Общаясь с другими командами, мы видели очень много людей, пришедших в крипто-игры из крипты и очень мало, пришедших из геймдева. Это сделало дискуссии довольно однобокими.
+
+
+Accomplishments that we're proud of
+
+В целом все хорошее, что мы сделали - мы сделали в рамках решения каких-то значимых проблем. Из общих достижений
+Изобрели стандарт для NFT, который станет будущим и, по нашему мнению, может устроить революцию не только в NFT, а в игровой индустрии в целом.
+Одни из первых собрали реально рабочую игру на Solana, хоть и простенькую.
+Придумали и спроектировали схему governance для Solcery, которая позволит пользователям управлять протоколами, оперируя теми же инструментами, которые используются для разработки игр.
+
+
+What we learned
+
+RUST - замечательный и очень крутой язык.
+Unity плохо подходит для веба.
+Очень легко добиться инвестиций и очень трудно их легализовать.
+
+
+Challenges we ran into
+
+-It is difficult to recruit new employees for blockchain development. The entry threshold into blockchain is pretty high.
+- Solana provides a rapid runtime, but also strictly limited in many ways. Each of its limitations required attention in one way or another. 
+- The maximum transaction size has been defeated by compilation and batching. Everything that's necessary for protocols should be prepared in advance.
+- The limit on the number of calculations for one transaction was worked around with a virtual machine that is able to suspend it's work and effectively serialize it's state into Solana account.
+- One of our products is a database. The inability to go through all of its accounts at once was cured by a) inventing a redundant but infinitely backward-compatible data format and b) representing the database in a way that is VM-friendly, which will allow to program and perform database scripts and migrations with user-friendly node editor.
+- Lack of game developers in the ecosystem. Talking to other teams, we saw a lot of people coming into cryptogames from defi and trading and very few coming from gamedev. This has made the discussions rather one-sided.
+
+
+Accomplishments that we're proud of
+
+Basically, all the good things we've done - we've done solving some problem. Of the general achievements.
+Invented a standard for the NFT that would become the future, and in our opinion, could revolutionize not just the NFT, but the gaming industry as a whole.
+We were one of the first to build a working game on Solana, even if it's very simple.
+We invented and designed governance for Solcery, which would allow users to operate protocols using the same tools that are used for game development.
+
+
+What we learned
+
+RUST is a great and very cool language.
+Unity is not well suited to the web.
+Very easy to get investment and very hard to legalise.
+
+Translated with www.DeepL.com/Translator (free version)

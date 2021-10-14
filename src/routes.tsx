@@ -4,6 +4,7 @@ import { WalletProvider } from "./contexts/wallet";
 import { ConnectionProvider } from "./contexts/connection";
 import { AccountsProvider } from "./contexts/accounts";
 import { ProjectProvider } from "./contexts/project";
+import { PlayerProvider } from "./contexts/player";
 import { AppLayout } from "./components/Layout";
 import { SolceryMenu } from "./components/SolceryMenu";
 
@@ -19,7 +20,7 @@ export function Routes() {
               <Switch>
                 <Route exact path="/account" component={() => <AccountView/>} />
                 <Route exact path="/store" component={() => <StoreView/>} />
-                <Route exact path="/game/:gameId" component={() => <GameView />} />
+                <Route exact path="/game/:gameId" component={() => <PlayerProvider><GameView /></PlayerProvider>} />
                 <Route path="/account/:accountKey" component={() => <AccountView/>} />
                 <Route path ="/" component={() => 
                   <ProjectProvider> 

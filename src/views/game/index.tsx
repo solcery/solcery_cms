@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useConnection, sendTransaction } from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
+import { usePlayer } from "../../contexts/player";
 import { useParams } from "react-router-dom";
 import Unity, { UnityContext } from "react-unity-webgl";
-import { GameState, GameSchema, Game } from "../../solcery/game"
+import { GameState, GameSchema, Game, programId } from "../../solcery/game"
 import { Project } from "../../solcery/classes"
 import { Button, Modal, Layout, Row, Col, Divider } from 'antd';
 import { ConnectButton } from "../../components/ConnectButton"
@@ -24,8 +25,6 @@ import 'animate.css';
 const { Header, Footer, Sider, Content } = Layout;
 
 const {TOKEN_PROGRAM_ID} = require('@solana/spl-token');
-
-const programId = new PublicKey("GN1p6pe6m7rdK3re2TayqJyQtJUme1EnCLyYrTAArYRR");
 
 type GameViewParams = {
   gameId: string;
@@ -325,51 +324,22 @@ const unityGameContext = new UnityContext({
   codeUrl: "game/game_6.wasm",
 })
 
+
+
 export const GameView = () => {
 
   const { connected, wallet, publicKey, connect } = useWallet();
   const connection = useConnection();
   const { gameId } = useParams<GameViewParams>();
   const projectPublicKey = new PublicKey(gameId);
+  const { player, playerStatePublicKey, gamePublicKey } = usePlayer();
 
   const [ playerStateData, setPlayerStateData ] = useState<Buffer|undefined>(undefined);
   const [ game, setGame ] = useState<Game|undefined>(undefined);
   const [ gameState, setGameState ] = useState<GameState|undefined>(undefined);
-  const [ gamePublicKey, setGamePublicKey ] = useState<PublicKey|undefined>(undefined);
   const [ items, setItems ] = useState<any>([]);
   const [ unityLoaded, setUnityLoaded ] = useState(false)
   const [ unityLoadProgression, setUnityLoadProgression ] = useState(0)
-
-  const playerStatePublicKey = new PublicKey('9RCmNwyM49CPyWqXgwgrPjtHVewMBLBYyS5MqGZUupe2')
-
-
-
-  useEffect(() => {
-    (async () => {
-      let stateInfo = await connection.getAccountInfo(playerStatePublicKey)
-      if (stateInfo) {
-        connection.onAccountChange(playerStatePublicKey, (accountInfo) => {
-          setPlayerStateData(accountInfo.data)
-        })
-        setPlayerStateData(stateInfo.data)
-      }
-    })()
-  }, [])
-
-  useEffect(() => {
-    if (playerStateData) {
-      var reader = new BinaryReader(playerStateData)
-      let playerPublicKey = reader.readPubkey()
-      let isInGame = reader.readBoolean()
-      if (false && isInGame) {
-        let gameKey = reader.readPubkey()
-        setGamePublicKey(gameKey)
-      } else {
-        if (gamePublicKey)
-          setGamePublicKey(undefined)
-      }
-    }
-  }, [ playerStateData ])
 
   useEffect(() => {
     if (!gamePublicKey) {
@@ -460,34 +430,6 @@ export const GameView = () => {
     // unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
   }, [ gameState ])
 
-  const createPlayerState = async() => {
-    if (!publicKey || wallet === undefined ) {
-      return;
-    }
-    if (!wallet.publicKey)
-      return
-    var instructions = [];
-
-    var stateAccount = new Account()
-    instructions.push(SystemProgram.createAccount({
-      programId: programId,
-      space: 65, // TODO
-      lamports: await connection.getMinimumBalanceForRentExemption(65, 'singleGossip'),
-      fromPubkey: publicKey,
-      newAccountPubkey: stateAccount.publicKey,
-    })); 
-
-    instructions.push(new TransactionInstruction({
-      keys: [
-        { pubkey: publicKey, isSigner: true, isWritable: false },
-        { pubkey: stateAccount.publicKey, isSigner: false, isWritable: true }
-      ],
-      programId: programId,
-      data: Buffer.from([5]),
-    }));
-    sendTransaction(connection, wallet, instructions, [ stateAccount ])
-  }
-
   const createGame = async () => {
     if (!publicKey || wallet === undefined) {
       return;
@@ -531,7 +473,8 @@ export const GameView = () => {
       data: Buffer.from([0]),
     }));
 
-
+    if (!playerStatePublicKey)
+      throw new Error("TESDG")
     // join game
     let keys = [
       { pubkey: publicKey, isSigner: true, isWritable: false },
@@ -577,6 +520,8 @@ export const GameView = () => {
     if (!publicKey || wallet === undefined) 
       return;
     if (!gamePublicKey)
+      return;
+    if (!playerStatePublicKey)
       return;
     let setStateIx = new TransactionInstruction({
       keys: [
@@ -695,19 +640,7 @@ return(
         }
       </div>
   :
-    <div className="login_page">
-      <video autoPlay muted loop className='bgvideo'>
-        <source src="/gameplay.mp4" type="video/mp4"/>
-      </video>
-      <Row align='middle'>
-         <Col offset={8} span={8}>
-          <img className="solcery_text animate__animated animate__slideInDown" src="/solcery.png"/>
-          <div className="btn-container">
-            <a onClick={connect} className="btn effect01"><span>Connect & play</span></a>
-          </div>
-        </Col>
-      </Row>
-    </div>
+    <div></div>
   )
 }
 

@@ -1,7 +1,8 @@
 import { applyBrick } from "./types/brick";
 import { BinaryReader, BinaryWriter } from "borsh";
 import { PublicKey } from "@solana/web3.js";
-export { programId } from "./engine"
+
+export const programId = new PublicKey("GN1p6pe6m7rdK3re2TayqJyQtJUme1EnCLyYrTAArYRR");
 
 type GameObject = {
 	id: number,
