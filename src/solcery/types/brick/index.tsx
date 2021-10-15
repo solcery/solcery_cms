@@ -610,7 +610,8 @@ basicBricks.push({
     { id: 1, code: 'varName', name: 'Variable name', type: new SString() }
   ],
   func: (params: any, ctx: any) => {
-    return ctx.vars[params[1]]
+    let res = ctx.vars[params[1]]
+    return res ? res : 0
   }
 })
 
