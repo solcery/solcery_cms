@@ -120,12 +120,14 @@ export const TemplateView = () => {
     var tableData: any[] = []
     for (let objectInfo of objects) {
       var res = Object.fromEntries(objectInfo.fields)
-      if (filter === undefined || res[1].includes(filter)) {
+      if (filter === undefined || (res[1] && res[1].includes(filter))) {
         res.key = objectInfo.publicKey.toBase58()
         res.id = objectInfo.id
         tableData.push(res)
       }
     }
+
+
 
     const divStyle = {
       width: '100%',
@@ -145,6 +147,9 @@ export const TemplateView = () => {
             title = { field.name + ((field.id === 1 && filter) ? ' : [' + filter + ']' : '') } 
             key = { field.id } 
             filterDropdown={field.id === 1 && <Input defaultValue={filter} onChange={(event: any) => { applyFilter(event.target.value) }}/>}
+            sorter = { field.fieldType.sorter && ((a: any, b: any) => { 
+              return field.fieldType.sorter(a[field.id], b[field.id]) 
+            }) }
             render = {
               (text, object: any) => {
                 return React.createElement(

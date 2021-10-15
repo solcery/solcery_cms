@@ -17,6 +17,7 @@ export class SType {
   static typename = "Empty type";
   typename = "Empty type";
   nameRender = (<NameRender type={this}/>);
+  sorter: any; //TODO
 
   // static typedataRender: any = (<p>Error</p>);
   valueRender: any = null;

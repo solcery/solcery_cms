@@ -227,7 +227,6 @@ export class TplObject {
     }
     var rawData = reader.readFixedArray(reader.readU32())
     var fields = new Map()
-
     for (let fieldOffset of fieldOffsets) {
       var field = template.getField(fieldOffset.fieldId)
       if (!field)

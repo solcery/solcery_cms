@@ -14,12 +14,13 @@ import { setProgramIds } from "../utils/ids";
 import { WalletAdapter } from "./wallet";
 import { cache, getMultipleAccounts, MintParser } from "./accounts";
 import { TokenListProvider, ENV as ChainID, TokenInfo } from "@solana/spl-token-registry";
+import Cookies from 'universal-cookie';
 
 export type ENV =
   // | "mainnet-beta"
   // | "testnet"
   | "devnet"
-  // | "localnet";
+  | "localnet";
 
 export const ENDPOINTS = [
   // {
@@ -37,14 +38,15 @@ export const ENDPOINTS = [
     endpoint: clusterApiUrl("devnet"),
     chainID: ChainID.Devnet,
   },
-  // {
-  //   name: "localnet" as ENV,
-  //   endpoint: "http://127.0.0.1:8899",
-  //   chainID: ChainID.Devnet,
-  // },
+  {
+    name: "localnet" as ENV,
+    endpoint: "http://127.0.0.1:8899",
+    chainID: ChainID.Devnet,
+  },
 ];
 
-const DEFAULT = ENDPOINTS[0].endpoint;
+var cookies = new Cookies()
+const DEFAULT = cookies.get("network") === 'local' ? ENDPOINTS[1].endpoint : ENDPOINTS[0].endpoint;
 const DEFAULT_SLIPPAGE = 0.25;
 
 interface ConnectionConfig {
@@ -72,11 +74,7 @@ const ConnectionContext = React.createContext<ConnectionConfig>({
 });
 
 export function ConnectionProvider({ children = undefined as any }) {
-  const [endpoint, setEndpoint] = useLocalStorageState(
-    "connectionEndpts",
-    ENDPOINTS[0].endpoint
-  );
-
+  const [endpoint, setEndpoint] = useState(DEFAULT);
   const [slippage, setSlippage] = useLocalStorageState(
     "slippage",
     DEFAULT_SLIPPAGE.toString()

@@ -8,10 +8,10 @@ import { SInt, SString, ValueRenderParams, SBrick } from '../index'
 
 
 const unityContext = new UnityContext({
-  loaderUrl: "node_editor/node_editor_11.loader.js",
-  dataUrl: "node_editor/node_editor_11.data",
-  frameworkUrl: "node_editor/node_editor_11.framework.js",
-  codeUrl: "node_editor/node_editor_11.wasm",
+  loaderUrl: "node_editor/node_editor_12.loader.js",
+  dataUrl: "node_editor/node_editor_12.data",
+  frameworkUrl: "node_editor/node_editor_12.framework.js",
+  codeUrl: "node_editor/node_editor_12.wasm",
 })
 
 export const ValueRender = (props: ValueRenderParams) => {

@@ -88,7 +88,7 @@ export class GameState {
           let contentAttr = attributes[contentAttrId]
           attrs[contentAttr.code] = 0
         }
-        attrs.place = cardPack.place
+        attrs.place = cardPack.place ? cardPack.place : 0;
 
 	      this.objects.set(cardId, {
 	      	id: cardId,
@@ -96,7 +96,7 @@ export class GameState {
 	        attrs: attrs
 	      })
         if (cardPack.initializer) {
-          let ctx = new Context({ game: this, object: this.objects.get(cardId), extra: {} })
+          let ctx = new Context({ game: this, object: this.objects.get(cardId),  extra: { vars: { cardNumber: i } } })
           applyBrick(cardPack.initializer, ctx)
         }
         if (cardType.initializer) {
@@ -210,10 +210,8 @@ export class GameState {
 				CardType: gameObject.tplId,
 				CardPlace: gameObject.attrs.place,
         Attrs: cardAttrs,
-        //CardAttrs: Object.entries(gameObject.attrs).map(([ k ,v ]) => { Name: k, Value: v}),
 			})
 		}
-    console.log(result)
 		return result
 	}	
 
