@@ -68,7 +68,28 @@ export const PlayView = () => {
       return
     (async () => {
       var constructedContent = await project.сonstructContent(connection)
-      setGameState(new GameState(constructedContent))
+      let gameState = new GameState(constructedContent)
+
+      let slots = gameState.content.slots
+      console.log(JSON.stringify(gameState.toBuffer()))
+
+      for (let slotId of Object.keys(slots)) {
+        console.log(slotId)
+        console.log(slots)
+        let slot = slots[slotId]
+        let defaultCardTypeId = slot.default
+        let cardType = gameState.content.cardTypes[defaultCardTypeId]
+        console.log(cardType)
+        console.log(slot.id)
+        console.log(gameState.objects)
+        for (let object of gameState.objects.values()) {
+          if (object.tplId === slot.id) {
+            object.tplId = cardType.id
+            console.log(object)
+          }
+        }
+      }
+      setGameState(gameState)
     })()
     return () => { unityPlayContext.quitUnityInstance() }
   })

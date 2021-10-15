@@ -40,7 +40,7 @@ export const CardRender = (props: {
     <div className="cardname">{ props.card.name }</div>
     <div className="carddescription">{ props.card.description }</div>
     <img src={props.picture ? props.picture : props.card.picture} className="cardimage"/>
-    <img src="https://cdn.discordapp.com/attachments/863663744194183198/896236065248141372/grey_wood_front.png" className="cardframe"/>
+    <img src="https://i.ibb.co/mG7BnfV/frame.png" className="cardframe"/>
   </div>)
 }
 
@@ -220,6 +220,7 @@ const loadNftsAsCollectionItems = async (mintPubkeys: PublicKey[], content: any)
             picture: imageResponse.data.image,
             collection: collectionKey
           })
+          console.log(result)
         }
       }
     }
@@ -231,13 +232,13 @@ const loadNftsAsCollectionItems = async (mintPubkeys: PublicKey[], content: any)
 export const NftSelector = (props: {
   onChange: (filled: any) => void,
 }) => { 
-  const { connected, wallet } = useWallet();
+  const { connected, wallet, publicKey} = useWallet();
   const connection = useConnection();
   const { gameId } = useParams<GameViewParams>();
   const projectPublicKey = new PublicKey(gameId);
   const [ content, setContent ] = useState<any>(undefined)
   const [ slots, setSlots ] = useState<any>(undefined)
-  const [ nfts, setNfts ] = useState<any>([]);
+  const [ nfts, setNfts ] = useState<any>(undefined);
 
   const onChange = () => {
     props.onChange(slots.filter((elem: any) => elem.selected).map((elem: any) => {
@@ -250,12 +251,12 @@ export const NftSelector = (props: {
   }
 
   const getNfts = async() => {
-    if (!wallet || wallet.publicKey == undefined)
+    if (!publicKey)
       return []
     let connection = new Connection(clusterApiUrl('mainnet-beta'), 'confirmed');
 
     let response = await connection.getParsedTokenAccountsByOwner(
-      wallet.publicKey,
+      publicKey,
       {
         programId: TOKEN_PROGRAM_ID,
       },
@@ -288,22 +289,26 @@ export const NftSelector = (props: {
   }, [])
 
   useEffect(() => {
-    if (wallet?.publicKey && content) {
+    if (publicKey && content) {
+      console.log('if both');
+
       (async () => {
-        setNfts(await loadNftsAsCollectionItems(await getNfts(), content))
+        let nfts = await loadNftsAsCollectionItems(await getNfts(), content)
+        console.log(nfts)
+        setNfts(nfts)
       })()
     }
-  }, [ content ])
+  }, [ content, publicKey ])
 
 
   return ( 
     <div>
       { content && <h1 className="select_some_cards animate__animated animate__fadeIn">Choose some cards:</h1>}
       <Divider className="divider"/>
-      {content && 
+      { content && nfts &&
         <Row className="card_slots animate__animated animate__fadeIn">
           { slots && slots.map((elem: any) => <Col>
-            <p className="slot_header">Slot</p>
+            <p key={"slot_header_" + elem.data.id} className="slot_header">{elem.data.name}</p>
             <SlotSelector
               key={elem.data.id}
               slot={elem}
@@ -318,16 +323,18 @@ export const NftSelector = (props: {
 }
 
 const unityGameContext = new UnityContext({
-  loaderUrl: "game/game_6.loader.js",
-  dataUrl: "game/game_6.data",
-  frameworkUrl: "game/game_6.framework.js",
-  codeUrl: "game/game_6.wasm",
+  loaderUrl: "game/game_8.loader.js",
+  dataUrl: "game/game_8.data",
+  frameworkUrl: "game/game_8.framework.js",
+  codeUrl: "game/game_8.wasm",
 })
 
 
 
 export const GameView = () => {
 
+
+  const [ constructedContent, setConstructedContent ] = useState<any>(undefined);
   const { connected, wallet, publicKey, connect } = useWallet();
   const connection = useConnection();
   const { gameId } = useParams<GameViewParams>();
@@ -340,6 +347,13 @@ export const GameView = () => {
   const [ items, setItems ] = useState<any>([]);
   const [ unityLoaded, setUnityLoaded ] = useState(false)
   const [ unityLoadProgression, setUnityLoadProgression ] = useState(0)
+
+  useEffect(() => {
+    (async () => {
+      let project = await Project.get(connection, projectPublicKey)
+      setConstructedContent(await project.сonstructContent(connection))
+    })()
+  }, [])    
 
   useEffect(() => {
     if (!gamePublicKey) {
@@ -367,7 +381,53 @@ export const GameView = () => {
     })()    
   }, [ gamePublicKey ])
   
+
+  const loadGameStateFromAccount = async (accountInfo: any) => {
+    if (!game) 
+      return; // TODO
+    let data = accountInfo?.data
+
+    let state = new GameState()
+    state.content = constructedContent
+    let reader = new BinaryReader(data)
+    state.read(reader)
+
+    // applying items
+    let allItems: any[] = []
+    for (let player of game.players) {
+      allItems = allItems.concat(player.items)
+    }
+    let collectionItems = await loadNftsAsCollectionItems(allItems.map((item: any) => item.publicKey ), state.content)
+    let items = new Map();
+    if (allItems.length != collectionItems.length)
+      throw new Error("Wrong NFTs in game")
+    for (let i in allItems) {
+      items.set(allItems[i].tplId, collectionItems[i])
+    }
+    for (let slotId of Object.keys(state.content.slots)) {
+      let slot = state.content.slots[slotId]
+      let item = items.get(slot.id)
+      if (item) {
+        let cardType = state.content.cardTypes[item.cardTypeKey.toBase58()]
+        cardType.picture = item.picture
+        state.objects.forEach((card: any) => {
+          if (card.tplId == slot.id) 
+            card.tplId = cardType.id
+        })
+      }
+      else {
+        state.objects.forEach((card: any) => {
+          if (card.tplId == slot.id) 
+            card.tplId = state.content.cardTypes[slot.default].id
+        })
+      } 
+    }
+    setGameState(state)
+  }
+
   useEffect(() => {
+    if (!constructedContent)
+      return;
     if (!game) {
       if (gameState)
         setGameState(undefined)
@@ -375,67 +435,27 @@ export const GameView = () => {
     }
     
     (async () => {
-      let gameStateInfo = await connection.getAccountInfo(game.state)
-      if (gameStateInfo?.data) {
-        let project = await Project.get(connection, game.project)
-        let constructedContent = await project.сonstructContent(connection)
-
-        let state = new GameState()
-        state.content = constructedContent
-        let reader = new BinaryReader(gameStateInfo.data)
-        state.read(reader)
-
-        // applying items
-        let allItems: any[] = []
-        for (let player of game.players) {
-          allItems = allItems.concat(player.items)
-        }
-        let collectionItems = await loadNftsAsCollectionItems(allItems.map((item: any) => item.publicKey ), state.content)
-        let items = new Map();
-        if (allItems.length != collectionItems.length)
-          throw new Error("Wrong NFTs in game")
-        for (let i in allItems) {
-          items.set(allItems[i].tplId, collectionItems[i])
-        }
-        for (let slotId of Object.keys(state.content.slots)) {
-          let slot = state.content.slots[slotId]
-          let item = items.get(slot.id)
-          if (item) {
-            let cardType = state.content.cardTypes[item.cardTypeKey.toBase58()]
-            cardType.picture = item.picture
-            state.objects.forEach((card: any) => {
-              if (card.tplId == slot.id) 
-                card.tplId = cardType.id
-            })
-          }
-          else {
-            state.objects.forEach((card: any) => {
-              if (card.tplId == slot.id) 
-                card.tplId = state.content.cardTypes[slot.default].id
-            })
-          } 
-        }
-        
-        setGameState(state)
-      }
+      loadGameStateFromAccount(await connection.getAccountInfo(game.state))
+      connection.onAccountChange(game.state, loadGameStateFromAccount)
     })()
-  }, [ game ])
+  }, [ game, constructedContent ])
 
-  useEffect(() => {
-    if (!gameState)
-      return
-    // unityGameContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
-    // unityGameContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData()));
-    // unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
-    // unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
-  }, [ gameState ])
+
 
   const createGame = async () => {
     if (!publicKey || wallet === undefined) {
       return;
     }
-    var instructions = [];
+    let projectSettings = constructedContent.projectSettings
+    let baseGameStateAccountKey = projectSettings[Object.keys(projectSettings)[0]].gameStateAccount
+    let baseGameStateAccountPublicKey = new PublicKey(baseGameStateAccountKey)
 
+    let gameStateInfo = await connection.getAccountInfo(baseGameStateAccountPublicKey)
+    if (!gameStateInfo)
+      throw new Error('NO compiled game state')
+    var instructions = [];
+    
+    let gameStateBuffer = gameStateInfo.data
     var gameAccount = new Account()
     instructions.push(SystemProgram.createAccount({
       programId: programId,
@@ -444,19 +464,13 @@ export const GameView = () => {
       fromPubkey: publicKey,
       newAccountPubkey: gameAccount.publicKey,
     }));
-
-    let project = await Project.get(connection, projectPublicKey)
-    let constructedContent = await project.сonstructContent(connection)
-    let gm = new GameState(constructedContent)
-
-    let writer = new BinaryWriter()
-    let gameBuffer = gm.write(writer)
-    let gameStateBuffer = writer.buf.slice(0, writer.length)
+    //H9dvmwtrV4FxcJfdCRtxv2fATKqeG4fNUyboXKxDnmLK
     var gameStateAccount = new Account()
+    var gameStateSize = gameStateBuffer.length
     instructions.push(SystemProgram.createAccount({
       programId: programId,
-      space: gameStateBuffer.length,
-      lamports: await connection.getMinimumBalanceForRentExemption(gameStateBuffer.length, 'singleGossip'),
+      space: gameStateSize,
+      lamports: await connection.getMinimumBalanceForRentExemption(gameStateSize, 'singleGossip'),
       fromPubkey: publicKey,
       newAccountPubkey: gameStateAccount.publicKey,
     }));
@@ -468,6 +482,8 @@ export const GameView = () => {
         { pubkey: gameAccount.publicKey, isSigner: false, isWritable: true },
         { pubkey: projectPublicKey, isSigner: false, isWritable: false },
         { pubkey: gameStateAccount.publicKey, isSigner: false, isWritable: true },
+        { pubkey: baseGameStateAccountPublicKey, isSigner: false, isWritable: false },
+
       ],
       programId: programId,
       data: Buffer.from([0]),
@@ -481,7 +497,7 @@ export const GameView = () => {
       { pubkey: gameAccount.publicKey, isSigner: false, isWritable: true },
       { pubkey: playerStatePublicKey, isSigner: false, isWritable: true },
     ];
-    writer = new BinaryWriter()
+    let writer = new BinaryWriter()
     writer.writeU8(1)
     writer.writeU32(items.length)
     for (let item of items) {
@@ -498,20 +514,18 @@ export const GameView = () => {
       data: writer.buf.slice(0, writer.length)
     }));
 
-    // set state
-    instructions.push(new TransactionInstruction({
-      keys: [
-        { pubkey: publicKey, isSigner: true, isWritable: false },
-        { pubkey: gameAccount.publicKey, isSigner: false, isWritable: true },
-        { pubkey: gameStateAccount.publicKey, isSigner: false, isWritable: true },
-      ],
-      programId: programId,
-      data: Buffer.concat([
-        Buffer.from([2]),
-        Buffer.from([0, 0, 0, 0]),
-        gameStateBuffer,
-      ])
-    }));
+    // instructions.push(new TransactionInstruction({
+    //   keys: [
+    //     { pubkey: publicKey, isSigner: true, isWritable: false },
+    //     { pubkey: gameAccount.publicKey, isSigner: false, isWritable: true },
+    //     { pubkey: gameStateAccount.publicKey, isSigner: false, isWritable: true }, 
+    //   ],
+    //   programId: programId,
+    //   data: Buffer.concat([
+    //     Buffer.from([2]),
+    //     Buffer.from([0, 0, 0, 0])
+    //   ])
+    // }));
 
     sendTransaction(connection, wallet, instructions, [ gameAccount, gameStateAccount ])
   }
@@ -544,9 +558,16 @@ export const GameView = () => {
     unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
   });
 
+  useEffect(() => {
+    if (!gameState)
+      return
+    unityGameContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
+    unityGameContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData()));
+    unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
+  }, [ gameState ])
+
   useEffect(function () {
     unityGameContext.on("progress", function (progression) {
-      console.log(progression)
       setUnityLoadProgression(Math.floor(progression * 100))
     });
   }, []);
@@ -558,10 +579,48 @@ export const GameView = () => {
   }, []);
 
   unityGameContext.on("CastCard", async (cardId: number) => {
-    if (!gameState)
-      return
-    gameState.useCard(cardId, 1)
-    unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
+    if (!gameState || !game || !gamePublicKey)
+      return;
+    if (!publicKey || wallet === undefined) 
+      return;
+    let diff = gameState.useCard(cardId, 1)
+    let attrIndexes = new Map()
+    let attrIndex = 0
+    for (let attrId of Object.keys(gameState.content.attributes)) { // TODO:??
+      let attr = gameState.content.attributes[attrId]
+      attrIndexes.set(attr.code, attrIndex)
+      attrIndex++;
+    }
+    let writer = new BinaryWriter()
+    console.log(diff)
+    writer.writeU32(diff.size)
+    for (let objectId of diff.keys()) {
+      writer.writeU32(objectId)
+      let objectDiff = diff.get(objectId)
+      writer.writeU32(objectDiff.size)
+      for (let attrName of objectDiff.keys()) {
+        let attrIndex = attrIndexes.get(attrName)
+        if (attrIndex === undefined) 
+          throw new Error("Error serializing game state diff")
+        writer.writeU32(attrIndex)
+        writer.writeU32(objectDiff.get(attrName))
+      }
+    }
+
+    let updateStateIx = new TransactionInstruction({
+      keys: [
+        { pubkey: publicKey, isSigner: true, isWritable: false },
+        { pubkey: gamePublicKey, isSigner: false, isWritable: false },
+        { pubkey: game.state, isSigner: false, isWritable: true },
+      ],
+      programId: programId,
+      data: Buffer.concat([
+        Buffer.from([6]),
+        writer.buf.slice(0, writer.length),
+      ])
+    });
+    sendTransaction(connection, wallet, [updateStateIx], [])
+    // unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
   });
 
   unityGameContext.on("LogAction", async (log: string) => {

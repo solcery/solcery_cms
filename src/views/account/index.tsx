@@ -109,6 +109,53 @@ export const AccountView = () => {
     })
   }
 
+  const setAccountData = async (accountPublicKey: PublicKey, data: Buffer, offset: number) => {
+    console.log('setAccountData')
+    console.log(offset)
+    const MAX_DATA_SIZE = 700
+    if (wallet === undefined || !wallet.publicKey)
+      return
+    if (data.length <= MAX_DATA_SIZE) {
+      let writer = new BinaryWriter()
+      writer.writeU8(3)
+      writer.writeU8(0)
+      writer.writeU64(offset) 
+      // let buf = writer.buf.slice(0, writer.length + 8)
+      // buf.writeBigInt
+      console.log(writer.buf.slice(0, writer.length))
+      const saveAccountIx = new TransactionInstruction({
+        keys: [
+          { pubkey: accountPublicKey, isSigner: false, isWritable: true },
+        ],
+        programId: programId,
+        data: Buffer.concat([ 
+          writer.buf.slice(0, writer.length),
+          data,
+        ]),
+      });
+      sendTransaction(connection, wallet, [saveAccountIx], [])
+    }
+    else {
+      let writer = new BinaryWriter()
+      writer.writeU8(3)
+      writer.writeU8(0)
+      writer.writeU64(offset)
+      const saveAccountIx = new TransactionInstruction({
+        keys: [
+          { pubkey: accountPublicKey, isSigner: false, isWritable: true },
+        ],
+        programId: programId,
+        data: Buffer.concat([ 
+          writer.buf.slice(0, writer.length),
+          data.slice(0, MAX_DATA_SIZE),
+        ]),
+      });
+      await sendTransaction(connection, wallet, [saveAccountIx], []).then(async () => {
+        await setAccountData(accountPublicKey, data.slice(MAX_DATA_SIZE), offset + MAX_DATA_SIZE)
+      })
+    }
+    
+  }
 
   const saveAccount = async (key: string) => {
     if (!publicKey) {
@@ -117,17 +164,20 @@ export const AccountView = () => {
     if (wallet === undefined) {
       return;
     }
+    let writer = new BinaryWriter()
     const accountPublicKey = new PublicKey(key);
     var jsonData = JSON.parse((document.getElementById('accountData') as HTMLInputElement).value)
     var accountData = Buffer.from(jsonData.data);
-    const saveAccountIx = new TransactionInstruction({
-      keys: [
-        { pubkey: accountPublicKey, isSigner: false, isWritable: true },
-      ],
-      programId: programId,
-      data: Buffer.concat([ Buffer.from([3, 0]), accountData]),
-    });
-    sendTransaction(connection, wallet, [saveAccountIx], []);
+    setAccountData(accountPublicKey, accountData, 0)
+
+    // const saveAccountIx = new TransactionInstruction({
+    //   keys: [
+    //     { pubkey: accountPublicKey, isSigner: false, isWritable: true },
+    //   ],
+    //   programId: programId,
+    //   data: Buffer.concat([ Buffer.from([3, 0]), accountData]),
+    // });
+    // sendTransaction(connection, wallet, [saveAccountIx], []);
   }
 
   const airdrop = () => {

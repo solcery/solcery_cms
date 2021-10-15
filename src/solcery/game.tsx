@@ -114,12 +114,17 @@ export class GameState {
           let contentAttr = attributes[contentAttrId]
           attrs[contentAttr.code] = 0
         }
-        attrs.place = slots[slotId].place
+        let slot = slots[slotId]
+        attrs.place = slot.place
         this.objects.set(cardId, {
           id: cardId,
-          tplId: slots[slotId].id,
+          tplId: slot.id,
           attrs: attrs
         })
+        if (slot.initializer) {
+          let ctx = new Context({ game: this, object: this.objects.get(cardId), extra: {} })
+          applyBrick(slot.initializer, ctx)
+        }
         cardId++;
       }
     }
@@ -136,10 +141,17 @@ export class GameState {
     writer.writeU32(this.objects.size)
     for (let [_, object ] of this.objects) {
       writer.writeU32(object.tplId)
+      writer.writeU32(Object.keys(object.attrs).length)
       for (let value of Object.values(object.attrs)) {
         writer.writeI32(parseInt(value as string))
       }
     }
+  }
+
+  toBuffer = () => {
+    let writer = new BinaryWriter()
+    this.write(writer)
+    return writer.buf.slice(0, writer.length)
   }
 
   read = (reader: BinaryReader) => {
@@ -151,6 +163,7 @@ export class GameState {
     for (let id = 1; id <= objectsNumber; id++) {
       let attrMap = new Map()
       let tplId = reader.readU32()
+      let attrAmount = reader.readU32()
       attrs.forEach((attr) => {
         attrMap.set(attr, reader.readI32())
       })
@@ -171,6 +184,7 @@ export class GameState {
 			object: object,
 			extra: { vars: new Map([[ 'playerId', playerId ]]) },
 		})
+    ctx.diff = new Map<number, any>()
 		let cardTypes = this.content.cardTypes
 		for (let cardTypeKey in cardTypes) {
 			var cardType = cardTypes[cardTypeKey]
@@ -178,6 +192,7 @@ export class GameState {
 				applyBrick(cardType.action, ctx)
 			}
 		}
+    return ctx.diff
 	}
 
 	extractGameState = () => {
@@ -221,11 +236,12 @@ class Context {
 	vars: Map<string, number> = new Map();
 	game: GameState;
 	object: any;
-  args: any[] = []
+  diff: any;
+  args: any[] = [];
 	constructor(src: { game: GameState, object: any, extra?: any}) {
 		this.object = src.object;
 		this.game = src.game;
-		this.vars = src.extra?.vars
+		this.vars = src.extra?.vars;
 	}
 }
 
