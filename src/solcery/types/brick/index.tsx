@@ -272,10 +272,12 @@ export const exportBrick = (object: TplObject, brick: Brick) => {
   let paramsMap = new Map<string, BrickParamSignature>()
   exportArgsAsParams(brick, paramsMap)
   let argParams = Array.from(paramsMap.values())
+  let name = object.fields.get(1)
+  let subtype = 10000 + object.id
   return {
     type: brick.type,
-    subtype: 10000 + object.id, //TODO: magic number
-    name: object.fields.get(1),
+    subtype: subtype, //TODO: magic number
+    name: name,
     params: argParams,
     func: (params: any, ctx: any) => {
       // let args: any = {}
@@ -357,10 +359,12 @@ basicBricks.push({
     { id: 3, name: 'Else', type: new SBrick({ brickType: 0 }) }
   ],
   func: (params: any, ctx: any) => {
-    if (applyBrick(params[1], ctx))
+    if (applyBrick(params[1], ctx)) {
       applyBrick(params[2], ctx)
-    else
+    }
+    else {
       applyBrick(params[3], ctx)
+    }
   }
 })
 
@@ -456,8 +460,16 @@ basicBricks.push({
     { id: 2, code: 'value', name: 'Value', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
-    let x = applyBrick(params[2], ctx)
-    ctx.object.attrs[params[1]] = x
+    let attrName = params[1]
+    let value = applyBrick(params[2], ctx)
+    ctx.object.attrs[attrName] = value
+    if (ctx.diff) {
+      let objectId = ctx.object.id
+      let objectDiff = ctx.diff.get(objectId)
+      if (!objectDiff)
+        ctx.diff.set(objectId, new Map())
+      ctx.diff.get(objectId).set(attrName, value)
+    }
   }
 })
 
@@ -520,7 +532,7 @@ basicBricks.push({
     { id: 2, code: 'value2', name: 'Value2', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
-    return applyBrick(params[1], ctx) == applyBrick(params[2], ctx)
+    return applyBrick(params[1], ctx) === applyBrick(params[2], ctx)
   }
 })
 
@@ -741,8 +753,8 @@ basicBricks.push({
   ],
   func: (params: any, ctx: any) => {
     let min = applyBrick(params[1], ctx)
-    let max = applyBrick(params[2], ctx)
-    return min + Math.floor(Math.random() * max);
+    let max = applyBrick(params[2], ctx) + 1
+    return min + Math.floor(Math.random() * (max - min));
   }
 })
 
@@ -762,7 +774,6 @@ basicBricks.push({
   name: 'Card type Id',
   params: [],
   func: (params: any, ctx: any) => {
-    console.log(ctx.object.tplId)
     return ctx.object.tplId
   }
 })
