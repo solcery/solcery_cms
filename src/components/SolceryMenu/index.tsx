@@ -37,5 +37,9 @@ export const SolceryMenu = () => {
           <a href={'/#/template/' + tpl.publicKey.toBase58()}>{tpl.name}</a>
         </Menu.Item>)
       }
+      {project && 
+      <Menu.Item key="game">
+        <a href={ "/#/game/" + project.publicKey.toBase58() }>RELEASE</a>
+      </Menu.Item>}
     </Menu>);
 };
