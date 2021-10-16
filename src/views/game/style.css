@@ -51,24 +51,27 @@
 
 .cardname {
   position: absolute;
-  left: 0;
-  top: 68%;
+  left: 5%;
+  top: 67%;
   height: 10%;
   text-align: center;
-  width: 98%;
+  width: 90%;
   font-weight: bold;
   font-size: 160%;
   z-index: 4;
+  color: rgb(20, 20, 30);
+  font-color: red;
   /*background-color: blue;*/
 }
 
+
 .carddescription {
   position: absolute;
-  top: 80%;
+  top: 79%;
   height: 20%;
-  left: 0;
+  left: 3%;
   text-align: center;
-  width: 90%;
+  width: 93%;
   font-size: 120%;
   /*background-color: green;*/
   z-index: 2;
@@ -230,3 +233,32 @@
   margin-top: 4vh;
   width: 80%;
 }
+
+
+.close {
+  position: absolute;
+  right: 32px;
+  top: 32px;
+  width: 64px;
+  height: 64px;
+  opacity: 0.7;
+  z-index: 100;
+}
+.close:hover {
+  opacity: 1;
+}
+.close:before, .close:after {
+  position: absolute;
+  left: 15px;
+  content: ' ';
+  height: 33px;
+  width: 2px;
+  background-color: #333;
+}
+.close:before {
+  transform: rotate(45deg);
+}
+.close:after {
+  transform: rotate(-45deg);
+}
+

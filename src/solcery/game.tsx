@@ -266,6 +266,7 @@ const constructPlaces = (content: any) => {
         Min: (place.y1 ? place.y1 : 0) / 10000,
         Max: (place.y2 ? place.y2 : 0) / 10000,
       },
+      ZOrder: place.zOrder,
       CardFaceOption: place.face ? place.face : 0,
       CardLayoutOption: place.layout ? place.layout : 0,
     })

@@ -220,7 +220,6 @@ const loadNftsAsCollectionItems = async (mintPubkeys: PublicKey[], content: any)
             picture: imageResponse.data.image,
             collection: collectionKey
           })
-          console.log(result)
         }
       }
     }
@@ -290,11 +289,8 @@ export const NftSelector = (props: {
 
   useEffect(() => {
     if (publicKey && content) {
-      console.log('if both');
-
       (async () => {
         let nfts = await loadNftsAsCollectionItems(await getNfts(), content)
-        console.log(nfts)
         setNfts(nfts)
       })()
     }
@@ -354,7 +350,7 @@ export const GameView = () => {
       let project = await Project.get(connection, projectPublicKey)
       setConstructedContent(await project.сonstructContent(connection))
     })()
-  }, [])    
+  }, [])   
 
   useEffect(() => {
     if (!gamePublicKey) {
@@ -419,8 +415,9 @@ export const GameView = () => {
       }
       else {
         state.objects.forEach((card: any) => {
-          if (card.tplId == slot.id) 
+          if (card.tplId == slot.id) {
             card.tplId = state.content.cardTypes[slot.default].id
+          }
         })
       } 
     }
@@ -597,15 +594,12 @@ export const GameView = () => {
       attrIndex++;
     }
     let writer = new BinaryWriter()
-    console.log(diff)
     writer.writeU32(diff.size)
     for (let objectId of diff.keys()) {
       writer.writeU16(objectId)
       let objectDiff = diff.get(objectId)
       writer.writeU32(objectDiff.size)
       for (let attrName of objectDiff.keys()) {
-        console.log(attrName)
-        console.log(attrIndexes)
         let attrIndex = attrIndexes.get(attrName)
         if (attrIndex === undefined) 
           throw new Error("Error serializing game state diff")
@@ -668,10 +662,11 @@ export const GameView = () => {
     }
   });
 
-
-return(
-  connected ?
-
+  if (!constructedContent)
+    return (<div></div>)
+  let projectSettings = constructedContent.projectSettings[Object.keys(constructedContent.projectSettings)[0]]
+  return(
+    (connected && projectSettings) ?
       <div style={{ width: '100%', height: '100%', verticalAlign: "middle", overflow:"hidden"}}>
         { gamePublicKey ? 
             <div style={{ width: '100%', height: '100%', top: '70vh' }}>
@@ -681,6 +676,7 @@ return(
                 </div>
                 <p>Loading</p>
               </div>}
+              <a onClick={leaveGame} className="close"/>
               {true && <Unity tabIndex={3} style={{ width: '100%', height: '100%', visibility: unityLoaded ? 'visible' : 'hidden'  }} unityContext={unityGameContext} />}
             </div>
           :
@@ -688,11 +684,11 @@ return(
               <Row align="top">
                 <Col span={12}>
                   <img className="game_logo animate__animated animate__fadeInLeft" 
-                      src="https://cdn.discordapp.com/attachments/863663744194183198/895676013814624276/Summoner_Logo.png"/>
+                      src={projectSettings.picture}/>
                   <div className="game_info">
-                    <h1 className="game_title animate__animated animate__fadeInUp">Summoner</h1>
+                    <h1 className="game_title animate__animated animate__fadeInUp">{projectSettings.name}</h1>
                     <Divider className="divider"/>
-                    <p className="game_description animate__animated animate__fadeInUp">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
+                    <p className="game_description animate__animated animate__fadeInUp">{projectSettings.description}</p>
                   </div>
                 </Col>
                 <Col span={12}>
