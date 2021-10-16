@@ -140,10 +140,10 @@ export class GameState {
   write = (writer: BinaryWriter) => {
     writer.writeU32(this.objects.size)
     for (let [_, object ] of this.objects) {
-      writer.writeU32(object.tplId)
+      writer.writeU16(object.tplId)
       writer.writeU32(Object.keys(object.attrs).length)
       for (let value of Object.values(object.attrs)) {
-        writer.writeI32(parseInt(value as string))
+        writer.writeI16(parseInt(value as string))
       }
     }
   }
@@ -162,10 +162,10 @@ export class GameState {
     let objectsNumber = reader.readU32()
     for (let id = 1; id <= objectsNumber; id++) {
       let attrMap = new Map()
-      let tplId = reader.readU32()
+      let tplId = reader.readU16()
       let attrAmount = reader.readU32()
       attrs.forEach((attr) => {
-        attrMap.set(attr, reader.readI32())
+        attrMap.set(attr, reader.readI16())
       })
       this.objects.set(id, {
         id: id,

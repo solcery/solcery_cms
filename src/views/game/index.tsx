@@ -347,6 +347,7 @@ export const GameView = () => {
   const [ items, setItems ] = useState<any>([]);
   const [ unityLoaded, setUnityLoaded ] = useState(false)
   const [ unityLoadProgression, setUnityLoadProgression ] = useState(0)
+  const [ unityContentLoaded, setUnityContentLoaded ] = useState(false)
 
   useEffect(() => {
     (async () => {
@@ -411,8 +412,9 @@ export const GameView = () => {
         let cardType = state.content.cardTypes[item.cardTypeKey.toBase58()]
         cardType.picture = item.picture
         state.objects.forEach((card: any) => {
-          if (card.tplId == slot.id) 
+          if (card.tplId == slot.id)  {
             card.tplId = cardType.id
+          }
         })
       }
       else {
@@ -561,8 +563,11 @@ export const GameView = () => {
   useEffect(() => {
     if (!gameState)
       return
-    unityGameContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
-    unityGameContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData()));
+    if (!unityContentLoaded) {
+      unityGameContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
+      unityGameContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData())); 
+      setUnityContentLoaded(true)     
+    }
     unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
   }, [ gameState ])
 
@@ -595,15 +600,17 @@ export const GameView = () => {
     console.log(diff)
     writer.writeU32(diff.size)
     for (let objectId of diff.keys()) {
-      writer.writeU32(objectId)
+      writer.writeU16(objectId)
       let objectDiff = diff.get(objectId)
       writer.writeU32(objectDiff.size)
       for (let attrName of objectDiff.keys()) {
+        console.log(attrName)
+        console.log(attrIndexes)
         let attrIndex = attrIndexes.get(attrName)
         if (attrIndex === undefined) 
           throw new Error("Error serializing game state diff")
-        writer.writeU32(attrIndex)
-        writer.writeU32(objectDiff.get(attrName))
+        writer.writeU8(attrIndex)
+        writer.writeI16(objectDiff.get(attrName))
       }
     }
 

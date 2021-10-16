@@ -49,6 +49,7 @@ export const ObjectView = () => {
       programId: programId,
       data: Buffer.concat([ Buffer.from([1, 1]), buf]),
     });
+    console.log(JSON.stringify(buf))
     sendTransaction(connection, wallet, [saveObjectIx], []).then(() => {
       history.push("/template/" + template?.publicKey.toBase58());
     })

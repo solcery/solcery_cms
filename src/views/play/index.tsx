@@ -74,18 +74,12 @@ export const PlayView = () => {
       console.log(JSON.stringify(gameState.toBuffer()))
 
       for (let slotId of Object.keys(slots)) {
-        console.log(slotId)
-        console.log(slots)
         let slot = slots[slotId]
         let defaultCardTypeId = slot.default
         let cardType = gameState.content.cardTypes[defaultCardTypeId]
-        console.log(cardType)
-        console.log(slot.id)
-        console.log(gameState.objects)
         for (let object of gameState.objects.values()) {
           if (object.tplId === slot.id) {
             object.tplId = cardType.id
-            console.log(object)
           }
         }
       }

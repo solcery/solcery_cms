@@ -6,10 +6,12 @@ import { solceryTypes } from "../solceryTypes"
 declare module "borsh" {
   interface BinaryReader {
     readI32(): number;
+    readI16(): number;
   }
 
   interface BinaryWriter {
     writeI32(value: number): void;
+    writeI16(value: number): void;
   }
 }
 
@@ -26,6 +28,21 @@ declare module "borsh" {
   this.buf.writeInt32LE(value, this.length);
   this.length += 4;
 };
+
+(BinaryReader.prototype).readI16 = function readI16() {
+  const reader = this;
+  const value = this.buf.readInt16LE(this.offset);
+  this.offset += 2;
+  return value;
+};
+
+(BinaryWriter.prototype).writeI16 = function writeI16(value: number) {
+  const writer = this;
+  this.maybeResize();
+  this.buf.writeInt16LE(value, this.length);
+  this.length += 2;
+};
+
 
 
 
