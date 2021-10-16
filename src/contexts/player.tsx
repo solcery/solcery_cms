@@ -11,7 +11,7 @@ import { BinaryReader } from "borsh";
 import 'animate.css';
 
 const programId = new PublicKey("GN1p6pe6m7rdK3re2TayqJyQtJUme1EnCLyYrTAArYRR");
-const STATE_ACCOUNT_SEED = 'solcery_player_state_dv';
+const STATE_ACCOUNT_SEED = 'solcery_player_state_dev_net';
 const STATE_ACCOUNT_SIZE = 65;
 
 type PlayerState = {
