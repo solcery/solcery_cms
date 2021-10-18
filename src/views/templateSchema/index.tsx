@@ -46,6 +46,7 @@ export const TemplateSchemaView = () => {
     var buf = Buffer.from(serialize(SolcerySchema, template))
     const changeNameIx = new TransactionInstruction({
       keys: [
+        { pubkey: publicKey, isSigner: true, isWritable: false },
         { pubkey: template.publicKey, isSigner: false, isWritable: true },
       ],
       programId: programId,

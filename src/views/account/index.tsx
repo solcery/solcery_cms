@@ -77,9 +77,7 @@ export const AccountView = () => {
     const PROJECT_ACCOUNT_SIZE = 1000
     const STORAGE_ACCOUNT_SIZE = 3200
     var projectAccount = new Account()
-    console.log(projectAccount.publicKey.toBase58())
     var storageAccount = new Account()
-    console.log(storageAccount.publicKey.toBase58())
     var createProjectAccountIx = SystemProgram.createAccount({
       programId: programId,
       space: PROJECT_ACCOUNT_SIZE, // TODO
@@ -96,9 +94,9 @@ export const AccountView = () => {
     });
     const createProjectIx = new TransactionInstruction({
       keys: [
+        { pubkey: publicKey, isSigner: true, isWritable: false },
         { pubkey: projectAccount.publicKey, isSigner: false, isWritable: true },
         { pubkey: storageAccount.publicKey, isSigner: false, isWritable: true },
-        { pubkey: publicKey, isSigner: true, isWritable: false },
       ],
       programId: programId,
       data: Buffer.from([4, 0]),
@@ -110,8 +108,6 @@ export const AccountView = () => {
   }
 
   const setAccountData = async (accountPublicKey: PublicKey, data: Buffer, offset: number) => {
-    console.log('setAccountData')
-    console.log(offset)
     const MAX_DATA_SIZE = 700
     if (wallet === undefined || !wallet.publicKey)
       return
@@ -122,9 +118,9 @@ export const AccountView = () => {
       writer.writeU64(offset) 
       // let buf = writer.buf.slice(0, writer.length + 8)
       // buf.writeBigInt
-      console.log(writer.buf.slice(0, writer.length))
       const saveAccountIx = new TransactionInstruction({
         keys: [
+          { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
           { pubkey: accountPublicKey, isSigner: false, isWritable: true },
         ],
         programId: programId,
@@ -142,6 +138,7 @@ export const AccountView = () => {
       writer.writeU64(offset)
       const saveAccountIx = new TransactionInstruction({
         keys: [
+          { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
           { pubkey: accountPublicKey, isSigner: false, isWritable: true },
         ],
         programId: programId,

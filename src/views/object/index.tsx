@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback, useState } from "react";
 import ReactDOM from 'react-dom'
-import { useConnection, sendTransaction} from "../../contexts/connection";
+import { useConnection, sendTransaction } from "../../contexts/connection";
+import { useProject } from "../../contexts/project";
 import { useWallet } from "../../contexts/wallet";
 import { PublicKey, Account, TransactionInstruction } from "@solana/web3.js";
 import { SystemProgram } from "@solana/web3.js";
@@ -27,6 +28,7 @@ type ObjectViewParams = {
 export const ObjectView = () => {
 
   const { Column } = Table;
+  const { project } = useProject();
   let { objectId } = useParams<ObjectViewParams>();
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
@@ -38,18 +40,17 @@ export const ObjectView = () => {
   const saveObject = async () => {
     if (!publicKey || wallet === undefined)
       return;
-    if (!object || !template)
+    if (!object || !template || !project)
       return;
-    var buf = await object.serialize(connection)
-
     const saveObjectIx = new TransactionInstruction({
       keys: [
+        { pubkey: publicKey, isSigner: true, isWritable: true },
+        { pubkey: project.publicKey, isSigner: false, isWritable: true },
         { pubkey: objectPublicKey, isSigner: false, isWritable: true },
       ],
       programId: programId,
-      data: Buffer.concat([ Buffer.from([1, 1]), buf]),
+      data: Buffer.concat([ Buffer.from([1, 1]), await object.serialize(connection)]),
     });
-    console.log(JSON.stringify(buf))
     sendTransaction(connection, wallet, [saveObjectIx], []).then(() => {
       history.push("/template/" + template?.publicKey.toBase58());
     })

@@ -7,7 +7,7 @@ import { useParams, useHistory } from "react-router-dom";
 import { Button, Table, Input } from "antd";
 import { TemplateData, TemplateField, SolcerySchema, Storage, TplObject } from "../../solcery/classes"
 import { programId } from "../../solcery/engine"
-import { useProject} from "../../contexts/project";
+import { useProject } from "../../contexts/project";
 import Cookies from 'universal-cookie';
 
 
@@ -49,6 +49,7 @@ export const TemplateView = () => {
     }));
     instructions.push(new TransactionInstruction({
       keys: [
+        { pubkey: publicKey, isSigner: true, isWritable: false },
         { pubkey: project.publicKey, isSigner: false, isWritable: true },
         { pubkey: storage.template, isSigner: false, isWritable: false },
         { pubkey: storagePublicKey, isSigner: false, isWritable: true },
@@ -62,6 +63,7 @@ export const TemplateView = () => {
       let buf = await object?.serialize(connection)
       instructions.push(new TransactionInstruction({
         keys: [
+          { pubkey: publicKey, isSigner: true, isWritable: false },
           { pubkey: objectAccount.publicKey, isSigner: false, isWritable: true },
         ],
         programId: programId,
@@ -85,6 +87,7 @@ export const TemplateView = () => {
     var storagePublicKey = template.storages[0]// TODO
     const popFromStorageIx = new TransactionInstruction({
       keys: [
+        { pubkey: publicKey, isSigner: true, isWritable: false },
         { pubkey: storagePublicKey, isSigner: false, isWritable: true },
         { pubkey: objectPublicKey, isSigner: false, isWritable: false },
       ],
