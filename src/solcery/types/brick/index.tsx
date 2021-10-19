@@ -280,16 +280,16 @@ export const exportBrick = (object: TplObject, brick: Brick) => {
     name: name,
     params: argParams,
     func: (params: any, ctx: any) => {
-      // let args: any = {}
-      // Object.keys(params).forEach(function(paramId, index) {
-      //   let param = argParams[index]
-      //   args[param.name] = params[paramId]
-      // });
-      // ctx.args.push(args)
+      let args: any = {}
       Object.keys(params).forEach(function(paramId, index) {
         let param = argParams[index]
-        ctx.args[param.name] = applyBrick(params[paramId], ctx) // Calculating params TODO: addType
+        args[param.name] = params[paramId]
       });
+      ctx.args.push(args)
+      // Object.keys(params).forEach(function(paramId, index) {
+      //   let param = argParams[index]
+      //   ctx.args[param.name] = applyBrick(params[paramId], ctx) // Calculating params TODO: addType
+      // });
       return applyBrick(ctx.game.content[templateName][object.publicKey.toBase58()].brick, ctx) // closure?
     }
   }
@@ -314,14 +314,14 @@ export const getBricks = () => {
   return solceryBricks
 }
 
-const oldArgFunc = (params: any, ctx: any) => {
+const argFunc = (params: any, ctx: any) => {
   var args = ctx.args.pop()
   var result = applyBrick(args[params[1]], ctx)
   ctx.args.push(args)
   return result
 }
 
-const argFunc = (params: any, ctx: any) => {
+const altArgFunc = (params: any, ctx: any) => {
   return ctx.args[params[1]]
 }
 
