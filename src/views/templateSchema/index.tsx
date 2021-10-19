@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import ReactDOM from 'react-dom'
 import { useConnection, sendTransaction} from "../../contexts/connection";
+import { useProject } from "../../contexts/project";
 import { useWallet } from "../../contexts/wallet";
 import { PublicKey, Account, TransactionInstruction } from "@solana/web3.js";
 import './style.css';
@@ -33,7 +34,7 @@ export const TemplateSchemaView = () => {
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
   let { templateKey } = useParams<TemplateSchemaViewParams>();
-
+  let { project } = useProject();
   var [ template, setTemplate ] = useState<TemplateData | undefined>()
   var [ revision, setRevision ] = useState(0)
 
@@ -47,6 +48,7 @@ export const TemplateSchemaView = () => {
     const changeNameIx = new TransactionInstruction({
       keys: [
         { pubkey: publicKey, isSigner: true, isWritable: false },
+        { pubkey: project.publicKey, isSigner: false, isWritable: false },
         { pubkey: template.publicKey, isSigner: false, isWritable: true },
       ],
       programId: programId,

@@ -44,8 +44,8 @@ export const ObjectView = () => {
       return;
     const saveObjectIx = new TransactionInstruction({
       keys: [
-        { pubkey: publicKey, isSigner: true, isWritable: true },
-        { pubkey: project.publicKey, isSigner: false, isWritable: true },
+        { pubkey: publicKey, isSigner: true, isWritable: false },
+        { pubkey: project.publicKey, isSigner: false, isWritable: false },
         { pubkey: objectPublicKey, isSigner: false, isWritable: true },
       ],
       programId: programId,

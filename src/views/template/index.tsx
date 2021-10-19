@@ -88,6 +88,7 @@ export const TemplateView = () => {
     const popFromStorageIx = new TransactionInstruction({
       keys: [
         { pubkey: publicKey, isSigner: true, isWritable: false },
+        { pubkey: project.publicKey, isSigner: false, isWritable: false },
         { pubkey: storagePublicKey, isSigner: false, isWritable: true },
         { pubkey: objectPublicKey, isSigner: false, isWritable: false },
       ],
