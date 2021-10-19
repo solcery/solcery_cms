@@ -80,7 +80,7 @@ export const TemplateView = () => {
   const deleteObject = async(objectPublicKey: PublicKey) => {
     if (!publicKey || wallet === undefined) 
       return;
-    if (!template)
+    if (!project || !template)
       return
     if (!template.storages)
       throw new Error("Template.createObject error - storage is empty")

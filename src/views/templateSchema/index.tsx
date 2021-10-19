@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react"; 
 import ReactDOM from 'react-dom'
 import { useConnection, sendTransaction} from "../../contexts/connection";
 import { useProject } from "../../contexts/project";
@@ -39,7 +39,7 @@ export const TemplateSchemaView = () => {
   var [ revision, setRevision ] = useState(0)
 
   const update = () => {
-    if (!template)
+    if (!project || !template)
       return
     if (!publicKey || wallet === undefined) {
       return;
