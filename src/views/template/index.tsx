@@ -64,6 +64,7 @@ export const TemplateView = () => {
       instructions.push(new TransactionInstruction({
         keys: [
           { pubkey: publicKey, isSigner: true, isWritable: false },
+          { pubkey: project.publicKey, isSigner: false, isWritable: true },
           { pubkey: objectAccount.publicKey, isSigner: false, isWritable: true },
         ],
         programId: programId,
