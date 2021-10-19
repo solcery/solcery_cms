@@ -290,7 +290,9 @@ export const exportBrick = (object: TplObject, brick: Brick) => {
       //   let param = argParams[index]
       //   ctx.args[param.name] = applyBrick(params[paramId], ctx) // Calculating params TODO: addType
       // });
-      return applyBrick(ctx.game.content[templateName][object.publicKey.toBase58()].brick, ctx) // closure?
+      let result = applyBrick(ctx.game.content[templateName][object.publicKey.toBase58()].brick, ctx) // closure?
+      ctx.args.pop()
+      return result
     }
   }
 }
