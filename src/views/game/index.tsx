@@ -319,10 +319,10 @@ export const NftSelector = (props: {
 }
 
 const unityGameContext = new UnityContext({
-  loaderUrl: "game/game_13.loader.js",
-  dataUrl: "game/game_13.data",
-  frameworkUrl: "game/game_13.framework.js",
-  codeUrl: "game/game_13.wasm",
+  loaderUrl: "game/game_14.loader.js",
+  dataUrl: "game/game_14.data",
+  frameworkUrl: "game/game_14.framework.js",
+  codeUrl: "game/game_14.wasm",
 })
 
 
