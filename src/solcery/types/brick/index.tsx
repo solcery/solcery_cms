@@ -301,10 +301,15 @@ export const basicBricks: BrickSignature[] = [];
 export const customBricks: BrickSignature[] = [];
 export const solceryBricks: BrickSignature[] = [];
 
+function aplhabetSortBricks(a: BrickSignature, b: BrickSignature) {
+  return a.name.localeCompare(b.name)
+}
+
 export const updateCustomBricks = (src: BrickSignature[]) => {
   customBricks.length = 0
   for (let brick of src)
     customBricks.push(brick)
+  customBricks.sort(aplhabetSortBricks)
   solceryBricks.length = 0
   for (let brick of basicBricks)
     solceryBricks.push(brick)
