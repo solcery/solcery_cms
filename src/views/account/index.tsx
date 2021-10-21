@@ -13,10 +13,11 @@ import {
 import { useParams, useHistory } from "react-router-dom";
 import { getAccountObject, programId, projectPublicKey, projectStoragePublicKey, getAccountData } from "../../solcery/engine";
 import { Button, Input } from "antd";
+import Cookies from 'universal-cookie';
+
 
 export async function onWalletConnected() {
   
-
 }
 
 
@@ -26,13 +27,12 @@ type AccountViewParams = {
 
 export const AccountView = () => {
 
-
-
+  var cookies = new Cookies()
   const connection = useConnection();
-  const { wallet, publicKey } = useWallet();
+  const { connected, wallet, publicKey } = useWallet();
   const history = useHistory();
 
-  const createEmptyAccount = async (accountSize: number) => {
+  const createEmptyAccount = async (accountSize: number, ownerProgramId: PublicKey = programId) => {
     if (!publicKey) {
       return;
     }
@@ -43,7 +43,7 @@ export const AccountView = () => {
     var newAccount = new Account()
     connection.requestAirdrop(publicKey, accountCost)
     var createAccountIx = SystemProgram.createAccount({
-      programId: programId,
+      programId: ownerProgramId,
       space: accountSize, // TODO
       lamports: accountCost,
       fromPubkey: publicKey,
@@ -63,7 +63,8 @@ export const AccountView = () => {
 
   const createAccount = async () => {
     var size = parseInt((document.getElementById('accountSize') as HTMLInputElement).value)
-    window.location.replace("/#/account/" + await createEmptyAccount(size) );
+    var programPublicKey = new PublicKey((document.getElementById('programId') as HTMLInputElement).value)
+    history.push("/account/" + await createEmptyAccount(size, programPublicKey))
   }
 
   const newProject = async () => {
@@ -76,9 +77,7 @@ export const AccountView = () => {
     const PROJECT_ACCOUNT_SIZE = 1000
     const STORAGE_ACCOUNT_SIZE = 3200
     var projectAccount = new Account()
-    console.log(projectAccount.publicKey.toBase58())
     var storageAccount = new Account()
-    console.log(storageAccount.publicKey.toBase58())
     var createProjectAccountIx = SystemProgram.createAccount({
       programId: programId,
       space: PROJECT_ACCOUNT_SIZE, // TODO
@@ -95,18 +94,62 @@ export const AccountView = () => {
     });
     const createProjectIx = new TransactionInstruction({
       keys: [
+        { pubkey: publicKey, isSigner: true, isWritable: false },
         { pubkey: projectAccount.publicKey, isSigner: false, isWritable: true },
         { pubkey: storageAccount.publicKey, isSigner: false, isWritable: true },
-        { pubkey: publicKey, isSigner: true, isWritable: false },
       ],
       programId: programId,
       data: Buffer.from([4, 0]),
     });
     await sendTransaction(connection, wallet, [createProjectAccountIx, createStorageAccountIx, createProjectIx], [projectAccount, storageAccount]).then(() => {
+      cookies.set('projectKey', projectAccount.publicKey.toBase58())
       history.push("/#/account/" + storageAccount.publicKey.toBase58());
     })
   }
 
+  const setAccountData = async (accountPublicKey: PublicKey, data: Buffer, offset: number = 0) => {
+    const MAX_DATA_SIZE = 700
+    if (wallet === undefined || !wallet.publicKey)
+      return
+    if (data.length <= MAX_DATA_SIZE) {
+      let writer = new BinaryWriter()
+      writer.writeU8(3)
+      writer.writeU8(0)
+      writer.writeU64(offset) 
+      const saveAccountIx = new TransactionInstruction({
+        keys: [
+          { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
+          { pubkey: accountPublicKey, isSigner: false, isWritable: true },
+        ],
+        programId: programId,
+        data: Buffer.concat([ 
+          writer.buf.slice(0, writer.length),
+          data,
+        ]),
+      });
+      sendTransaction(connection, wallet, [saveAccountIx], [])
+    }
+    else {
+      let writer = new BinaryWriter()
+      writer.writeU8(3)
+      writer.writeU8(0)
+      writer.writeU64(offset)
+      const saveAccountIx = new TransactionInstruction({
+        keys: [
+          { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
+          { pubkey: accountPublicKey, isSigner: false, isWritable: true },
+        ],
+        programId: programId,
+        data: Buffer.concat([ 
+          writer.buf.slice(0, writer.length),
+          data.slice(0, MAX_DATA_SIZE),
+        ]),
+      });
+      await sendTransaction(connection, wallet, [saveAccountIx], []).then(async () => {
+        await setAccountData(accountPublicKey, data.slice(MAX_DATA_SIZE), offset + MAX_DATA_SIZE)
+      })
+    }
+  }
 
   const saveAccount = async (key: string) => {
     if (!publicKey) {
@@ -115,27 +158,40 @@ export const AccountView = () => {
     if (wallet === undefined) {
       return;
     }
+    let writer = new BinaryWriter()
     const accountPublicKey = new PublicKey(key);
     var jsonData = JSON.parse((document.getElementById('accountData') as HTMLInputElement).value)
     var accountData = Buffer.from(jsonData.data);
-    const saveAccountIx = new TransactionInstruction({
-      keys: [
-        { pubkey: accountPublicKey, isSigner: false, isWritable: true },
-      ],
-      programId: programId,
-      data: Buffer.concat([ Buffer.from([3, 0]), accountData]),
-    });
-    sendTransaction(connection, wallet, [saveAccountIx], []);
+    setAccountData(accountPublicKey, accountData, 0)
+
+    // const saveAccountIx = new TransactionInstruction({
+    //   keys: [
+    //     { pubkey: accountPublicKey, isSigner: false, isWritable: true },
+    //   ],
+    //   programId: programId,
+    //   data: Buffer.concat([ Buffer.from([3, 0]), accountData]),
+    // });
+    // sendTransaction(connection, wallet, [saveAccountIx], []);
   }
+
+  const airdrop = () => {
+    if (!publicKey || wallet === undefined) {
+      return;
+    }
+    connection.requestAirdrop(publicKey, 5 * LAMPORTS_PER_SOL)
+  }
+
 
   let { accountKey } = useParams<AccountViewParams>();
   if (accountKey) {
-    console.log(accountKey)
     loadAccount(accountKey);
   }
 
+
+
   return (
     <div>
+      {!connected && <ConnectButton />}
       { accountKey ? 
         <div>
           <Button id = 'saveButton' onClick = { () => { saveAccount(accountKey) } }>Save</Button>
@@ -143,10 +199,12 @@ export const AccountView = () => {
         </div>
         : 
         <div>
-          <Input id = "accountSize"></Input>
-          <Button id = 'createButton' onClick = { () => { newProject() } }>New</Button>
+          Program: <Input defaultValue={programId.toBase58()} id="programId"/>
+          Size: <Input id="accountSize"/>
+          <Button id = 'createButton' onClick = { () => { createAccount() } }>New</Button>
+          <Button id = 'newProject' onClick = { () => { newProject() } }>New project</Button>
         </div> }
-      <table id = "templateTable"></table>
+      <Button onClick={airdrop}>Airdrop</Button>
     </div>
   );
 };

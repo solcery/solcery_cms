@@ -1,41 +1,45 @@
-import React, { useCallback, useState, useEffect } from "react";
-import { useConnection, sendTransaction} from "../../contexts/connection";
-import { useWallet } from "../../contexts/wallet";
-import { LAMPORTS_PER_SOL, PublicKey, Account, TransactionInstruction } from "@solana/web3.js";
+import React, { useState, useEffect } from "react";
+import { useConnection } from "../../contexts/connection";
+import { useProject } from "../../contexts/project"
 import { SystemProgram } from "@solana/web3.js";
-import { notify } from "../../utils/notifications";
-import { ConnectButton } from "./../../components/ConnectButton";
-import { LABELS } from "../../constants";
-import "./style.less";
-import { Project, TemplateData, SolcerySchema, Storage} from "../../solcery/classes"
-import { getAccountObject, programId, projectPublicKey, projectStoragePublicKey} from "../../solcery/engine";
-import { Button, Input } from "antd";
+import { TemplateData, Storage} from "../../solcery/classes"
+import { Menu} from "antd"
+
+const { SubMenu } = Menu;
 
 export const SolceryMenu = () => {
-
+  const { project } = useProject();
   const connection = useConnection();
-  var [ templates, setTemplates ] = useState<TemplateData[]>([]);
+  var [ templates, setTemplates ] = useState<TemplateData[]>([]);  
 
   useEffect(() => { 
-    if (templates.length < 1) {
+    if (project)
       (async () => {
-        const strg = await Storage.get(connection, projectStoragePublicKey)
+        const strg = await Storage.get(connection, project?.templateStorage)
         setTemplates(await TemplateData.getAll(connection, strg.accounts))
       })()
-    }
-  });
+  }, [ project ]);
 
-  if (templates.length > 0) 
-    return (
-      <div className='Solcery-Bar'>
-        { templates.map((tpl) => {
-          return (<a key={tpl.publicKey.toBase58()} href={'/#/template/' + tpl.publicKey.toBase58()}>{tpl.name}</a>)
-        })}
-        
-        <table id='templatesTable'></table>
-      </div>
-    );
+  const handleClick = (event: any) => {
+
+  }
+
   return (
-    <div></div>
-  )
+    <Menu onClick={handleClick} mode="horizontal">
+      <Menu.Item key="play">
+        <a href="/#/play">PLAY</a>
+      </Menu.Item>
+      <Menu.Item key="home">
+        <a key='home' href='/#/'>Home</a>
+      </Menu.Item>
+      {templates.map((tpl) => 
+        <Menu.Item key={tpl.publicKey.toBase58()}>
+          <a href={'/#/template/' + tpl.publicKey.toBase58()}>{tpl.name}</a>
+        </Menu.Item>)
+      }
+      {project && 
+      <Menu.Item key="game">
+        <a href={ "/#/game/" + project.publicKey.toBase58() }>RELEASE</a>
+      </Menu.Item>}
+    </Menu>);
 };

@@ -1,27 +1,15 @@
-import React, { useCallback, useEffect, useState } from "react";
-import ReactDOM from 'react-dom'
+import React, { useCallback, useState, useEffect } from "react";
 import { useConnection, sendTransaction} from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
 import { LAMPORTS_PER_SOL, PublicKey, Account, TransactionInstruction } from "@solana/web3.js";
 import { SystemProgram } from "@solana/web3.js";
-import { notify } from "../../utils/notifications";
-import { ConnectButton } from "./../../components/ConnectButton";
-import { LABELS } from "../../constants";
-import './style.css';
-
 import { useParams, useHistory } from "react-router-dom";
-import { Button, Table } from "antd";
+import { Button, Table, Input } from "antd";
+import { TemplateData, TemplateField, SolcerySchema, Storage, TplObject } from "../../solcery/classes"
+import { programId } from "../../solcery/engine"
+import { useProject } from "../../contexts/project";
+import Cookies from 'universal-cookie';
 
-import { programId, projectPublicKey, projectStoragePublicKey } from "../../solcery/engine"
-import { solceryTypes, SType } from "../../solcery/types"
-import { TemplateData, SolcerySchema, TemplateField } from "../../solcery/classes"
-import { AddFieldPopup } from "./AddFieldPopup";
-
-import { deserializeUnchecked, serialize } from "borsh"
-
-import 'reactjs-popup/dist/index.css';
-
-export async function onWalletConnected() {}
 
 type TemplateViewParams = {
   templateKey: string;
@@ -29,126 +17,174 @@ type TemplateViewParams = {
 
 export const TemplateView = () => {
 
+  const cookies = new Cookies()
   const { Column } = Table;
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
   let history = useHistory();
   let { templateKey } = useParams<TemplateViewParams>();
-  const templatePublicKey = new PublicKey(templateKey);
-  var [ template, setTemplate ] = useState<TemplateData | undefined>();
-  var [ addFieldMenu, setAddFieldMenu ] = useState(false);
+  var [ objects, setObjects ] = useState<TplObject[] | undefined>(undefined);
+  var [ template, setTemplate ] = useState<TemplateData | undefined>(undefined);
+  var { project } = useProject();
+  let [ filter, setFilter ] = useState<any>(undefined)
 
-  const addField = async (fieldType : SType | undefined, fieldName: string) => {
-    if (!publicKey || wallet === undefined) return;
-    if (fieldType == undefined) return;
-
-    const data = Buffer.concat([
-      Buffer.from([0, 1]),
-      fieldType?.toBuffer(),
-      Buffer.from([fieldName.length, 0, 0, 0]), //TODO
-      Buffer.from(fieldName),
-      Buffer.from([1, 1])
-    ]);
-    const addFieldIx = new TransactionInstruction({
-      keys: [
-        { pubkey: templatePublicKey, isSigner: false, isWritable: true },
-      ],
-      programId: programId,
-      data: data,
-    });
-    await sendTransaction(connection, wallet, [addFieldIx], []);
-    load();
-  };
-
-  const deleteField = async (fieldId: number) => {
-    if (!publicKey || wallet === undefined) {
+  const createObject = async (src: PublicKey | undefined = undefined) => {
+    if (!publicKey || !project || wallet === undefined || !template) {
       return;
     }
-    const buf = Buffer.allocUnsafe(4);
-    buf.writeUInt32LE(fieldId);
-    const deleteFieldIx = new TransactionInstruction({
+    var instructions = [];
+
+    if (!template.storages)
+      throw new Error("Template.createObject error - storage is empty")
+    var storagePublicKey = template.storages[0]// TODO
+
+    var storage = await Storage.get(connection, storagePublicKey)
+    var objectAccount = new Account()
+    instructions.push(SystemProgram.createAccount({
+      programId: programId,
+      space: 3200, // TODO
+      lamports: await connection.getMinimumBalanceForRentExemption(3200, 'singleGossip'),
+      fromPubkey: publicKey,
+      newAccountPubkey: objectAccount.publicKey,
+    }));
+    instructions.push(new TransactionInstruction({
       keys: [
-        { pubkey: templatePublicKey, isSigner: false, isWritable: true },
+        { pubkey: publicKey, isSigner: true, isWritable: false },
+        { pubkey: project.publicKey, isSigner: false, isWritable: true },
+        { pubkey: storage.template, isSigner: false, isWritable: false },
+        { pubkey: storagePublicKey, isSigner: false, isWritable: true },
+        { pubkey: objectAccount.publicKey, isSigner: false, isWritable: true },
       ],
       programId: programId,
-      data: Buffer.concat([Buffer.from([0, 2,]), buf ]),
-    });
-    await sendTransaction(connection, wallet, [deleteFieldIx], []);
-    load();
-  };
-
-  const sendChangeName = async(templateName: string) => {
-    if (!publicKey || wallet === undefined) {
-      return;
+      data: Buffer.from([1, 0]),
+    }));
+    if (src) {
+      instructions.push(new TransactionInstruction({
+        keys: [
+          { pubkey: publicKey, isSigner: true, isWritable: false },
+          { pubkey: project.publicKey, isSigner: false, isWritable: false },
+          { pubkey: objectAccount.publicKey, isSigner: false, isWritable: true },
+          { pubkey: src, isSigner: false, isWritable: false },
+        ],
+        programId: programId,
+        data: Buffer.from([1, 2]),
+      }));
     }
-    // var templateName = (document.getElementById('templateName') as HTMLInputElement).value
-    var buf = Buffer.allocUnsafe(4)
-    buf.writeInt32LE(templateName.length)
-    const deleteFieldIx = new TransactionInstruction({
-      keys: [
-        { pubkey: templatePublicKey, isSigner: false, isWritable: true },
-      ],
-      programId: programId,
-      data: Buffer.concat([Buffer.from([0, 3]), buf, Buffer.from(templateName)]),
-    });
-    await sendTransaction(connection, wallet, [deleteFieldIx], []);
-    load();
-  };
-
-  function changeName() {
-    let name = prompt("Enter new name:", "New template name");
-    if (name == null || name == "") {
-      
-    } else {
-      sendChangeName(name);
-    }
+    sendTransaction(connection, wallet, instructions, [objectAccount]).then(() => {
+      history.push('/object/' + objectAccount.publicKey.toBase58());
+    })
   }
 
-  const load = async () => {
-    setTemplate(await TemplateData.get(connection, templatePublicKey));
-  };
+
+  const deleteObject = async(objectPublicKey: PublicKey) => {
+    if (!publicKey || wallet === undefined) 
+      return;
+    if (!project || !template)
+      return
+    if (!template.storages)
+      throw new Error("Template.createObject error - storage is empty")
+    var storagePublicKey = template.storages[0]// TODO
+    const popFromStorageIx = new TransactionInstruction({
+      keys: [
+        { pubkey: publicKey, isSigner: true, isWritable: false },
+        { pubkey: project.publicKey, isSigner: false, isWritable: false },
+        { pubkey: storagePublicKey, isSigner: false, isWritable: true },
+        { pubkey: objectPublicKey, isSigner: false, isWritable: false },
+      ],
+      programId: programId,
+      data: Buffer.from([2, 1]),
+    });
+    sendTransaction(connection, wallet, [popFromStorageIx], []).then(() => {
+      history.push('/template/' + templateKey);
+    })
+  }
+
+  const applyFilter = (value: string) => {
+    setFilter(value)
+    cookies.set(templateKey + '.filter.name', value)
+  }
+
+  useEffect(() => {
+    setFilter(cookies.get(templateKey + '.filter.name'))
+  }, [])
 
   useEffect(() => { 
-    if (!template) {
-      load();
-    }
-  });
+    if (project)
+      (async () => {
+        const tpl = await TemplateData.get(connection, new PublicKey(templateKey))
+        setTemplate(tpl)
+        var storage = await Storage.get(connection, tpl.storages[0])
+        setObjects(await tpl.getObjects(connection, storage.accounts))
+      })()
+  }, [ project ]);
 
-  if (template) {
-    var tableData: any[] = [];
-    for (let field of template.fields) {
-      tableData.push({
-        key: field.id,
-        id: field.id,
-        fieldType: field.fieldType,
-        name: field.name,
-      });
+  if (project && template && objects)
+  {
+    var tableData: any[] = []
+    for (let objectInfo of objects) {
+      var res = Object.fromEntries(objectInfo.fields)
+      if (filter === undefined || (res[1] && res[1].includes(filter))) {
+        res.key = objectInfo.publicKey.toBase58()
+        res.id = objectInfo.id
+        tableData.push(res)
+      }
     }
 
+
+
+    const divStyle = {
+      width: '100%',
+    };
     return (
-      <div style = { { width: '100%' } }>
-        <h2 id="templateName" onClick = { changeName }>{template.name}</h2>
-        <a href={"/#/storage/" + template.storages[0].toBase58()}>Objects</a>
-        <Table dataSource={tableData} >
-          <Column title="ID" dataIndex="id" key="fieldId"/>
-          <Column title="Name" dataIndex="name" key="fieldName"/>
-          <Column
-            title="Type"
-            key="fieldType"
-            render={(text, record: any) => record.fieldType.nameRender}
+    <div style = {divStyle}>
+      <Table dataSource={tableData} >
+        <Column 
+          title="Object" 
+          key="objectKey"
+          render={(text, record: any) => (
+              <a href={"/#/object/"+record.key}>{record.id}</a>
+          )}
+        />
+        {template.fields.map((field: TemplateField) => { 
+          return <Column 
+            title = { field.name + ((field.id === 1 && filter) ? ' : [' + filter + ']' : '') } 
+            key = { field.id } 
+            filterDropdown={field.id === 1 && <Input defaultValue={filter} onChange={(event: any) => { applyFilter(event.target.value) }}/>}
+            sorter = { field.fieldType.sorter && ((a: any, b: any) => { 
+              return field.fieldType.sorter(a[field.id], b[field.id]) 
+            }) }
+            render = {
+              (text, object: any) => {
+                return React.createElement(
+                  field.fieldType.valueRender,
+                  { 
+                    type: field.fieldType,
+                    defaultValue: object[field.id], 
+                    readonly: true
+                  }
+                )
+              }
+            }
           />
-          <Column
-            title="Actions"
-            key="actions"
-            render={(text, record: any) => (
-                <Button onClick={() => { deleteField(record.id)} }>Delete</Button>
-            )}
-          />
-        </Table>
-        <AddFieldPopup onAdd={addField} />
-      </div>
-    );
+        })}
+        <Column 
+          title="Actions"
+          key="actions"
+          render={(text, object: any) =>
+          <div>
+            <Button onClick={() => { createObject(new PublicKey(object.key)) }}>Copy</Button>  
+            <Button onClick={() => { deleteObject(new PublicKey(object.key)) }}>Delete</Button>  
+          </div>} //TODO: delete: accountCleanup, confirmation
+        />
+      </Table>
+      <Button onClick={() => { createObject() }}>Create new object</Button>
+    </div>
+    )
   }
-  
-  return (<div>Loading</div>);
+  return (
+    <div>
+      Loading
+    </div>
+  );
 };
+

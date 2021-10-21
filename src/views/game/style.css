@@ -1,0 +1,264 @@
+@charset "UTF-8";
+
+.cardholder {
+  -webkit-filter: grayscale(50%);
+  webkit-transition: .5s ease-in-out;
+  height: 277px;
+  width: 200px;
+  position: relative;
+  margin: auto;
+  /*box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;*/
+}
+
+.cardholder:hover {
+  -webkit-filter: grayscale(0%);
+  -webkit-transition: .5s ease-in-out;
+}
+
+.divider {
+  margin: 0.2%;
+  background: linear-gradient(90deg, rgba(250,160,255,0), rgba(250,160,255,0.1), rgba(250,160,255,0));
+}
+
+.card_slots {
+  background: linear-gradient(90deg, rgba(250,160,255,0), rgba(250,160,255,0.1), rgba(250,160,255,0));
+  position: relative;
+  margin: auto;
+  padding-top: 2%;
+  padding-bottom: 2%;
+  justify-content: center;
+  grid-gap: 10px;
+}
+
+.slot_header {
+  text-align: center;
+  font-size: 120%;
+}
+
+.cardframe {
+  position:absolute;
+  left: 0px;
+  width: 100%;
+  top:0px;
+}
+
+.cardimage {
+  left: 1%;
+  width: 97%;
+  position:absolute;
+  top: 1%;
+}
+
+.cardname {
+  position: absolute;
+  left: 5%;
+  top: 67%;
+  height: 10%;
+  text-align: center;
+  width: 90%;
+  font-weight: bold;
+  font-size: 160%;
+  z-index: 4;
+  color: rgb(20, 20, 30);
+  font-color: red;
+  /*background-color: blue;*/
+}
+
+
+.carddescription {
+  position: absolute;
+  top: 79%;
+  height: 20%;
+  left: 3%;
+  text-align: center;
+  width: 93%;
+  font-size: 120%;
+  /*background-color: green;*/
+  z-index: 2;
+}
+
+.modal {
+  left: 0%;
+  top: 0%;
+  z-index: 100;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+  margin:  auto;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+
+.modal h1 {
+  padding: 2%;
+  width: 100%;
+  text-align: center;
+  top: 20%;
+  font-weight: bold;
+  font-size: 3em;
+}
+
+.game_logo {
+  /*box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;*/
+  position: relative;
+  width: 80%;
+  margin: 10%;
+}
+
+.select_some_cards {
+  margin: auto;
+  color: white;
+  padding-bottom: 1%;
+  text-align: center;
+  font-style: italic;
+  padding-top: 6.7%;
+  font-size: 130%;
+}
+
+.game_title {
+  margin: auto;
+  color: white;
+  padding-left: 10%;
+  padding-right: 5%;
+}
+
+.game_description {
+  padding-left: 10%;
+  padding-right: 5%;
+  padding-top: 4%;
+  margin: auto;
+  font-size: 1.4em;
+}
+
+.login_page {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  /*background: -webkit-linear-gradient(top, #000 0%, #131621 100%);*/
+}
+
+
+.btn-container {
+  margin-top: 10%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn {
+  width: 370px;
+  height: 60px;
+  text-decoration: none;
+  border: 1px solid rgb(146, 148, 248);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn span {
+  font-size: 2.4em;
+}
+
+.btn:hover {
+  box-shadow: 1px 1px 25px 10px rgba(146, 148, 248, 0.4);
+}
+
+.btn:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(146, 148, 248, 0.4),
+    transparent
+  );
+  transition: all 650ms;
+}
+
+.btn:hover:before {
+  left: 100%;
+}
+
+.unity_loading {
+  margin: auto;
+  position: absolute;
+  top: 70vh;
+  width: 100%;
+}
+
+.progress {
+  background: rgba(255,255,255,0.1);
+  justify-content: flex-start;
+  border-radius: 100px;
+  align-items: center;
+  position: relative;
+  margin: auto;
+  display: flex;
+  height: 40px;
+  width: 500px;
+}
+
+.progress-value {
+  box-shadow: 0 10px 40px -10px #fff;
+  border-radius: 100px;
+  background: #fff;
+  height: 30px;
+  width: 0;
+}
+
+.bgvideo {
+  position: fixed;
+  margin: auto;
+  left: 0;
+  right: 0;
+  width: 100%;
+  filter: brightness(15%);
+}
+
+.solcerer {
+  width: 100%;
+}
+
+.solcery_logo {
+  transform: translateX(-10%);
+  margin-top: 12vh;
+  width: 9%;
+}
+
+.solcery_text {
+  margin-top: 4vh;
+  width: 80%;
+}
+
+
+.close {
+  position: absolute;
+  right: 32px;
+  top: 32px;
+  width: 64px;
+  height: 64px;
+  opacity: 0.7;
+  z-index: 100;
+}
+.close:hover {
+  opacity: 1;
+}
+.close:before, .close:after {
+  position: absolute;
+  left: 15px;
+  content: ' ';
+  height: 33px;
+  width: 2px;
+  background-color: #333;
+}
+.close:before {
+  transform: rotate(45deg);
+}
+.close:after {
+  transform: rotate(-45deg);
+}
+
