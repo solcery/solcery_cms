@@ -58,17 +58,19 @@ export const TemplateView = () => {
       programId: programId,
       data: Buffer.from([1, 0]),
     }));
-    if (src) {
+    if (src && template) {
+      let object = await template.getObject(connection, src)
+      let buf = await object?.serialize(connection)
       instructions.push(new TransactionInstruction({
         keys: [
           { pubkey: publicKey, isSigner: true, isWritable: false },
-          { pubkey: project.publicKey, isSigner: false, isWritable: false },
+          { pubkey: project.publicKey, isSigner: false, isWritable: true },
           { pubkey: objectAccount.publicKey, isSigner: false, isWritable: true },
-          { pubkey: src, isSigner: false, isWritable: false },
         ],
         programId: programId,
-        data: Buffer.from([1, 2]),
+        data: Buffer.concat([ Buffer.from([1, 1]), buf]),
       }));
+
     }
     sendTransaction(connection, wallet, instructions, [objectAccount]).then(() => {
       history.push('/object/' + objectAccount.publicKey.toBase58());
