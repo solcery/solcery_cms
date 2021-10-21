@@ -393,15 +393,15 @@ basicBricks.push({
   }
 })
 
-// basicBricks.push({
-//   type: 0,
-//   subtype: 4,
-//   name: 'Argument',
-//   params: [
-//     { id: 1, name: 'Name', type: new SString() },
-//   ],
-//   func: argFunc,
-// })
+basicBricks.push({
+  type: 0,
+  subtype: 4,
+  name: 'Argument',
+  params: [
+    { id: 1, name: 'Name', type: new SString() },
+  ],
+  func: argFunc,
+})
 
 function shuffleArray(array: any[]) {
     for (var i = array.length - 1; i > 0; i--) {
