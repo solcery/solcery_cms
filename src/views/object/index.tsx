@@ -37,23 +37,74 @@ export const ObjectView = () => {
   let history = useHistory();
   var objectPublicKey = new PublicKey(objectId)
 
+
+  const setAccountData = async (accountPublicKey: PublicKey, data: Buffer, offset: number = 0) => {
+    const MAX_DATA_SIZE = 700
+    if (wallet === undefined || !wallet.publicKey)
+      return
+    if (data.length <= MAX_DATA_SIZE) {
+      let writer = new BinaryWriter()
+      writer.writeU8(3)
+      writer.writeU8(0)
+      writer.writeU64(offset) 
+      const saveAccountIx = new TransactionInstruction({
+        keys: [
+          { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
+          { pubkey: accountPublicKey, isSigner: false, isWritable: true },
+        ],
+        programId: programId,
+        data: Buffer.concat([ 
+          writer.buf.slice(0, writer.length),
+          data,
+        ]),
+      });
+      sendTransaction(connection, wallet, [saveAccountIx], [])
+    }
+    else {
+      let writer = new BinaryWriter()
+      writer.writeU8(3)
+      writer.writeU8(0)
+      writer.writeU64(offset)
+      const saveAccountIx = new TransactionInstruction({
+        keys: [
+          { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
+          { pubkey: accountPublicKey, isSigner: false, isWritable: true },
+        ],
+        programId: programId,
+        data: Buffer.concat([ 
+          writer.buf.slice(0, writer.length),
+          data.slice(0, MAX_DATA_SIZE),
+        ]),
+      });
+      await sendTransaction(connection, wallet, [saveAccountIx], []).then(async () => {
+        await setAccountData(accountPublicKey, data.slice(MAX_DATA_SIZE), offset + MAX_DATA_SIZE)
+      })
+    }
+  }
+
+
   const saveObject = async () => {
-    if (!publicKey || wallet === undefined)
-      return;
     if (!object || !template || !project)
       return;
-    const saveObjectIx = new TransactionInstruction({
-      keys: [
-        { pubkey: publicKey, isSigner: true, isWritable: false },
-        { pubkey: project.publicKey, isSigner: false, isWritable: false },
-        { pubkey: objectPublicKey, isSigner: false, isWritable: true },
-      ],
-      programId: programId,
-      data: Buffer.concat([ Buffer.from([1, 1]), await object.serialize(connection)]),
-    });
-    sendTransaction(connection, wallet, [saveObjectIx], []).then(() => {
-      history.push("/template/" + template?.publicKey.toBase58());
-    })
+    let data = await object.serialize(connection)
+    if (data.length < 700) {
+      if (!publicKey || wallet === undefined)
+        return;
+        const saveObjectIx = new TransactionInstruction({
+          keys: [
+            { pubkey: publicKey, isSigner: true, isWritable: false },
+            { pubkey: project.publicKey, isSigner: false, isWritable: false },
+            { pubkey: objectPublicKey, isSigner: false, isWritable: true },
+          ],
+          programId: programId,
+          data: Buffer.concat([ Buffer.from([1, 1]), data]),
+        });
+        sendTransaction(connection, wallet, [saveObjectIx], []).then(() => {
+          history.push("/template/" + template?.publicKey.toBase58());
+        })
+    } else {
+      setAccountData(objectPublicKey, data, 33 + 36) // TODO: remove hardcode
+    }
   }
 
   useEffect(() => { 

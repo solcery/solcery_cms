@@ -107,7 +107,7 @@ export const AccountView = () => {
     })
   }
 
-  const setAccountData = async (accountPublicKey: PublicKey, data: Buffer, offset: number) => {
+  const setAccountData = async (accountPublicKey: PublicKey, data: Buffer, offset: number = 0) => {
     const MAX_DATA_SIZE = 700
     if (wallet === undefined || !wallet.publicKey)
       return
@@ -116,8 +116,6 @@ export const AccountView = () => {
       writer.writeU8(3)
       writer.writeU8(0)
       writer.writeU64(offset) 
-      // let buf = writer.buf.slice(0, writer.length + 8)
-      // buf.writeBigInt
       const saveAccountIx = new TransactionInstruction({
         keys: [
           { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
@@ -151,7 +149,6 @@ export const AccountView = () => {
         await setAccountData(accountPublicKey, data.slice(MAX_DATA_SIZE), offset + MAX_DATA_SIZE)
       })
     }
-    
   }
 
   const saveAccount = async (key: string) => {
