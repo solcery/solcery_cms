@@ -58,7 +58,8 @@ export const ObjectView = () => {
           data,
         ]),
       });
-      sendTransaction(connection, wallet, [saveAccountIx], [])
+      await sendTransaction(connection, wallet, [saveAccountIx], [])
+      return true
     }
     else {
       let writer = new BinaryWriter()
@@ -76,8 +77,9 @@ export const ObjectView = () => {
           data.slice(0, MAX_DATA_SIZE),
         ]),
       });
-      await sendTransaction(connection, wallet, [saveAccountIx], []).then(async () => {
+      return await sendTransaction(connection, wallet, [saveAccountIx], []).then(async () => {
         await setAccountData(accountPublicKey, data.slice(MAX_DATA_SIZE), offset + MAX_DATA_SIZE)
+        return true
       })
     }
   }
@@ -103,7 +105,9 @@ export const ObjectView = () => {
           history.push("/template/" + template?.publicKey.toBase58());
         })
     } else {
-      setAccountData(objectPublicKey, data, 33 + 36) // TODO: remove hardcode
+      setAccountData(objectPublicKey, data, 33 + 36).then(() => {  // TODO: remove hardcode
+        history.push("/template/" + template?.publicKey.toBase58());
+      })
     }
   }
 
