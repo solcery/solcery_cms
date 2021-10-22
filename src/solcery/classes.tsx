@@ -1,8 +1,10 @@
 import { PublicKey, Connection} from "@solana/web3.js";
 import { getAccountData, getMultipleAccountsData, getAccountObject, getAllAccountObjects} from "./engine"
 import { BinaryReader, BinaryWriter } from "borsh";
-import { SType } from "./types";
+import { SType, SInt, SLink, SArray } from "./types";
 import { updateCustomBricks, exportBrick, BrickSignature } from './types/brick'
+import { ConstructedTemplate, ConstructedContent, ConstructedObject, ConstructedObjects, ConstructedSchema, ConstructedFieldData } from "./content"
+
 
 
 class SolceryAccount {
@@ -51,16 +53,18 @@ export class Project extends SolceryAccount {
   }
 
   async сonstructContent(connection: Connection) {
-    let result: Map<number, any> = new Map()
+    console.log('Constructing content...')
+
     await this.updateBricks(connection)
     await this.updateBricks(connection)
     const projectStorage = await Storage.get(connection, this.templateStorage)
+    let constructedTemplates = new Map<string, ConstructedTemplate>();
     var templates = await TemplateData.getAll(connection, projectStorage.accounts)
-    for (var tpl of templates) {
-      result.set(tpl.code, await tpl.construct(connection))
+    for (var template of templates) {
+      let tpl = await template.construct(connection)
+      constructedTemplates.set(tpl.code, tpl)
     }
-    let content = Object.fromEntries(await result)
-    return content
+    return new ConstructedContent({ templates: constructedTemplates })
   }
 
 }
@@ -126,6 +130,7 @@ export class TemplateData extends SolceryAccount {
     var accountInfos = await connection.getMultipleAccountsInfo(publicKeys)
     for (let i in accountInfos) {
       if (accountInfos[i]) {
+        console.log(publicKeys[i].toBase58())
         result.push(await TplObject.build(publicKeys[i], accountInfos[i]!.data, this))
       }
     }
@@ -143,14 +148,45 @@ export class TemplateData extends SolceryAccount {
   }
 
   async construct(connection: Connection) {
-    var constructedObjects: Map<string, any> = new Map()
-    let objects = await this.getAllObjects(connection)
-    for (let object of objects) {
+    let code = this.code
+    let fields = new Map<number, ConstructedFieldData>();
+    for (let fieldData of this.fields) {
+      fields.set(fieldData.id, new ConstructedFieldData({
+        id: fieldData.id,
+        type: fieldData.fieldType,
+        code: fieldData.code,
+      }));
+    }
+    let schema = new ConstructedSchema({ fields })
+
+    let constructedObjects = new Map<number, ConstructedObject>();
+    let rawObjects = await this.getAllObjects(connection)
+    for (let object of rawObjects) {
       if (object.fields.get(2)) { // enabled
-        constructedObjects.set(object.publicKey.toBase58(), object.construct(this))
+        constructedObjects.set(object.id, await object.construct(connection, this))
       }
     }
-    return Object.fromEntries(constructedObjects)
+
+    for (let field of fields.values()) {
+      if (field.type instanceof SLink) {
+        field.type = new SInt() // Compiling links into IDs
+      }
+      if (field.type instanceof SArray && (field.type as SArray).subtype instanceof SLink) {
+        console.log(field)
+        field.type = new SArray({ subtype: new SInt() }) // Compiling link arrays into IDs
+      }
+    }
+
+    for (let field of fields.values()) {
+      if (field.type instanceof SLink) {
+        field.type = new SInt() // Compiling links into IDs
+      }
+    }
+
+    console.log(constructedObjects)
+
+    let objects = new ConstructedObjects({ objects: constructedObjects, schema })
+    return new ConstructedTemplate({ code, schema, objects })
   }
 
   async exportBricks(connection: Connection, result: any[]) {
@@ -188,18 +224,16 @@ export class TplObject {
     return prefix + this.publicKey.toBase58();
   }
 
-  construct(tpl: TemplateData) {
-    var constructed: Map<string, any> = new Map();
+  async construct(connection: Connection, tpl: TemplateData) {
+    let id = this.id
+    var data = new Map<number, any>();
     for (let [fieldId, value] of this.fields) {
       var field = tpl.getField(fieldId)
       if (field) {
-        constructed.set(field.code, value)
+        data.set(fieldId, await field.fieldType.construct(value, connection))
       }
     }
-    var result = Object.fromEntries(constructed)
-    result.id = this.id
-    result.publicKey = this.publicKey.toBase58()
-    return result
+    return new ConstructedObject({ id, data });
   }
 
   static async getTemplate(connection: Connection, publicKey: PublicKey) {
@@ -209,6 +243,14 @@ export class TplObject {
     var reader = new BinaryReader(objectData.slice(37)) //TODO
     var templatePublicKey = reader.readPubkey()
     return await TemplateData.get(connection, templatePublicKey)
+  }
+
+  static async getId(connection: Connection, publicKey: PublicKey) {
+    var objectData = await getAccountData(connection, publicKey)
+    if (!objectData)
+      return undefined
+    var reader = new BinaryReader(objectData.slice(33))
+    return reader.readU32();
   }
 
   static async build(publicKey: PublicKey, src: Buffer, template: TemplateData) {

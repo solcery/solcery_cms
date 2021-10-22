@@ -1,6 +1,7 @@
 import { SType, solceryTypes } from "../index";
 import { BinaryReader, BinaryWriter } from 'borsh';
 import { ValueRender, TypedataRender } from './components'
+import { Connection } from "@solana/web3.js";
 
 
 export class SArray extends SType {
@@ -37,6 +38,14 @@ export class SArray extends SType {
 
   writeType = (writer: BinaryWriter) => {
     writer.writeSType(this.subtype)
+  }
+
+  construct = async (value: any[], connection: Connection) => {
+    let result: any[] = []
+    for (let val of value) {
+      result.push(await this.subtype.construct(val, connection) )
+    }
+    return result
   }
 }
 

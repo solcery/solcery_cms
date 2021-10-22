@@ -108,10 +108,12 @@ export const AccountView = () => {
   }
 
   const setAccountData = async (accountPublicKey: PublicKey, data: Buffer, offset: number = 0) => {
-    const MAX_DATA_SIZE = 700
+    console.log(offset)
+    const MAX_DATA_SIZE = 1000
     if (wallet === undefined || !wallet.publicKey)
       return
     if (data.length <= MAX_DATA_SIZE) {
+      console.log('small')
       let writer = new BinaryWriter()
       writer.writeU8(3)
       writer.writeU8(0)
@@ -127,6 +129,7 @@ export const AccountView = () => {
           data,
         ]),
       });
+      console.log('sending')
       sendTransaction(connection, wallet, [saveAccountIx], [])
     }
     else {
@@ -145,7 +148,9 @@ export const AccountView = () => {
           data.slice(0, MAX_DATA_SIZE),
         ]),
       });
-      await sendTransaction(connection, wallet, [saveAccountIx], []).then(async () => {
+      console.log('sending')
+      await sendTransaction(connection, wallet, [saveAccountIx], [], false).then(async () => {
+        console.log('new')
         await setAccountData(accountPublicKey, data.slice(MAX_DATA_SIZE), offset + MAX_DATA_SIZE)
       })
     }
