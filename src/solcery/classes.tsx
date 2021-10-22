@@ -130,7 +130,6 @@ export class TemplateData extends SolceryAccount {
     var accountInfos = await connection.getMultipleAccountsInfo(publicKeys)
     for (let i in accountInfos) {
       if (accountInfos[i]) {
-        console.log(publicKeys[i].toBase58())
         result.push(await TplObject.build(publicKeys[i], accountInfos[i]!.data, this))
       }
     }

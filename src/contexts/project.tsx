@@ -35,7 +35,7 @@ export function ProjectProvider({ children = null as any }) {
 			return
 		cookies.set('projectKey', projectKey)
 		let prj = await Project.get(connection, new PublicKey(projectKey))
-		// prj.сonstructContent(connection)
+		prj.сonstructContent(connection)
 		setProject(prj)
 
 	}
