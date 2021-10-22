@@ -58,7 +58,13 @@ export const ObjectView = () => {
           data,
         ]),
       });
-      await sendTransaction(connection, wallet, [saveAccountIx], [])
+      await sendTransaction(connection, wallet, [saveAccountIx], [], true, () => { history.push("/template/" + template?.publicKey.toBase58()); }).then(() => {  // TODO: remove hardcode
+        notify({ message: "Object saved successfully", description: objectId })
+      },
+      () => {
+        notify({ message: "Object saving error", description: objectId })
+      })
+
       return true
     }
     else {
@@ -77,9 +83,8 @@ export const ObjectView = () => {
           data.slice(0, MAX_DATA_SIZE),
         ]),
       });
-      return await sendTransaction(connection, wallet, [saveAccountIx], []).then(async () => {
+      return await sendTransaction(connection, wallet, [saveAccountIx], [], false).then(async () => {
         await setAccountData(accountPublicKey, data.slice(MAX_DATA_SIZE), offset + MAX_DATA_SIZE)
-        return true
       })
     }
   }
@@ -101,13 +106,14 @@ export const ObjectView = () => {
           programId: programId,
           data: Buffer.concat([ Buffer.from([1, 1]), data]),
         });
-        sendTransaction(connection, wallet, [saveObjectIx], []).then(() => {
-          history.push("/template/" + template?.publicKey.toBase58());
+        await sendTransaction(connection, wallet, [saveObjectIx], [], true, () => { history.push("/template/" + template?.publicKey.toBase58()); }).then(() => {
+          notify({ message: "Object saved successfully", description: objectId })
+        },
+        () => {
+          notify({ message: "Object saving error", description: objectId })
         })
     } else {
-      setAccountData(objectPublicKey, data, 33 + 36).then(() => {  // TODO: remove hardcode
-        history.push("/template/" + template?.publicKey.toBase58());
-      })
+      setAccountData(objectPublicKey, data, 33 + 36)
     }
   }
 
