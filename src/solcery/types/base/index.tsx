@@ -1,4 +1,4 @@
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, Connection } from "@solana/web3.js";
 import ReactDOM from 'react-dom'
 import { BinaryReader, BinaryWriter } from 'borsh';
 import { solceryTypes } from "../solceryTypes"
@@ -40,7 +40,7 @@ export class SType {
   	return writer.buf.slice(0, writer.length)
   }
 
-  buildValue = (value: any) => { return value }
+  construct = async (value: any, connection: Connection) => { return value }
 }
 
 

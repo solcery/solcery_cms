@@ -9,6 +9,12 @@ import { Button, Layout, InputNumber, Collapse, Divider, Space, Input } from "an
 import { applyBrick, brickToOldBrick, oldBrickToBrick } from "../../solcery/types/brick";
 import { GameState } from "../../solcery/game"
 import { Project } from "../../solcery/classes"
+import { ConstructedContent } from "../../solcery/content"
+
+import { PublicKey } from "@solana/web3.js";
+
+
+import { BinaryWriter, BinaryReader } from "borsh";
 
 import "./style.css"
 
@@ -68,15 +74,20 @@ export const PlayView = () => {
       return
     (async () => {
       var constructedContent = await project.сonstructContent(connection)
-      let gameState = new GameState(constructedContent)
-
-      let slots = gameState.content.slots
+      let buf = constructedContent.toBuffer()
+      let cc = ConstructedContent.read(new BinaryReader(buf))
+      // let contentInfo = await connection.getAccountInfo(new PublicKey("7cRU5jAtqRjaSFUb3Dj3e8Mhnnhe2G3J7XbDqSjhrPPc"))
+      // if (!contentInfo)
+      //   return
+      // let constructedContent = ConstructedContent.read(new BinaryReader(contentInfo.data))
+      let gameState = new GameState(cc)
+      console.log(JSON.stringify(buf))
       console.log(JSON.stringify(gameState.toBuffer()))
 
-      for (let slotId of Object.keys(slots)) {
-        let slot = slots[slotId]
+      let slots = gameState.content.getAll('slots')
+      for (let slot of slots.values()) {
         let defaultCardTypeId = slot.default
-        let cardType = gameState.content.cardTypes[defaultCardTypeId]
+        let cardType = gameState.content.get('cardTypes', defaultCardTypeId)
         for (let object of gameState.objects.values()) {
           if (object.tplId === slot.id) {
             object.tplId = cardType.id
@@ -92,8 +103,7 @@ export const PlayView = () => {
     if (!gameState)
       return
     let result = new Map()
-    for (let cardTypeId of Object.keys(gameState.content.cardTypes)) {
-      let cardType: any = gameState.content.cardTypes[cardTypeId]
+    for (let cardType of gameState.content.get('cardTypes')) {
       result.set(cardType.id, cardType.name)
     }
     setCardTypeNamesById(Object.fromEntries(result))
@@ -144,12 +154,13 @@ export const PlayView = () => {
     }
     return filter.header === undefined || elem.header.includes(filter.header)
   })
-
+  if (gameState && gameState.content)
+    console.log(gameState.content.getAll('attributes'))
   return (
     <Layout>
       <Sider width='300'>
         <Input onChange={(e:any) => { onHeaderFilterChange(e.target.value) }}/>
-        {Object.values(gameState.content.attributes).map((attr: any) => (
+        {gameState.content.get('attributes').map((attr: any) => (
           <div>
             { attr.name  } 
             <InputNumber 

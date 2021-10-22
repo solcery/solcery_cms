@@ -50,8 +50,11 @@ export class SBrick extends SType {
 
   writeValue = (value: Brick, writer: BinaryWriter) => { 
     var brickSignature = getBrickSignature(value.type, value.subtype)
-    if (!brickSignature)
-      throw new Error("Writing brick failed")
+    if (!brickSignature) {
+      let def = defaultBricksByType.get(value.type)
+      this.writeValue(def, writer)
+      return
+    }
     writer.writeU32(value.type)
     writer.writeU32(value.subtype)
     writer.writeU32(value.params.size)
@@ -74,6 +77,30 @@ export const getParamSignatureById = (brickSignature: BrickSignature, paramId: n
       return param
   }
 }
+
+const defaultBricksByType = new Map()
+defaultBricksByType.set(0, {
+  type: 0,
+  subtype: 0,
+  params: new Map(),
+})
+
+defaultBricksByType.set(1, {
+  type: 1,
+  subtype: 0,
+  params: new Map([
+    [1, 0]
+  ])
+})
+
+defaultBricksByType.set(2, {
+  type: 2,
+  subtype: 0,
+  params: new Map([
+    [1, 0]
+  ])
+})
+
 
 const getBrickTypeName = (brickType: number) => {
   if (brickType == 0)
@@ -290,7 +317,7 @@ export const exportBrick = (object: TplObject, brick: Brick) => {
       //   let param = argParams[index]
       //   ctx.args[param.name] = applyBrick(params[paramId], ctx) // Calculating params TODO: addType
       // });
-      let result = applyBrick(ctx.game.content[templateName][object.publicKey.toBase58()].brick, ctx) // closure?
+      let result = applyBrick(ctx.game.content.get(templateName, object.id).brick, ctx) // closure?
       ctx.args.pop()
       return result
     }
@@ -488,16 +515,9 @@ basicBricks.push({
   params: [],
   func: (params: any, ctx: any) => {
     let tplId = ctx.object.tplId
-    let cardTypes = ctx.game.content.cardTypes
-    for (let cardTypeId in cardTypes) {
-      let cardType = cardTypes[cardTypeId]
-      if (cardType.id == tplId) {
-        if (cardType.action) {
-          applyBrick(cardType.action, ctx)
-        }
-        return
-      }
-    }
+    let cardType = ctx.game.content.get('cardTypes', tplId)
+    if (cardType.action) 
+      applyBrick(cardType.action, ctx)
   }
 })
 

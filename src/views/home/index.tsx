@@ -4,11 +4,12 @@ import { useProject } from "../../contexts/project";
 import { useWallet } from "../../contexts/wallet";
 import { LAMPORTS_PER_SOL, Account, TransactionInstruction } from "@solana/web3.js";
 import { SystemProgram } from "@solana/web3.js";
-
+import { BinaryWriter, BinaryReader } from "borsh";
 import { programId } from "../../solcery/engine"
 import { Project, TemplateData, SolcerySchema, Storage} from "../../solcery/classes"
 import { useHistory } from "react-router-dom";
 import { Button } from "antd";
+import { ConstructedContent } from "../../solcery/content"
 
 export const HomeView = () => {
 
@@ -22,6 +23,16 @@ export const HomeView = () => {
     if (!publicKey)
       return
     connection.requestAirdrop(publicKey, LAMPORTS_PER_SOL * 1)
+  }
+
+  const constructContent = async () => {
+    if (!project)
+      return
+    let constructed = await project.сonstructContent(connection)
+    let writer = new BinaryWriter()
+    constructed.write(writer)
+    let buf = writer.buf.slice(0, writer.length)
+    console.log(JSON.stringify(buf))
   }
 
   const createTemplate = async () => {
@@ -77,6 +88,7 @@ export const HomeView = () => {
   return (
     <div>
       <Button onClick = { createTemplate }>NEW TEMPLATE</Button>
+      <Button onClick = { constructContent }>CONSTRUCT</Button>
       <Button onClick = { airdrop }>Airdrop</Button>
     </div>
   );

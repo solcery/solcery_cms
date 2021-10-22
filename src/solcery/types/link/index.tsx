@@ -1,7 +1,7 @@
 import React from "react";
 import { SType } from "../index";
 import { TemplateData, Storage, TplObject } from "../../classes";
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, Connection } from "@solana/web3.js";
 import { BinaryReader, BinaryWriter } from "borsh";
 import { solceryTypes } from '../solceryTypes'
 
@@ -36,6 +36,10 @@ export class SLink extends SType {
 
   writeType = (writer: BinaryWriter) => {
   	writer.writePubkey(this.templatePublicKey)
+  }
+
+  construct = async (value: PublicKey, connection: Connection) => {
+    return await TplObject.getId(connection, value)
   }
 }
 

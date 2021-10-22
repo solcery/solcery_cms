@@ -74,18 +74,15 @@ export class GameState {
 	content: any = undefined;
 
   initObjects = () => {
-    if (!this.content || !this.content.attributes || !this.content.cards)
+    if (!this.content)
       return
-	  var cards = this.content.cards
-    var attributes = this.content.attributes
+    var attributes = this.content.get('attributes')
 	  var cardId = 0
-	  for (let cardPackId in cards) { 
-	    let cardPack = cards[cardPackId]
+	  for (let cardPack of this.content.get('cards')) { 
 	    for (let i = 0; i < cardPack.amount; i++) {
-	      var cardType = this.content.cardTypes[cardPack.cardType.toBase58()]
+	      var cardType = this.content.get('cardTypes', cardPack.cardType)
         var attrs: any = {}
-        for (let contentAttrId of Object.keys(attributes)) {
-          let contentAttr = attributes[contentAttrId]
+        for (let contentAttr of attributes) {
           attrs[contentAttr.code] = 0
         }
         attrs.place = cardPack.place ? cardPack.place : 0;
@@ -106,16 +103,14 @@ export class GameState {
 	      cardId++;
 	    }
 	  }
-    let slots = this.content.slots
+    let slots = this.content.get('slots')
     if (slots) {
-      for (let slotId of Object.keys(slots)) {
+      for (let slot of slots) {
         var attrs: any = {}
-        for (let contentAttrId of Object.keys(attributes)) {
-          let contentAttr = attributes[contentAttrId]
+        for (let contentAttr of attributes) {
           attrs[contentAttr.code] = 0
         }
-        let slot = slots[slotId]
-        attrs.place = slot.place
+        attrs.place = slot.place ? slot.place : 0;
         this.objects.set(cardId, {
           id: cardId,
           tplId: slot.id,
@@ -158,13 +153,13 @@ export class GameState {
     if (!this.content)
       throw new Error("Error loading gameState from buffer!")
     this.objects = new Map()
-    let attrs = Object.values(this.content.attributes).map((elem: any) => { return elem.code })
+    let attrs = this.content.get('attributes').map((elem: any) => { return elem.code })
     let objectsNumber = reader.readU32()
     for (let id = 1; id <= objectsNumber; id++) {
       let attrMap = new Map()
       let tplId = reader.readU16()
       let attrAmount = reader.readU32()
-      attrs.forEach((attr) => {
+      attrs.forEach((attr: string) => {
         attrMap.set(attr, reader.readI16())
       })
       this.objects.set(id, {
@@ -185,13 +180,8 @@ export class GameState {
 			extra: { vars: new Map([[ 'playerId', playerId ]]) },
 		})
     ctx.diff = new Map<number, any>()
-		let cardTypes = this.content.cardTypes
-		for (let cardTypeKey in cardTypes) {
-			var cardType = cardTypes[cardTypeKey]
-			if ((cardType.id == object.tplId) && cardType.action) {
-				applyBrick(cardType.action, ctx)
-			}
-		}
+		let cardType = this.content.get('cardTypes', object.tplId)
+		applyBrick(cardType.action, ctx)
     return ctx.diff
 	}
 
@@ -247,11 +237,10 @@ class Context {
 
 const constructPlaces = (content: any) => {
   var result = []
-  var placesContent = content.places
+  var placesContent = content.get('places')
   if (!placesContent)
     return
-  for (let placeId in placesContent) { 
-    let place = placesContent[placeId]
+  for (let place of placesContent) { 
     result.push({
       PlaceName: place.name,
       PlaceId: place.placeId,
@@ -361,11 +350,10 @@ type BoardData = {
 
 const constructCardTypes = (content: any) => {
   var result: CardType[] = []
-  var cardTypesContent = content.cardTypes
+  var cardTypesContent = content.get('cardTypes')
   if (!cardTypesContent)
     return result
-  for (let cardTypeId in cardTypesContent) { 
-    let cardType = cardTypesContent[cardTypeId]
+  for (let cardType of cardTypesContent) { 
     result.push({
       Id: cardType.id,
       BrickTree: {},

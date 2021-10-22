@@ -5,6 +5,7 @@ import { usePlayer } from "../../contexts/player";
 import { useParams } from "react-router-dom";
 import Unity, { UnityContext } from "react-unity-webgl";
 import { GameState, GameSchema, Game, programId } from "../../solcery/game"
+import { ConstructedContent } from "../../solcery/content"
 import { Project } from "../../solcery/classes"
 import { Button, Modal, Layout, Row, Col, Divider } from 'antd';
 import { ConnectButton } from "../../components/ConnectButton"
@@ -119,7 +120,7 @@ export const SlotSelector = (props: {
   nfts: any,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const showModal = () => { setIsModalVisible(true) };
+  const showModal = () => { setIsModalVisible(true); console.log(props.nfts) };
   const handleOk = () => { setIsModalVisible(false) };
   const handleCancel = () => { setIsModalVisible(false) };
   const selectNft = (index: number | undefined = undefined) => {
@@ -157,7 +158,8 @@ export const SlotSelector = (props: {
               card={props.slot.defaultCard}
             />}
             {props.nfts.map((elem: any, index: any) => {
-              if (!elem.isSelected && props.slot.data.collections.find((publicKey: PublicKey) => publicKey.toBase58() === elem.collection)) {
+              console.log(props.slot)
+              if (!elem.isSelected && props.slot.data.collections.find((collectionId: number) => collectionId === elem.collection)) {
                 return (<CardRotator 
                   key={index}
                   onClick={() => { selectNft(index) }}
@@ -181,10 +183,10 @@ const getVerifiedCreator = (metadata: any) => {
   }
 }
 
-const getCollection = (metadata: any, collections: any) => {
-  for (let collectionKey of Object.keys(collections)) {
-    if (checkCollection(metadata, collections[collectionKey])) {
-      return collectionKey
+const getCollectionId = (metadata: any, collections: any) => {
+  for (let collection of collections) {
+    if (checkCollection(metadata, collection)) {
+      return collection.id
     }
   }
 }
@@ -200,7 +202,7 @@ const checkCollection = (metadata: any, collection: any) => {
 }
 
 const loadNftsAsCollectionItems = async (mintPubkeys: PublicKey[], content: any) => {
-  let collections = content.collections
+  let collections = content.get('collections')
   let connection = new Connection(clusterApiUrl('mainnet-beta'), 'confirmed');
   let multipleAccountInfos = await connection.getMultipleAccountsInfo(mintPubkeys);
   let result: any[] = []
@@ -209,16 +211,16 @@ const loadNftsAsCollectionItems = async (mintPubkeys: PublicKey[], content: any)
       let data = decodeMetadata(multipleAccountInfos[i]!.data)
       if (data) {
         var imageResponse = await axios.get(data.data.uri)
-        let collectionKey = getCollection(data, collections)
-        if (collectionKey) {
-          let cardTypeKey = collections[collectionKey].cardType
+        let collectionId = getCollectionId(data, collections)
+        if (collectionId) {
+          let cardTypeId = content.get('collections', collectionId).cardType
           result.push({
             publicKey: mintPubkeys[i],
-            cardTypeKey: cardTypeKey,
-            cardType: content.cardTypes[cardTypeKey],
+            cardTypeId: cardTypeId,
+            cardType: content.get('cardTypes', cardTypeId),
             data: data,
             picture: imageResponse.data.image,
-            collection: collectionKey
+            collection: collectionId
           })
         }
       }
@@ -234,7 +236,6 @@ export const NftSelector = (props: {
   const { connected, wallet, publicKey} = useWallet();
   const connection = useConnection();
   const { gameId } = useParams<GameViewParams>();
-  const projectPublicKey = new PublicKey(gameId);
   const [ content, setContent ] = useState<any>(undefined)
   const [ slots, setSlots ] = useState<any>(undefined)
   const [ nfts, setNfts ] = useState<any>(undefined);
@@ -272,20 +273,25 @@ export const NftSelector = (props: {
 
   useEffect(() => {
     (async () => {
-      let project = await Project.get(connection, projectPublicKey)
-      let constructedContent = await project.сonstructContent(connection)
-      setContent(constructedContent)
-      let slots = Object.values(constructedContent.slots)
-      setSlots(slots.map((slot: any) => {
-        let defaultCardTypeKey = slot.default.toBase58()
-        let defaultCardType = constructedContent.cardTypes[defaultCardTypeKey]
-        return {
-          data: slot,
-          defaultCard: constructedContent.cardTypes[slot.default]
-        }
-      }))
+      let contentInfo = await connection.getAccountInfo(new PublicKey(gameId))
+      if (contentInfo)
+      {
+        let constructedContent = ConstructedContent.fromBuffer(contentInfo.data)
+        setContent(constructedContent)
+      }
     })()
   }, [])
+
+  useEffect(() => {
+    if (!content)
+      return
+    setSlots(content.get('slots').map((slot: any) => {
+      return {
+        data: slot,
+        defaultCard: content.get('cardTypes', slot.default)
+      }
+    }))
+  }, [content])
 
   useEffect(() => {
     if (publicKey && content) {
@@ -325,8 +331,6 @@ const unityGameContext = new UnityContext({
   codeUrl: "game/game_15.wasm",
 })
 
-
-
 export const GameView = () => {
 
 
@@ -347,8 +351,12 @@ export const GameView = () => {
 
   useEffect(() => {
     (async () => {
-      let project = await Project.get(connection, projectPublicKey)
-      setConstructedContent(await project.сonstructContent(connection))
+      let contentInfo = await connection.getAccountInfo(new PublicKey(gameId))
+      if (contentInfo) {
+        let content = ConstructedContent.fromBuffer(contentInfo.data)
+        console.log(content)
+        setConstructedContent(content)
+      }
     })()
   }, [])   
 
@@ -401,11 +409,10 @@ export const GameView = () => {
     for (let i in allItems) {
       items.set(allItems[i].tplId, collectionItems[i])
     }
-    for (let slotId of Object.keys(state.content.slots)) {
-      let slot = state.content.slots[slotId]
+    for (let slot of state.content.get('slots')) {
       let item = items.get(slot.id)
       if (item) {
-        let cardType = state.content.cardTypes[item.cardTypeKey.toBase58()]
+        let cardType = item.cardType
         cardType.picture = item.picture
         state.objects.forEach((card: any) => {
           if (card.tplId == slot.id)  {
@@ -416,7 +423,9 @@ export const GameView = () => {
       else {
         state.objects.forEach((card: any) => {
           if (card.tplId == slot.id) {
-            card.tplId = state.content.cardTypes[slot.default].id
+            console.log('default')
+            console.log(state.content.get('cardTypes', slot.default))
+            card.tplId = state.content.get('cardTypes', slot.default).id
           }
         })
       } 
@@ -445,8 +454,8 @@ export const GameView = () => {
     if (!publicKey || wallet === undefined) {
       return;
     }
-    let projectSettings = constructedContent.projectSettings
-    let baseGameStateAccountKey = projectSettings[Object.keys(projectSettings)[0]].gameStateAccount
+    let projectSettings = constructedContent.get('projectSettings')[0]
+    let baseGameStateAccountKey = projectSettings.gameStateAccount
     let baseGameStateAccountPublicKey = new PublicKey(baseGameStateAccountKey)
 
     let gameStateInfo = await connection.getAccountInfo(baseGameStateAccountPublicKey)
@@ -552,6 +561,10 @@ export const GameView = () => {
   unityGameContext.on("OnUnityLoaded", async () => {
     if (!gameState)
       return
+    console.log('gameState')
+    console.log(JSON.stringify(gameState.extractContent()))
+    console.log(JSON.stringify(gameState.extractDisplayData()))
+    console.log(JSON.stringify(gameState.extractGameState()))
     unityGameContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
     unityGameContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData()));
     unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
@@ -664,7 +677,7 @@ export const GameView = () => {
 
   if (!constructedContent)
     return (<div></div>)
-  let projectSettings = constructedContent.projectSettings[Object.keys(constructedContent.projectSettings)[0]]
+  let projectSettings = constructedContent.get('projectSettings')[0]
   return(
     (connected && projectSettings) ?
       <div style={{ width: '100%', height: '100%', verticalAlign: "middle", overflow:"hidden"}}>
