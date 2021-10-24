@@ -69,18 +69,29 @@ GameSchema.set(PlayerItem, { kind: 'struct', fields: [
     ['publicKey', 'pubkey'],
 ]});
 
+type GameSateDiff = {
+  gameAttrs: Map<string, number>,
+  objectAttrs: Map<number, Map<string, number>>,
+}
+
 export class GameState {
 	objects: Map<number, GameObject> = new Map();
+  attrs: any = {};
 	content: any = undefined;
 
-  initObjects = () => {
-    if (!this.content)
+  init = () => {
+    let content = this.content
+    if (!content)
       return
-    var attributes = this.content.get('attributes')
+    var gameAttributes = content.get('gameAttributes')
+    for (let attr of gameAttributes) {
+      this.attrs[attr.code] = attr.initialValue ? attr.initialValue : 0;
+    }
+    var attributes = content.get('attributes')
 	  var cardId = 0
-	  for (let cardPack of this.content.get('cards')) { 
+	  for (let cardPack of content.get('cards')) { 
 	    for (let i = 0; i < cardPack.amount; i++) {
-	      var cardType = this.content.get('cardTypes', cardPack.cardType)
+	      var cardType = content.get('cardTypes', cardPack.cardType)
         var attrs: any = {}
         for (let contentAttr of attributes) {
           attrs[contentAttr.code] = 0
@@ -128,11 +139,15 @@ export class GameState {
   constructor(content: any = undefined) {
     if (content) {
       this.content = content
-      this.initObjects()
+      this.init()
     }
   }
 
   write = (writer: BinaryWriter) => {
+    writer.writeU32(Object.keys(this.attrs).length)
+    for (let attrValue of Object.values(this.attrs)) {
+      writer.writeI16(parseInt(attrValue as string))
+    }
     writer.writeU32(this.objects.size)
     for (let [_, object ] of this.objects) {
       writer.writeU16(object.tplId)
@@ -152,6 +167,13 @@ export class GameState {
   read = (reader: BinaryReader) => {
     if (!this.content)
       throw new Error("Error loading gameState from buffer!")
+    let gameAttributes = this.content.get('gameAttributes')
+    let gameAttrAmount = reader.readU32()
+    if (gameAttrAmount != gameAttributes.length)
+      throw new Error("Error loading gameState from buffer!");
+    for (let attr of gameAttributes) {
+      this.attrs[attr.code] = reader.readI16()
+    }
     this.objects = new Map()
     let attrs = this.content.get('attributes').map((elem: any) => { return elem.code })
     let objectsNumber = reader.readU32()
@@ -169,14 +191,18 @@ export class GameState {
       })
     }
     let bricksToAdd: any[] = []
+    console.log(this.content.get('actions'))
     for (let action of this.content.get('actions')) {
-      bricksToAdd.push(exportBrick(action.name, action.id, action.brick))
+      if (action.brick && action.id && action.name)
+        bricksToAdd.push(exportBrick(action.name, action.id, action.brick))
     }
     for (let value of this.content.get('values')) {
-      bricksToAdd.push(exportBrick(value.name, value.id, value.brick))
+      if (value.brick && value.id && value.name)
+        bricksToAdd.push(exportBrick(value.name, value.id, value.brick))
     }
     for (let condition of this.content.get('conditions')) {
-      bricksToAdd.push(exportBrick(condition.name, condition.id, condition.brick))
+      if (condition.brick && condition.id && condition.name)
+        bricksToAdd.push(exportBrick(condition.name, condition.id, condition.brick))
     }
     updateCustomBricks([])
     updateCustomBricks(bricksToAdd)
@@ -191,7 +217,10 @@ export class GameState {
 			object: object,
 			extra: { vars: new Map([[ 'playerId', playerId ]]) },
 		})
-    ctx.diff = new Map<number, any>()
+    ctx.diff = {
+      gameAttrs: new Map(),
+      objectAttrs: new Map()
+    }
 		let cardType = this.content.get('cardTypes', object.tplId)
 		applyBrick(cardType.action, ctx)
     return ctx.diff

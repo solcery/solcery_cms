@@ -182,8 +182,6 @@ export class TemplateData extends SolceryAccount {
       }
     }
 
-    console.log(constructedObjects)
-
     let objects = new ConstructedObjects({ objects: constructedObjects, schema })
     return new ConstructedTemplate({ code, schema, objects })
   }

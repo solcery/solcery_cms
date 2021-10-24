@@ -501,14 +501,14 @@ basicBricks.push({
     let attrName = params[1]
     let value = applyBrick(params[2], ctx)
     if (ctx.object.attrs[attrName] === undefined)
-      throw new Error("trying to set attr " + attrName)
+      throw new Error("trying to set unknown attr " + attrName)
     ctx.object.attrs[attrName] = value
     if (ctx.diff) {
       let objectId = ctx.object.id
-      let objectDiff = ctx.diff.get(objectId)
+      let objectDiff = ctx.diff.objectAttrs.get(objectId)
       if (!objectDiff)
-        ctx.diff.set(objectId, new Map())
-      ctx.diff.get(objectId).set(attrName, value)
+        ctx.diff.objectAttrs.set(objectId, new Map())
+      ctx.diff.objectAttrs.get(objectId).set(attrName, value)
     }
   }
 })
@@ -530,19 +530,24 @@ basicBricks.push({
 basicBricks.push({
   type: 0,
   subtype: 9,
-  name: 'Apply To Card',
+  name: 'Set game attribute',
   params: [
-    { id: 1, name: 'Id', type: new SBrick({ brickType: 2 }) },
-    { id: 2, name: 'Action', type: new SBrick({ brickType: 0 }) }
+    { id: 1, code: 'attrName', name: 'Attr', type: new SString() },
+    { id: 2, code: 'value', name: 'Value', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
-    let cardId = applyBrick(params[1], ctx)
-    let newObject = ctx.game.object.get(cardId)
-    if (newObject) {
-      ctx.object = newObject
+    let attrName = params[1]
+    let value = applyBrick(params[2], ctx)
+    if (ctx.game.attrs[attrName] === undefined)
+      throw new Error("Trying to set unknown game attr " + attrName)
+    ctx.game.attrs[attrName] = value
+    console.log(ctx.game.attrs)
+    if (ctx.diff) {
+      ctx.diff.gameAttrs.set(attrName, value)
     }
   }
 })
+
 
 basicBricks.push({
   type: 0,
@@ -843,6 +848,20 @@ basicBricks.push({
     return ctx.object.tplId
   }
 })
+
+// value.attr
+basicBricks.push({
+  type: 2,
+  subtype: 13,
+  name: 'Game Attribute',
+  params: [
+    { id: 1, code: 'attrName', name: 'Attribute name', type: new SString() }
+  ],
+  func: (params: any, ctx: any) => {
+    return ctx.games.attrs[params[1]]
+  }
+})
+
 
 for (let brick of basicBricks)
   solceryBricks.push(brick)

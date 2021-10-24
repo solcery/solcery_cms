@@ -9,7 +9,7 @@ import { programId } from "../../solcery/engine"
 import { Project, TemplateData, SolcerySchema, Storage} from "../../solcery/classes"
 import { useHistory } from "react-router-dom";
 import { Button } from "antd";
-import { ConstructedContent } from "../../solcery/content"
+import { ConstructedContent, ConstructedObject, ConstructedTemplate, ConstructedObjects } from "../../solcery/content"
 import { GameState } from "../../solcery/game"
 
 export const HomeView = () => {
@@ -70,7 +70,7 @@ export const HomeView = () => {
       return
     connection.requestAirdrop(publicKey, LAMPORTS_PER_SOL * 1)
   }
-
+  //7hjjgLMmKBbqHuphsmonhvffD3sCW1fBuUckWVeJoipv
   const constructContent = async () => {
     if (!project)
       return
@@ -92,8 +92,19 @@ export const HomeView = () => {
     });
 
     constructed.get('projectSettings')[0].gameStateAccount = gameStateAccount.publicKey.toBase58() // TODO: remove hardcode, publish
+    
+    // rawsetting gameStateAccount
+    let gameStateAccountKey = gameStateAccount.publicKey.toBase58() 
+    let projectSettings = constructed.templates.get("projectSettings")
+    if (projectSettings) {
+      for (let projectSetting of projectSettings.objects.raw.values()) {
+        projectSetting.data.set(13, gameStateAccountKey)
+      }
+    }
     constructed.write(writer)
     let contentBuf = writer.buf.slice(0, writer.length)
+    let readContent = ConstructedContent.read(new BinaryReader(contentBuf))
+    console.log(readContent)
 
     var contentAccount = new Account()
     var createContentAccountIx = SystemProgram.createAccount({

@@ -224,13 +224,12 @@ export const TemplateView = () => {
           key="actions"
           render={(text, object: any) =>
           <div>
-            <Button onClick={() => { copyToAnotherProject(new PublicKey(object.key)) }}>Copy</Button>  
+            <Button onClick={() => { createObject(new PublicKey(object.key)) }}>Copy</Button>  
             <Button onClick={() => { deleteObject(new PublicKey(object.key)) }}>Delete</Button>  
           </div>} //TODO: delete: accountCleanup, confirmation
         />
       </Table>
       <Button onClick={() => { createObject() }}>Create new object</Button>
-      <Button onClick={() => { copyAll() }}>Copyall</Button>
     </div>
     )
   }

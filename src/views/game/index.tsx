@@ -386,6 +386,9 @@ export const GameView = () => {
     })()    
   }, [ gamePublicKey ])
   
+  function delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+  }
 
   const loadGameStateFromAccount = async (accountInfo: any) => {
     if (!game) 
@@ -429,6 +432,10 @@ export const GameView = () => {
       } 
     }
     setGameState(state)
+    if (state.attrs.finished == 1) {
+      await delay(2000)
+      leaveGame()
+    }
   }
 
   useEffect(() => {
@@ -470,7 +477,6 @@ export const GameView = () => {
       fromPubkey: publicKey,
       newAccountPubkey: gameAccount.publicKey,
     }));
-    //H9dvmwtrV4FxcJfdCRtxv2fATKqeG4fNUyboXKxDnmLK
     var gameStateAccount = new Account()
     var gameStateSize = gameStateBuffer.length
     instructions.push(SystemProgram.createAccount({
@@ -519,19 +525,6 @@ export const GameView = () => {
       programId: programId,
       data: writer.buf.slice(0, writer.length)
     }));
-
-    // instructions.push(new TransactionInstruction({
-    //   keys: [
-    //     { pubkey: publicKey, isSigner: true, isWritable: false },
-    //     { pubkey: gameAccount.publicKey, isSigner: false, isWritable: true },
-    //     { pubkey: gameStateAccount.publicKey, isSigner: false, isWritable: true }, 
-    //   ],
-    //   programId: programId,
-    //   data: Buffer.concat([
-    //     Buffer.from([2]),
-    //     Buffer.from([0, 0, 0, 0])
-    //   ])
-    // }));
 
     sendTransaction(connection, wallet, instructions, [ gameAccount, gameStateAccount ])
   }
@@ -597,11 +590,27 @@ export const GameView = () => {
     gameState.content.get('attributes').forEach((attr: any, index: number) => {
       attrIndexes.set(attr.code, index)
     })
+    let gameAttrIndexes = new Map()
+    gameState.content.get('gameAttributes').forEach((attr: any, index: number) => {
+      gameAttrIndexes.set(attr.code, index)
+    })
     let writer = new BinaryWriter()
-    writer.writeU32(diff.size)
-    for (let objectId of diff.keys()) {
+
+    let gameAttrsDiff = diff.gameAttrs
+    writer.writeU32(gameAttrsDiff.size)
+    for (let attrName of gameAttrsDiff.keys()) {
+      let gameAttrIndex = gameAttrIndexes.get(attrName)
+      if (gameAttrIndex === undefined) 
+          throw new Error("Error serializing game state diff")
+      writer.writeU8(gameAttrIndex)
+      writer.writeI16(gameAttrsDiff.get(attrName))
+    }
+
+    writer.writeU32(diff.objectAttrs.size)
+    let objectAttrs = diff.objectAttrs
+    for (let objectId of objectAttrs.keys()) {
       writer.writeU16(objectId)
-      let objectDiff = diff.get(objectId)
+      let objectDiff = objectAttrs.get(objectId)
       writer.writeU32(objectDiff.size)
       for (let attrName of objectDiff.keys()) {
         let attrIndex = attrIndexes.get(attrName)
@@ -625,45 +634,6 @@ export const GameView = () => {
       ])
     });
     sendTransaction(connection, wallet, [updateStateIx], [])
-    // unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
-  });
-
-  unityGameContext.on("LogAction", async (log: string) => {
-    if (!gameState || !game || !gamePublicKey)
-      return;
-    if (!publicKey || wallet === undefined) 
-      return;
-    var logToApply = JSON.parse(log)
-    for (let logEntry of logToApply.Steps) {
-      if (logEntry.actionType == 2) {
-        leaveGame()
-      }
-      if (logEntry.actionType == 0)
-      {
-        let writer = new BinaryWriter()
-        gameState.useCard(logEntry.data, logEntry.playerId)
-        gameState.write(writer)
-
-        let step = game.step
-        let stepBuffer = Buffer.allocUnsafe(4)
-        stepBuffer.writeUInt32LE(step)
-
-        let setStateIx = new TransactionInstruction({
-          keys: [
-            { pubkey: publicKey, isSigner: true, isWritable: false },
-            { pubkey: gamePublicKey, isSigner: false, isWritable: true },
-            { pubkey: game.state, isSigner: false, isWritable: true },
-          ],
-          programId: programId,
-          data: Buffer.concat([
-            Buffer.from([2]),
-            Buffer.from(stepBuffer),
-            writer.buf.slice(0, writer.length),
-          ])
-        });
-        sendTransaction(connection, wallet, [setStateIx], [])
-      }
-    }
   });
 
   if (!constructedContent)
