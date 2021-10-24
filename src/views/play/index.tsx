@@ -39,10 +39,10 @@ export const GameObjectView = (props: {
 }
 
 const unityPlayContext = new UnityContext({
-  loaderUrl: "game/game_17.loader.js",
-  dataUrl: "game/game_17.data",
-  frameworkUrl: "game/game_17.framework.js",
-  codeUrl: "game/game_17.wasm",
+  loaderUrl: "game/game_19.loader.js",
+  dataUrl: "game/game_19.data",
+  frameworkUrl: "game/game_19.framework.js",
+  codeUrl: "game/game_19.wasm",
 })
 
 export const PlayView = () => {
