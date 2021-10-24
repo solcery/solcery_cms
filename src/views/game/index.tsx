@@ -232,10 +232,10 @@ const loadNftsAsCollectionItems = async (mintPubkeys: PublicKey[], content: any)
 
 export const NftSelector = (props: {
   onChange: (filled: any) => void,
+  contentPublicKey: PublicKey,
 }) => { 
   const { connected, wallet, publicKey} = useWallet();
   const connection = useConnection();
-  const { gameId } = useParams<GameViewParams>();
   const [ content, setContent ] = useState<any>(undefined)
   const [ slots, setSlots ] = useState<any>(undefined)
   const [ nfts, setNfts ] = useState<any>(undefined);
@@ -273,7 +273,7 @@ export const NftSelector = (props: {
 
   useEffect(() => {
     (async () => {
-      let contentInfo = await connection.getAccountInfo(new PublicKey(gameId))
+      let contentInfo = await connection.getAccountInfo(props.contentPublicKey)
       if (contentInfo)
       {
         let constructedContent = ConstructedContent.fromBuffer(contentInfo.data)
@@ -331,14 +331,14 @@ const unityGameContext = new UnityContext({
   codeUrl: "game/game_19.wasm",
 })
 
-export const GameView = () => {
-
-
+export const GameView = (props: {
+  gameId?: string
+}) => {
   const [ constructedContent, setConstructedContent ] = useState<any>(undefined);
   const { connected, wallet, publicKey, connect } = useWallet();
   const connection = useConnection();
   const { gameId } = useParams<GameViewParams>();
-  const projectPublicKey = new PublicKey(gameId);
+  const contentPublicKey = new PublicKey(props.gameId ? props.gameId : gameId);
   const { player, playerStatePublicKey, gamePublicKey } = usePlayer();
 
   const [ playerStateData, setPlayerStateData ] = useState<Buffer|undefined>(undefined);
@@ -351,10 +351,9 @@ export const GameView = () => {
 
   useEffect(() => {
     (async () => {
-      let contentInfo = await connection.getAccountInfo(new PublicKey(gameId))
+      let contentInfo = await connection.getAccountInfo(contentPublicKey)
       if (contentInfo) {
         let content = ConstructedContent.fromBuffer(contentInfo.data)
-        console.log(content)
         setConstructedContent(content)
       }
     })()
@@ -492,7 +491,7 @@ export const GameView = () => {
       keys: [
         { pubkey: publicKey, isSigner: true, isWritable: false },
         { pubkey: gameAccount.publicKey, isSigner: false, isWritable: true },
-        { pubkey: projectPublicKey, isSigner: false, isWritable: false },
+        { pubkey: contentPublicKey, isSigner: false, isWritable: false },
         { pubkey: gameStateAccount.publicKey, isSigner: false, isWritable: true },
         { pubkey: baseGameStateAccountPublicKey, isSigner: false, isWritable: false },
 
@@ -666,7 +665,7 @@ export const GameView = () => {
                   </div>
                 </Col>
                 <Col span={12}>
-                  <NftSelector onChange={(result: any) => {
+                  <NftSelector contentPublicKey={contentPublicKey} onChange={(result: any) => {
                     setItems(result)
                   }}/>
                   <div className="one" onClick={createGame}><span>START GAME</span></div>

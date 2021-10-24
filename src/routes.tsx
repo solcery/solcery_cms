@@ -8,7 +8,7 @@ import { PlayerProvider } from "./contexts/player";
 import { AppLayout } from "./components/Layout";
 import { SolceryMenu } from "./components/SolceryMenu";
 
-import { HomeView, TemplateView, AccountView, TemplateSchemaView, ObjectView, PlayView, GameView, StoreView } from "./views";
+import { HomeView, TemplateView, AccountView, TemplateSchemaView, ObjectView, PlayView, GameView, StoreView, SolitaryView } from "./views";
 export function Routes() {
   return (
     <>
@@ -19,6 +19,7 @@ export function Routes() {
               <AppLayout>
               <Switch>
                 <Route exact path="/account" component={() => <AccountView/>} />
+                <Route exact path="/solitary" component={() => <PlayerProvider><SolitaryView/></PlayerProvider>} />
                 <Route exact path="/store" component={() => <StoreView/>} />
                 <Route exact path="/game/:gameId" component={() => <PlayerProvider><GameView /></PlayerProvider>} />
                 <Route path="/account/:accountKey" component={() => <AccountView/>} />

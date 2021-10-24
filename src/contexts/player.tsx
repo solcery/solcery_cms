@@ -13,7 +13,7 @@ import 'animate.css';
 
 //DV1ykHgbc4oikjV3Wm9sPDSueuTp1ERD68DmJPndkUUF
 const programId = new PublicKey("GN1p6pe6m7rdK3re2TayqJyQtJUme1EnCLyYrTAArYRR");
-const STATE_ACCOUNT_SEED = 'solcery_player_state_dev_net9';
+const STATE_ACCOUNT_SEED = 'solcery_player_state_dev_net10';
 const STATE_ACCOUNT_SIZE = 65;
 
 type PlayerState = {

@@ -88,7 +88,7 @@ export class GameState {
       this.attrs[attr.code] = attr.initialValue ? attr.initialValue : 0;
     }
     var attributes = content.get('attributes')
-	  var cardId = 0
+	  var cardId = 1
 	  for (let cardPack of content.get('cards')) { 
 	    for (let i = 0; i < cardPack.amount; i++) {
 	      var cardType = content.get('cardTypes', cardPack.cardType)

@@ -6,3 +6,4 @@ export { ObjectView } from "./object";
 export { PlayView } from "./play";
 export { GameView } from "./game";
 export { StoreView } from "./store";
+export { SolitaryView } from "./solitary";
