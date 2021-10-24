@@ -7,6 +7,6 @@ type GameViewParams = {
 
 export const SolitaryView = () => {
   return (
-    <GameView gameId='7yKWL4o33bC6TG7rQVKxQNbUgTtpHfhmfNBJNeZzKJxz'/>
+    <GameView gameId='LtrTzER65iwKWKhUfBbfqKoZUKLdCZyBuQmYZMNWY5k'/>
   );
 };
