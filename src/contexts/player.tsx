@@ -112,7 +112,7 @@ export function PlayerProvider({ children = null as any }) {
 	return (
 		<div className="login_page">
       <video autoPlay muted loop className='bgvideo'>
-        <source src="/gameplay.mp4" type="video/mp4"/>
+        <source src="/solcery.mp4" type="video/mp4"/>
       </video>
       <Row align='middle'>
       	<Col span={24}>
