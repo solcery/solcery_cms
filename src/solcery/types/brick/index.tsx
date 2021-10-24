@@ -165,6 +165,8 @@ export const getBrickSignature = (type: number, subtype: number) => { // TODO cu
 
 export const applyBrick = (brick: Brick, ctx: any) => {
   var brickSignature = getBrickSignature(brick.type, brick.subtype)
+  if (!brickSignature)
+    return
   if (brickSignature) {
     let parsedParams: any = {}
     for (let [ paramId, param ] of brick.params) {
@@ -275,32 +277,31 @@ export const brickToOldBrick = (brick: Brick) => { // TODO: construct??
     throw new Error('Brick to old brick failed')
   for (var param of brick.params) {
     var paramSignature = getParamSignatureById(brickSignature, param[0])
-    if (!paramSignature)
-      throw new Error('Brick to old brick failed')
-    if (paramSignature.type instanceof SInt) {
-      result.HasField = true
-      result.IntField = param[1]
-      result.StringField = null
-    }
-    if (paramSignature.type instanceof SString) {
-      result.HasField = true
-      result.StringField = param[1]
-      result.IntField = 0
-    }
-    if (paramSignature.type instanceof SBrick) {
-      result.Slots.push(brickToOldBrick(param[1]))
+    if (paramSignature) {
+      if (paramSignature.type instanceof SInt) {
+        result.HasField = true
+        result.IntField = param[1]
+        result.StringField = null
+      }
+      if (paramSignature.type instanceof SString) {
+        result.HasField = true
+        result.StringField = param[1]
+        result.IntField = 0
+      }
+      if (paramSignature.type instanceof SBrick) {
+        result.Slots.push(brickToOldBrick(param[1]))
+      } 
     }
   }
   return result
 }
 
-export const exportBrick = (object: TplObject, brick: Brick) => {
+export const exportBrick = (name: string, id: number, brick: Brick) => {
   let templateName = getBrickTypeName(brick.type) + 's'
   let paramsMap = new Map<string, BrickParamSignature>()
   exportArgsAsParams(brick, paramsMap)
   let argParams = Array.from(paramsMap.values())
-  let name = object.fields.get(1)
-  let subtype = 10000 + object.id
+  let subtype = 10000 + id
   return {
     type: brick.type,
     subtype: subtype, //TODO: magic number
@@ -317,7 +318,7 @@ export const exportBrick = (object: TplObject, brick: Brick) => {
       //   let param = argParams[index]
       //   ctx.args[param.name] = applyBrick(params[paramId], ctx) // Calculating params TODO: addType
       // });
-      let result = applyBrick(ctx.game.content.get(templateName, object.id).brick, ctx) // closure?
+      let result = applyBrick(ctx.game.content.get(templateName, id).brick, ctx) // closure?
       ctx.args.pop()
       return result
     }
@@ -518,6 +519,23 @@ basicBricks.push({
     let cardType = ctx.game.content.get('cardTypes', tplId)
     if (cardType.action) 
       applyBrick(cardType.action, ctx)
+  }
+})
+
+basicBricks.push({
+  type: 0,
+  subtype: 9,
+  name: 'Apply To Card',
+  params: [
+    { id: 1, name: 'Id', type: new SBrick({ brickType: 2 }) },
+    { id: 2, name: 'Action', type: new SBrick({ brickType: 0 }) }
+  ],
+  func: (params: any, ctx: any) => {
+    let cardId = applyBrick(params[1], ctx)
+    let newObject = ctx.game.object.get(cardId)
+    if (newObject) {
+      ctx.object = newObject
+    }
   }
 })
 
@@ -804,3 +822,6 @@ basicBricks.push({
     return ctx.object.tplId
   }
 })
+
+for (let brick of basicBricks)
+  solceryBricks.push(brick)

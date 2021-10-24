@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import { useConnection, sendTransaction} from "../../contexts/connection";
 import { useProject } from "../../contexts/project";
 import { useWallet } from "../../contexts/wallet";
-import { PublicKey, Account, TransactionInstruction } from "@solana/web3.js";
+import { PublicKey, Account, TransactionInstruction, SystemProgram } from "@solana/web3.js";
 import './style.css';
 
 import { useParams, useHistory } from "react-router-dom";
@@ -38,6 +38,33 @@ export const TemplateSchemaView = () => {
   var [ template, setTemplate ] = useState<TemplateData | undefined>()
   var [ revision, setRevision ] = useState(0)
 
+  const newStorage = async () => {
+    if (!project || !template)
+      return
+    if (!publicKey || wallet === undefined) 
+      return;
+    const STORAGE_ACCOUNT_SIZE = 3200
+    var storageAccount = new Account()
+    var createStorageAccountIx = SystemProgram.createAccount({
+      programId: programId,
+      space: STORAGE_ACCOUNT_SIZE, // TODO
+      lamports: await connection.getMinimumBalanceForRentExemption(STORAGE_ACCOUNT_SIZE, 'singleGossip'),
+      fromPubkey: publicKey,
+      newAccountPubkey: storageAccount.publicKey,
+    });
+    const setStorageIx = new TransactionInstruction({
+      keys: [
+        { pubkey: publicKey, isSigner: true, isWritable: false },
+        { pubkey: project.publicKey, isSigner: false, isWritable: false },
+        { pubkey: template.publicKey, isSigner: false, isWritable: true },
+        { pubkey: storageAccount.publicKey, isSigner: false, isWritable: true },
+      ],
+      programId: programId,
+      data: Buffer.from([0, 6]),
+    });
+    sendTransaction(connection, wallet, [createStorageAccountIx, setStorageIx], [storageAccount])
+  }
+
   const update = () => {
     if (!project || !template)
       return
@@ -45,6 +72,7 @@ export const TemplateSchemaView = () => {
       return;
     }
     var buf = Buffer.from(serialize(SolcerySchema, template))
+      // let newProjectKey = new PublicKey("J5kfxFrjjouSb3MmScWXMUAYRqkjnbZ8zzaCokVdAv2h")
     const changeNameIx = new TransactionInstruction({
       keys: [
         { pubkey: publicKey, isSigner: true, isWritable: false },
@@ -175,6 +203,7 @@ export const TemplateSchemaView = () => {
         }} />
         <Button onClick={addField}>Add field</Button>
         <Button onClick={update}>Save</Button>
+        <Button onClick={newStorage}>New storage</Button>
       </div>
     );
   }

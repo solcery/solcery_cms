@@ -43,7 +43,7 @@ export class Project extends SolceryAccount {
           for (let obj of objects) {
             let brick = obj.fields.get(brickField)
             if (brick) {
-              result.push(exportBrick(obj, brick))
+              result.push(exportBrick(obj.fields.get(1), obj.id, brick))
             }
           }
         } 

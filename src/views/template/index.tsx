@@ -28,6 +28,58 @@ export const TemplateView = () => {
   var { project } = useProject();
   let [ filter, setFilter ] = useState<any>(undefined)
 
+
+  const copyToAnotherProject = async (src: PublicKey ) => {
+    if (!publicKey || !project || wallet === undefined) {
+      return;
+    }
+    var instructions = [];
+
+    let proj = new PublicKey("J2TDJcbUXev6SNJMqq5QAtvxsZdHDyjwnQdLSqJLL2kk")
+    let otherTpl = await TemplateData.get(connection, new PublicKey("H5vre6xcj5wqRzASoToNV284vaXzxsBGVBYqPeLpFiwS"))
+    var objectAccount = new Account()
+    instructions.push(SystemProgram.createAccount({
+      programId: programId,
+      space: 3200, // TODO
+      lamports: await connection.getMinimumBalanceForRentExemption(3200, 'singleGossip'),
+      fromPubkey: publicKey,
+      newAccountPubkey: objectAccount.publicKey,
+    }));
+    instructions.push(new TransactionInstruction({
+      keys: [
+        { pubkey: publicKey, isSigner: true, isWritable: false },
+        { pubkey: proj, isSigner: false, isWritable: true },
+        { pubkey: otherTpl.publicKey, isSigner: false, isWritable: false },
+        { pubkey: otherTpl.storages[0], isSigner: false, isWritable: true },
+        { pubkey: objectAccount.publicKey, isSigner: false, isWritable: true },
+      ],
+      programId: programId,
+      data: Buffer.from([1, 0]),
+    }));
+    if (src) {
+      instructions.push(new TransactionInstruction({
+        keys: [
+          { pubkey: publicKey, isSigner: true, isWritable: false },
+          { pubkey: proj, isSigner: false, isWritable: false },
+          { pubkey: objectAccount.publicKey, isSigner: false, isWritable: true },
+          { pubkey: src, isSigner: false, isWritable: false },
+        ],
+        programId: programId,
+        data: Buffer.from([1, 2]),
+      }));
+    }
+    sendTransaction(connection, wallet, instructions, [objectAccount])
+  }
+
+  const copyAll = () => {
+    if (!objects)
+      return;
+    for (let obj of objects) {
+      copyToAnotherProject(obj.publicKey)
+    }
+  }
+
+
   const createObject = async (src: PublicKey | undefined = undefined) => {
     if (!publicKey || !project || wallet === undefined || !template) {
       return;
@@ -172,12 +224,13 @@ export const TemplateView = () => {
           key="actions"
           render={(text, object: any) =>
           <div>
-            <Button onClick={() => { createObject(new PublicKey(object.key)) }}>Copy</Button>  
+            <Button onClick={() => { copyToAnotherProject(new PublicKey(object.key)) }}>Copy</Button>  
             <Button onClick={() => { deleteObject(new PublicKey(object.key)) }}>Delete</Button>  
           </div>} //TODO: delete: accountCleanup, confirmation
         />
       </Table>
       <Button onClick={() => { createObject() }}>Create new object</Button>
+      <Button onClick={() => { copyAll() }}>Copyall</Button>
     </div>
     )
   }

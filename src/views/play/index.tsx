@@ -75,13 +75,15 @@ export const PlayView = () => {
     (async () => {
       var constructedContent = await project.сonstructContent(connection)
       let buf = constructedContent.toBuffer()
+      console.log(JSON.stringify(buf))
+      
       let cc = ConstructedContent.read(new BinaryReader(buf))
       // let contentInfo = await connection.getAccountInfo(new PublicKey("7cRU5jAtqRjaSFUb3Dj3e8Mhnnhe2G3J7XbDqSjhrPPc"))
       // if (!contentInfo)
       //   return
       // let constructedContent = ConstructedContent.read(new BinaryReader(contentInfo.data))
       let gameState = new GameState(cc)
-      console.log(JSON.stringify(buf))
+      // console.log(JSON.stringify(buf))
       console.log(JSON.stringify(gameState.toBuffer()))
 
       let slots = gameState.content.getAll('slots')
@@ -154,8 +156,6 @@ export const PlayView = () => {
     }
     return filter.header === undefined || elem.header.includes(filter.header)
   })
-  if (gameState && gameState.content)
-    console.log(gameState.content.getAll('attributes'))
   return (
     <Layout>
       <Sider width='300'>

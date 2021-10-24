@@ -1,4 +1,4 @@
-import { applyBrick } from "./types/brick";
+import { applyBrick, exportBrick, updateCustomBricks } from "./types/brick";
 import { BinaryReader, BinaryWriter } from "borsh";
 import { PublicKey } from "@solana/web3.js";
 
@@ -168,6 +168,18 @@ export class GameState {
         attrs: Object.fromEntries(attrMap)
       })
     }
+    let bricksToAdd: any[] = []
+    for (let action of this.content.get('actions')) {
+      bricksToAdd.push(exportBrick(action.name, action.id, action.brick))
+    }
+    for (let value of this.content.get('values')) {
+      bricksToAdd.push(exportBrick(value.name, value.id, value.brick))
+    }
+    for (let condition of this.content.get('conditions')) {
+      bricksToAdd.push(exportBrick(condition.name, condition.id, condition.brick))
+    }
+    updateCustomBricks([])
+    updateCustomBricks(bricksToAdd)
   }
 
 	useCard = (cardId: number, playerId: number) => {

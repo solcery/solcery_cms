@@ -423,8 +423,6 @@ export const GameView = () => {
       else {
         state.objects.forEach((card: any) => {
           if (card.tplId == slot.id) {
-            console.log('default')
-            console.log(state.content.get('cardTypes', slot.default))
             card.tplId = state.content.get('cardTypes', slot.default).id
           }
         })
@@ -600,12 +598,9 @@ export const GameView = () => {
       return;
     let diff = gameState.useCard(cardId, 1)
     let attrIndexes = new Map()
-    let attrIndex = 0
-    for (let attrId of Object.keys(gameState.content.attributes)) { // TODO:??
-      let attr = gameState.content.attributes[attrId]
-      attrIndexes.set(attr.code, attrIndex)
-      attrIndex++;
-    }
+    gameState.content.get('attributes').forEach((attr: any, index: number) => {
+      attrIndexes.set(attr.code, index)
+    })
     let writer = new BinaryWriter()
     writer.writeU32(diff.size)
     for (let objectId of diff.keys()) {

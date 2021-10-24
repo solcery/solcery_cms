@@ -97,9 +97,6 @@ export class ConstructedObject {
 	}
 	static read(reader: BinaryReader, schema: ConstructedSchema) {
 		let id = reader.readU16();
-		if (id === 281) {
-			console.log(reader.buf.slice(reader.offset, reader.offset + 200))
-		}
 		let fieldsNumber = reader.readU8();
 		let data = new Map<number, any>();
 		for (let i = 0; i < fieldsNumber; i++) {

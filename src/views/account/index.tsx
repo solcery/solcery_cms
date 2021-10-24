@@ -97,6 +97,7 @@ export const AccountView = () => {
         { pubkey: publicKey, isSigner: true, isWritable: false },
         { pubkey: projectAccount.publicKey, isSigner: false, isWritable: true },
         { pubkey: storageAccount.publicKey, isSigner: false, isWritable: true },
+        { pubkey: publicKey, isSigner: false, isWritable: false },
       ],
       programId: programId,
       data: Buffer.from([4, 0]),
