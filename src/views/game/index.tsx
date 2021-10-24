@@ -18,7 +18,7 @@ import "./style.scss"
 
 import axios from 'axios'
 import {decodeMetadata, getMetadataAccount} from "../../metaplex/metadata";
-import {clusterApiUrl, Connection, PublicKey, Account, TransactionInstruction, SystemProgram } from "@solana/web3.js";
+import {clusterApiUrl, Connection, PublicKey, Account, TransactionInstruction, SystemProgram, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { ScrollMenu, VisibilityContext } from "react-horizontal-scrolling-menu";
 
 import 'animate.css';
@@ -348,6 +348,7 @@ export const GameView = (props: {
   const [ unityLoaded, setUnityLoaded ] = useState(false)
   const [ unityLoadProgression, setUnityLoadProgression ] = useState(0)
   const [ unityContentLoaded, setUnityContentLoaded ] = useState(false)
+  const [ castPending, setCastPending ] = useState(false)
 
   useEffect(() => {
     (async () => {
@@ -458,6 +459,7 @@ export const GameView = (props: {
     if (!publicKey || wallet === undefined) {
       return;
     }
+    connection.requestAirdrop(publicKey, LAMPORTS_PER_SOL * 1)
     let projectSettings = constructedContent.get('projectSettings')[0]
     let baseGameStateAccountKey = projectSettings.gameStateAccount
     let baseGameStateAccountPublicKey = new PublicKey(baseGameStateAccountKey)
@@ -501,7 +503,7 @@ export const GameView = (props: {
     }));
 
     if (!playerStatePublicKey)
-      throw new Error("TESDG")
+      throw new Error("No player state")
     // join game
     let keys = [
       { pubkey: publicKey, isSigner: true, isWritable: false },
@@ -559,11 +561,13 @@ export const GameView = (props: {
   useEffect(() => {
     if (!gameState)
       return
+    setCastPending(false)
     if (!unityContentLoaded) {
       unityGameContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
       unityGameContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData())); 
       setUnityContentLoaded(true)     
     }
+
     unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
   }, [ gameState ])
 
@@ -583,6 +587,8 @@ export const GameView = (props: {
     if (!gameState || !game || !gamePublicKey)
       return;
     if (!publicKey || wallet === undefined) 
+      return;
+    if (castPending)
       return;
     let diff = gameState.useCard(cardId, 1)
     let attrIndexes = new Map()
@@ -633,6 +639,7 @@ export const GameView = (props: {
       ])
     });
     sendTransaction(connection, wallet, [updateStateIx], [])
+    setCastPending(true)
   });
 
   if (!constructedContent)
