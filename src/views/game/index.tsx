@@ -559,10 +559,6 @@ export const GameView = () => {
   unityGameContext.on("OnUnityLoaded", async () => {
     if (!gameState)
       return
-    console.log('gameState')
-    console.log(JSON.stringify(gameState.extractContent()))
-    console.log(JSON.stringify(gameState.extractDisplayData()))
-    console.log(JSON.stringify(gameState.extractGameState()))
     unityGameContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
     unityGameContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData()));
     unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));

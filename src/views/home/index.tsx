@@ -2,7 +2,7 @@ import React from "react";
 import { useConnection, sendTransaction } from "../../contexts/connection";
 import { useProject } from "../../contexts/project";
 import { useWallet } from "../../contexts/wallet";
-import { LAMPORTS_PER_SOL, Account, TransactionInstruction } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL, Account, TransactionInstruction, PublicKey } from "@solana/web3.js";
 import { SystemProgram } from "@solana/web3.js";
 import { BinaryWriter, BinaryReader } from "borsh";
 import { programId } from "../../solcery/engine"
@@ -10,6 +10,7 @@ import { Project, TemplateData, SolcerySchema, Storage} from "../../solcery/clas
 import { useHistory } from "react-router-dom";
 import { Button } from "antd";
 import { ConstructedContent } from "../../solcery/content"
+import { GameState } from "../../solcery/game"
 
 export const HomeView = () => {
 
@@ -18,6 +19,51 @@ export const HomeView = () => {
   const { wallet, publicKey } = useWallet();
   const history = useHistory();
   const { project } = useProject();
+
+  const setAccountData = async (accountPublicKey: PublicKey, data: Buffer, offset: number = 0) => {
+    const MAX_DATA_SIZE = 1000
+    if (wallet === undefined || !wallet.publicKey)
+      return
+
+    if (data.length <= MAX_DATA_SIZE) {
+      let writer = new BinaryWriter()
+      writer.writeU8(3)
+      writer.writeU8(0)
+      writer.writeU64(offset) 
+      const saveAccountIx = new TransactionInstruction({
+        keys: [
+          { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
+          { pubkey: accountPublicKey, isSigner: false, isWritable: true },
+        ],
+        programId: programId,
+        data: Buffer.concat([ 
+          writer.buf.slice(0, writer.length),
+          data,
+        ]),
+      });
+      sendTransaction(connection, wallet, [saveAccountIx], [])
+    }
+    else {
+      let writer = new BinaryWriter()
+      writer.writeU8(3)
+      writer.writeU8(0)
+      writer.writeU64(offset)
+      const saveAccountIx = new TransactionInstruction({
+        keys: [
+          { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
+          { pubkey: accountPublicKey, isSigner: false, isWritable: true },
+        ],
+        programId: programId,
+        data: Buffer.concat([ 
+          writer.buf.slice(0, writer.length),
+          data.slice(0, MAX_DATA_SIZE),
+        ]),
+      });
+      await sendTransaction(connection, wallet, [saveAccountIx], [], false).then(async () => {
+        await setAccountData(accountPublicKey, data.slice(MAX_DATA_SIZE), offset + MAX_DATA_SIZE)
+      })
+    }
+  }
 
   const airdrop = async () => {
     if (!publicKey)
@@ -28,11 +74,43 @@ export const HomeView = () => {
   const constructContent = async () => {
     if (!project)
       return
+    if (wallet === undefined || !wallet.publicKey)
+      return
     let constructed = await project.сonstructContent(connection)
     let writer = new BinaryWriter()
+
+    let gameState = new GameState(constructed)
+    let gameStateBuf = gameState.toBuffer()
+
+    var gameStateAccount = new Account()
+    var createGameStateAccountIx = SystemProgram.createAccount({
+      programId: programId,
+      space: gameStateBuf.length, // TODO
+      lamports: await connection.getMinimumBalanceForRentExemption(gameStateBuf.length, 'singleGossip'),
+      fromPubkey: wallet.publicKey,
+      newAccountPubkey: gameStateAccount.publicKey,
+    });
+
+    constructed.get('projectSettings')[0].gameStateAccount = gameStateAccount.publicKey.toBase58() // TODO: remove hardcode, publish
     constructed.write(writer)
-    let buf = writer.buf.slice(0, writer.length)
-    console.log(JSON.stringify(buf))
+    let contentBuf = writer.buf.slice(0, writer.length)
+
+    var contentAccount = new Account()
+    var createContentAccountIx = SystemProgram.createAccount({
+      programId: programId,
+      space: contentBuf.length, // TODO
+      lamports: await connection.getMinimumBalanceForRentExemption(contentBuf.length, 'singleGossip'),
+      fromPubkey: wallet.publicKey,
+      newAccountPubkey: contentAccount.publicKey,
+    });
+
+
+    await sendTransaction(connection, wallet, [createContentAccountIx, createGameStateAccountIx], [contentAccount, gameStateAccount]).then(async () => {
+      await setAccountData(contentAccount.publicKey, contentBuf)
+      await setAccountData(gameStateAccount.publicKey, gameStateBuf)
+      console.log('CONSTRUCTED!')
+      console.log('Content account: ' + contentAccount.publicKey.toBase58())
+    })
   }
 
   const createTemplate = async () => {

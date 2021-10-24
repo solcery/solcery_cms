@@ -273,8 +273,11 @@ export const brickToOldBrick = (brick: Brick) => { // TODO: construct??
     Slots: [],
   }
   var brickSignature = getBrickSignature(brick.type, brick.subtype)
-  if (!brickSignature)
-    throw new Error('Brick to old brick failed')
+  if (!brickSignature) {
+    console.log("Error loading brick. Something morphed into default brick")
+    let res: OldBrick = brickToOldBrick(defaultBricksByType.get(brick.type))
+    return res
+  }
   for (var param of brick.params) {
     var paramSignature = getParamSignatureById(brickSignature, param[0])
     if (paramSignature) {
@@ -497,6 +500,8 @@ basicBricks.push({
   func: (params: any, ctx: any) => {
     let attrName = params[1]
     let value = applyBrick(params[2], ctx)
+    if (ctx.object.attrs[attrName] === undefined)
+      throw new Error("trying to set attr " + attrName)
     ctx.object.attrs[attrName] = value
     if (ctx.diff) {
       let objectId = ctx.object.id
@@ -538,6 +543,22 @@ basicBricks.push({
     }
   }
 })
+
+basicBricks.push({
+  type: 0,
+  subtype: 256,
+  name: 'Console.Log',
+  params: [
+    { id: 1, name: 'Message', type: new SString() },
+  ],
+  func: (params: any, ctx: any) => {
+    console.log('Brick Message: ' + params[1])
+    console.log('VARS: ' + JSON.stringify(ctx.vars))
+    console.log('ATTRS: ' + JSON.stringify(ctx.object.attrs))
+    console.log('GAME ATTRS ' + JSON.stringify(ctx.game.attrs))
+  }
+})
+
 
 
 

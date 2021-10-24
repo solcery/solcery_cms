@@ -80,7 +80,6 @@ export class ConstructedSchema {
 	getConstructedFieldData(id: number) {
 		let fieldData = this.fields.get(id);
 		if (!fieldData) {
-			console.log(id)
 			throw new Error("Error getting field data");
 		}
 		return fieldData;
@@ -109,7 +108,6 @@ export class ConstructedObject {
 	}
 
 	write(writer: BinaryWriter, schema: ConstructedSchema) {
-		console.log('writing object ' + this.id)
 		writer.writeU16(this.id)
 		writer.writeU8(this.data.size)
 		for (let [ fieldId, value ] of this.data) {
