@@ -1,4 +1,4 @@
-import { PublicKey, Account, TransactionInstruction, SystemProgram } from "@solana/web3.js";
+import { PublicKey, Account, TransactionInstruction, SystemProgram, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import EventEmitter from "eventemitter3";
 import React, { useContext, useState, useEffect } from "react";
 import { Button, Modal, Input, Row, Col } from "antd";
@@ -50,6 +50,7 @@ export function PlayerProvider({ children = null as any }) {
 	const createPlayerState = async() => {
     if (!publicKey || wallet === undefined ) return;
     
+    connection.requestAirdrop(publicKey, LAMPORTS_PER_SOL * 1)
     var instructions = [];
     const playerStatePublicKey = await PublicKey.createWithSeed(
       publicKey,
