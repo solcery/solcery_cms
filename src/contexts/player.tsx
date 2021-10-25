@@ -50,7 +50,7 @@ export function PlayerProvider({ children = null as any }) {
 	const createPlayerState = async() => {
     if (!publicKey || wallet === undefined ) return;
     
-    connection.requestAirdrop(publicKey, LAMPORTS_PER_SOL * 1)
+    await connection.requestAirdrop(publicKey, LAMPORTS_PER_SOL * 1)
     var instructions = [];
     const playerStatePublicKey = await PublicKey.createWithSeed(
       publicKey,
