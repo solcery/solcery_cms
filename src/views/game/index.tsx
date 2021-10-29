@@ -223,7 +223,7 @@ const loadNftsAsCollectionItems = async (mintPubkeys: PublicKey[], content: any)
           var imageResponse = await axios({
             method: 'HEAD',
             url: imageUrl,
-          });
+          }).then((result: any ) => { return result }, () => { return undefined });
           let imageType = imageResponse && imageResponse.headers['content-type']
           if (imageType === 'image/png' || imageType === 'image/jpg') { // only static images are supported
             let collectionId = getCollectionId(data, collections)
