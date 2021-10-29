@@ -1,7 +1,7 @@
 import { applyBrick, exportBrick, updateCustomBricks } from "./types/brick";
 import { BinaryReader, BinaryWriter } from "borsh";
 import { PublicKey } from "@solana/web3.js";
-
+//PsMkzGg4CPF92MZ6dDV64dTYHs8m7fqbqSkYJpTNAwb
 export const programId = new PublicKey("GN1p6pe6m7rdK3re2TayqJyQtJUme1EnCLyYrTAArYRR");
 
 type GameObject = {
@@ -78,6 +78,16 @@ export class GameState {
 	objects: Map<number, GameObject> = new Map();
   attrs: any = {};
 	content: any = undefined;
+
+  copy = () => {
+    let newState = new GameState()
+    newState.content = this.content
+    newState.attrs = { ...this.attrs }
+    this.objects.forEach((obj: GameObject) => {
+      newState.objects.set(obj.id, { id: obj.id, tplId: obj.tplId, attrs: {...obj.attrs }})
+    })
+    return newState
+  }
 
   init = () => {
     let content = this.content
@@ -191,7 +201,6 @@ export class GameState {
       })
     }
     let bricksToAdd: any[] = []
-    console.log(this.content.get('actions'))
     for (let action of this.content.get('actions')) {
       if (action.brick && action.id && action.name)
         bricksToAdd.push(exportBrick(action.name, action.id, action.brick))

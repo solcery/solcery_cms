@@ -158,7 +158,6 @@ export const SlotSelector = (props: {
               card={props.slot.defaultCard}
             />}
             {props.nfts.map((elem: any, index: any) => {
-              console.log(props.slot)
               if (!elem.isSelected && props.slot.data.collections.find((collectionId: number) => collectionId === elem.collection)) {
                 return (<CardRotator 
                   key={index}
@@ -192,6 +191,8 @@ const getCollectionId = (metadata: any, collections: any) => {
 }
 
 const checkCollection = (metadata: any, collection: any) => {
+  if (collection.updateAuthority || collection.symbol || collection.creator)
+    return false // TODO: remove
   if (collection.updateAuthority && metadata.updateAuthority !== collection.updateAuthority)
     return false
   if (collection.symbol && metadata.data.symbol !== collection.symbol)
@@ -199,6 +200,14 @@ const checkCollection = (metadata: any, collection: any) => {
   if (collection.creator && getVerifiedCreator(metadata) !== collection.creator)
     return false
   return true
+}
+
+const getCollectionCardType = (mintPubkey: PublicKey, collection: any) => {
+  let buf = mintPubkey.toBuffer();
+  let last = buf.readUInt32LE(buf.length - 4);
+  let cardTypes = collection.cardTypes
+  let index = last - Math.floor(last / cardTypes.length) * cardTypes.length
+  return cardTypes[index]
 }
 
 const loadNftsAsCollectionItems = async (mintPubkeys: PublicKey[], content: any) => {
@@ -211,17 +220,24 @@ const loadNftsAsCollectionItems = async (mintPubkeys: PublicKey[], content: any)
       let data = decodeMetadata(multipleAccountInfos[i]!.data)
       if (data) {
         var imageResponse = await axios.get(data.data.uri)
-        let collectionId = getCollectionId(data, collections)
-        if (collectionId) {
-          let cardTypeId = content.get('collections', collectionId).cardType
-          result.push({
-            publicKey: mintPubkeys[i],
-            cardTypeId: cardTypeId,
-            cardType: content.get('cardTypes', cardTypeId),
-            data: data,
-            picture: imageResponse.data.image,
-            collection: collectionId
-          })
+        if (imageResponse && imageResponse.data) {
+          let imageUrl = imageResponse.data.image;
+          let imageExtenstion = imageUrl.split('ext=').pop();
+          if (true) { // only static images are supported
+            let collectionId = getCollectionId(data, collections)
+            if (collectionId) {
+              let collection = content.get('collections', collectionId)
+              let cardTypeId = getCollectionCardType(mintPubkeys[i], collection)
+              result.push({
+                publicKey: mintPubkeys[i],
+                cardTypeId: cardTypeId,
+                cardType: content.get('cardTypes', cardTypeId),
+                data: data,
+                picture: imageResponse.data.image,
+                collection: collectionId
+              })
+            } 
+          }
         }
       }
     }
@@ -405,7 +421,7 @@ export const GameView = (props: {
     for (let player of game.players) {
       allItems = allItems.concat(player.items)
     }
-    let collectionItems = await loadNftsAsCollectionItems(allItems.map((item: any) => item.publicKey ), state.content)
+    let collectionItems = await loadNftsAsCollectionItems(allItems.map((item: any) => item.publicKey ), state.content) // TODO: speedup
     let items = new Map();
     if (allItems.length != collectionItems.length)
       throw new Error("Wrong NFTs in game")
@@ -552,23 +568,28 @@ export const GameView = (props: {
 
   unityGameContext.on("OnUnityLoaded", async () => {
     if (!gameState)
-      return
+      return;
     unityGameContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
-    unityGameContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData()));
-    unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
+    unityGameContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData())); 
+    sendGameState()
   });
+
+  const sendGameState = () => {
+    if (!gameState)
+      return
+    setCastPending(false)
+    unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
+  }
 
   useEffect(() => {
     if (!gameState)
       return
-    setCastPending(false)
     if (!unityContentLoaded) {
       unityGameContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
       unityGameContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData())); 
       setUnityContentLoaded(true)     
     }
-
-    unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
+    sendGameState();
   }, [ gameState ])
 
   useEffect(function () {
@@ -583,49 +604,82 @@ export const GameView = (props: {
     });
   }, []);
 
+  const diffToBuf = (content: any, diff: any) => {
+    let writer = new BinaryWriter()
+
+    let attrIndexes = new Map()
+    content.get('attributes').forEach((attr: any, index: number) => {
+      attrIndexes.set(attr.code, index)
+    })
+    let gameAttrIndexes = new Map()
+    content.get('gameAttributes').forEach((attr: any, index: number) => {
+      gameAttrIndexes.set(attr.code, index)
+    })
+
+    // let gameAttrsDiff = diff.gameAttrs
+    // writer.writeU32(gameAttrsDiff.size)
+    // for (let attrName of gameAttrsDiff.keys()) {
+    //   let gameAttrIndex = gameAttrIndexes.get(attrName)
+    //   if (gameAttrIndex === undefined) 
+    //       throw new Error("Error serializing game state diff")
+    //   writer.writeU8(gameAttrIndex)
+    //   writer.writeI16(gameAttrsDiff.get(attrName))
+    // }
+
+    // writer.writeU32(diff.objectAttrs.size)
+    // let objectAttrs = diff.objectAttrs
+    // for (let objectId of objectAttrs.keys()) {
+    //   writer.writeU16(objectId)
+    //   let objectDiff = objectAttrs.get(objectId)
+    //   writer.writeU32(objectDiff.size)
+    //   for (let attrName of objectDiff.keys()) {
+    //     let attrIndex = attrIndexes.get(attrName)
+    //     if (attrIndex === undefined) 
+    //       throw new Error("Error serializing game state diff")
+    //     writer.writeU8(attrIndex)
+    //     writer.writeI16(objectDiff.get(attrName))
+    //   }
+    // }
+
+    let gameAttrsDiff = diff.gameAttrs
+    for (let attrName of gameAttrsDiff.keys()) {
+      let gameAttrIndex = gameAttrIndexes.get(attrName)
+      if (gameAttrIndex === undefined) 
+          throw new Error("Error serializing game state diff")
+      writer.writeU16(4 + gameAttrIndex * 2);
+      writer.writeI16(gameAttrsDiff.get(attrName))
+    }
+
+    let gameAttrsSize = 4 + gameAttrIndexes.size * 2 //attrsize + i16 attrs
+    let objectSize = 2 + 4 + attrIndexes.size * 2 //tplId + attrsize + i16 atrs
+
+    let objectAttrs = diff.objectAttrs
+    for (let objectId of objectAttrs.keys()) {
+      let objectDiff = objectAttrs.get(objectId)
+      for (let attrName of objectDiff.keys()) {
+        let attrIndex = attrIndexes.get(attrName)
+        if (attrIndex === undefined) 
+          throw new Error("Error serializing game state diff")
+        writer.writeU16(gameAttrsSize + 4 + objectSize * (objectId - 1) + 2 + 4 + attrIndex * 2);
+        writer.writeI16(objectDiff.get(attrName))
+      }
+    }
+    return writer.buf.slice(0, writer.length)
+  }
+
   unityGameContext.on("CastCard", async (cardId: number) => {
     if (!gameState || !game || !gamePublicKey)
       return;
     if (!publicKey || wallet === undefined) 
       return;
-    if (castPending)
+    if (castPending) {
+      console.log(castPending)
       return;
-    let diff = gameState.useCard(cardId, 1)
-    let attrIndexes = new Map()
-    gameState.content.get('attributes').forEach((attr: any, index: number) => {
-      attrIndexes.set(attr.code, index)
-    })
-    let gameAttrIndexes = new Map()
-    gameState.content.get('gameAttributes').forEach((attr: any, index: number) => {
-      gameAttrIndexes.set(attr.code, index)
-    })
-    let writer = new BinaryWriter()
-
-    let gameAttrsDiff = diff.gameAttrs
-    writer.writeU32(gameAttrsDiff.size)
-    for (let attrName of gameAttrsDiff.keys()) {
-      let gameAttrIndex = gameAttrIndexes.get(attrName)
-      if (gameAttrIndex === undefined) 
-          throw new Error("Error serializing game state diff")
-      writer.writeU8(gameAttrIndex)
-      writer.writeI16(gameAttrsDiff.get(attrName))
     }
+    let tmpState = gameState.copy()
+    let diff = tmpState.useCard(cardId, 1)
 
-    writer.writeU32(diff.objectAttrs.size)
-    let objectAttrs = diff.objectAttrs
-    for (let objectId of objectAttrs.keys()) {
-      writer.writeU16(objectId)
-      let objectDiff = objectAttrs.get(objectId)
-      writer.writeU32(objectDiff.size)
-      for (let attrName of objectDiff.keys()) {
-        let attrIndex = attrIndexes.get(attrName)
-        if (attrIndex === undefined) 
-          throw new Error("Error serializing game state diff")
-        writer.writeU8(attrIndex)
-        writer.writeI16(objectDiff.get(attrName))
-      }
-    }
-
+    let buf = diffToBuf(tmpState.content, diff)
     let updateStateIx = new TransactionInstruction({
       keys: [
         { pubkey: publicKey, isSigner: true, isWritable: false },
@@ -634,12 +688,15 @@ export const GameView = (props: {
       ],
       programId: programId,
       data: Buffer.concat([
-        Buffer.from([6]),
-        writer.buf.slice(0, writer.length),
+        Buffer.from([7]),
+        buf,
       ])
     });
-    sendTransaction(connection, wallet, [updateStateIx], [])
-    setCastPending(true)
+    await sendTransaction(connection, wallet, [updateStateIx], [], true, () => {
+      setCastPending(true)
+    }, () => {
+      sendGameState() 
+    }).then(() => {}, () => { sendGameState() })
   });
 
   if (!constructedContent)
