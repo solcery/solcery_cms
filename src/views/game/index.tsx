@@ -191,8 +191,6 @@ const getCollectionId = (metadata: any, collections: any) => {
 }
 
 const checkCollection = (metadata: any, collection: any) => {
-  if (collection.updateAuthority || collection.symbol || collection.creator)
-    return false // TODO: remove
   if (collection.updateAuthority && metadata.updateAuthority !== collection.updateAuthority)
     return false
   if (collection.symbol && metadata.data.symbol !== collection.symbol)
