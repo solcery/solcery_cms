@@ -90,6 +90,7 @@
   margin:  auto;
   vertical-align: middle;
   box-sizing: border-box;
+  overflow: scroll;
 }
 
 .modal h1 {
@@ -136,7 +137,7 @@
 .login_page {
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
+  /*overflow: hidden;*/
   /*background: -webkit-linear-gradient(top, #000 0%, #131621 100%);*/
 }
 

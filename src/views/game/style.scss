@@ -11,10 +11,10 @@ body {
 .l-container {
     display: grid;
     margin: auto;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     grid-gap: 15px;
     width: 100%;
-    max-width: 1400px;
+    max-width: 1300px;
     padding: 30px;
     vertical-align: middle;
 

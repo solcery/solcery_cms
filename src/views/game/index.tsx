@@ -5,7 +5,7 @@ import { usePlayer } from "../../contexts/player";
 import { useParams } from "react-router-dom";
 import Unity, { UnityContext } from "react-unity-webgl";
 import { GameState, GameSchema, Game, programId } from "../../solcery/game"
-import { ConstructedContent } from "../../solcery/content"
+import { ConstructedContent, ConstructedObject } from "../../solcery/content"
 import { Project } from "../../solcery/classes"
 import { Button, Modal, Layout, Row, Col, Divider } from 'antd';
 import { ConnectButton } from "../../components/ConnectButton"
@@ -120,7 +120,7 @@ export const SlotSelector = (props: {
   nfts: any,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const showModal = () => { setIsModalVisible(true); console.log(props.nfts) };
+  const showModal = () => { setIsModalVisible(true) };
   const handleOk = () => { setIsModalVisible(false) };
   const handleCancel = () => { setIsModalVisible(false) };
   const selectNft = (index: number | undefined = undefined) => {
@@ -219,11 +219,15 @@ const loadNftsAsCollectionItems = async (mintPubkeys: PublicKey[], content: any)
     if (multipleAccountInfos[i]) {
       let data = decodeMetadata(multipleAccountInfos[i]!.data)
       if (data) {
-        var imageResponse = await axios.get(data.data.uri)
-        if (imageResponse && imageResponse.data) {
-          let imageUrl = imageResponse.data.image;
-          let imageExtenstion = imageUrl.split('ext=').pop();
-          if (true) { // only static images are supported
+        var metadataResponse = await axios.get(data.data.uri)
+        if (metadataResponse && metadataResponse.data) {
+          let imageUrl = metadataResponse.data.image;
+          var imageResponse = await axios({
+            method: 'HEAD',
+            url: imageUrl,
+          });
+          let imageType = imageResponse && imageResponse.headers['content-type']
+          if (imageType === 'image/png' || imageType === 'image/jpg') { // only static images are supported
             let collectionId = getCollectionId(data, collections)
             if (collectionId) {
               let collection = content.get('collections', collectionId)
@@ -233,7 +237,7 @@ const loadNftsAsCollectionItems = async (mintPubkeys: PublicKey[], content: any)
                 cardTypeId: cardTypeId,
                 cardType: content.get('cardTypes', cardTypeId),
                 data: data,
-                picture: imageResponse.data.image,
+                picture: metadataResponse.data.image,
                 collection: collectionId
               })
             } 
@@ -248,13 +252,15 @@ const loadNftsAsCollectionItems = async (mintPubkeys: PublicKey[], content: any)
 
 export const NftSelector = (props: {
   onChange: (filled: any) => void,
-  contentPublicKey: PublicKey,
+  content: any,
+  onLoad: () => void,
 }) => { 
   const { connected, wallet, publicKey} = useWallet();
   const connection = useConnection();
   const [ content, setContent ] = useState<any>(undefined)
   const [ slots, setSlots ] = useState<any>(undefined)
   const [ nfts, setNfts ] = useState<any>(undefined);
+  const [ loadingProgress, setLoadingProgress ] = useState(0)
 
   const onChange = () => {
     props.onChange(slots.filter((elem: any) => elem.selected).map((elem: any) => {
@@ -288,42 +294,35 @@ export const NftSelector = (props: {
   }
 
   useEffect(() => {
-    (async () => {
-      let contentInfo = await connection.getAccountInfo(props.contentPublicKey)
-      if (contentInfo)
-      {
-        let constructedContent = ConstructedContent.fromBuffer(contentInfo.data)
-        setContent(constructedContent)
-      }
-    })()
-  }, [])
-
-  useEffect(() => {
-    if (!content)
-      return
-    setSlots(content.get('slots').map((slot: any) => {
+    setSlots(props.content.get('slots').map((slot: any) => {
       return {
         data: slot,
-        defaultCard: content.get('cardTypes', slot.default)
+        defaultCard: props.content.get('cardTypes', slot.default)
       }
     }))
-  }, [content])
-
-  useEffect(() => {
-    if (publicKey && content) {
+    if (publicKey && !nfts) {
       (async () => {
-        let nfts = await loadNftsAsCollectionItems(await getNfts(), content)
+        let nfts = await loadNftsAsCollectionItems(await getNfts(), props.content)
         setNfts(nfts)
+        props.onLoad()
       })()
     }
-  }, [ content, publicKey ])
-
+  }, [] )
 
   return ( 
     <div>
-      { content && <h1 className="select_some_cards animate__animated animate__fadeIn">Choose some cards:</h1>}
+     {/* { content && !nfts && 
+        <div className="unity_loading">
+          <div className="progress">
+            <div className="progress-value" style={{width: "50%" }}></div>
+          </div>
+          <p>Loading</p>
+        </div>
+      }*/}
+      { !nfts && <h1 className="select_some_cards animate__animated animate__fadeIn">Loading ...</h1> }
+      { nfts && <h1 className="select_some_cards animate__animated animate__fadeIn">Choose some cards:</h1>}
       <Divider className="divider"/>
-      { content && nfts &&
+      { nfts &&
         <Row className="card_slots animate__animated animate__fadeIn">
           { slots && slots.map((elem: any) => <Col>
             <p key={"slot_header_" + elem.data.id} className="slot_header">{elem.data.name}</p>
@@ -336,6 +335,7 @@ export const NftSelector = (props: {
           </Col>)}
         </Row>}
       <Divider className="divider"/>
+
     </div>)
 
 }
@@ -365,7 +365,7 @@ export const GameView = (props: {
   const [ unityLoadProgression, setUnityLoadProgression ] = useState(0)
   const [ unityContentLoaded, setUnityContentLoaded ] = useState(false)
   const [ castPending, setCastPending ] = useState(false)
-
+  const [ nftsLoaded, setNftsLoaded ] = useState(false)
   useEffect(() => {
     (async () => {
       let contentInfo = await connection.getAccountInfo(contentPublicKey)
@@ -431,13 +431,15 @@ export const GameView = (props: {
     for (let slot of state.content.get('slots')) {
       let item = items.get(slot.id)
       if (item) {
-        let cardType = item.cardType
-        cardType.picture = item.picture
-        state.objects.forEach((card: any) => {
-          if (card.tplId == slot.id)  {
-            card.tplId = cardType.id
-          }
-        })
+        let slotCardType = Object.assign({}, item.cardType)
+        slotCardType.picture = item.picture;
+        slotCardType.id = slot.id
+        state.content.templates.get('cardTypes').objects.objects.set(slot.id, slotCardType)
+        // state.objects.forEach((card: any) => {
+        //   if (card.tplId == slot.id)  {
+        //     card.tplId = cardType.id
+        //   }
+        // })
       }
       else {
         state.objects.forEach((card: any) => {
@@ -673,7 +675,6 @@ export const GameView = (props: {
     if (!publicKey || wallet === undefined) 
       return;
     if (castPending) {
-      console.log(castPending)
       return;
     }
     let tmpState = gameState.copy()
@@ -729,10 +730,12 @@ export const GameView = (props: {
                   </div>
                 </Col>
                 <Col span={12}>
-                  <NftSelector contentPublicKey={contentPublicKey} onChange={(result: any) => {
-                    setItems(result)
-                  }}/>
-                  <div className="one" onClick={createGame}><span>START GAME</span></div>
+                  <NftSelector 
+                    content={constructedContent} 
+                    onChange={(result: any) => { setItems(result) }}
+                    onLoad={() => { setNftsLoaded(true) }
+                  }/>
+                  {nftsLoaded && <div className="one" onClick={createGame}><span>START GAME</span></div>}
                 </Col>
               </Row>
             </div>
