@@ -39,10 +39,10 @@ export const GameObjectView = (props: {
 }
 
 const unityPlayContext = new UnityContext({
-  loaderUrl: "game/game_25.loader.js",
-  dataUrl: "game/game_25.data",
-  frameworkUrl: "game/game_25.framework.js",
-  codeUrl: "game/game_25.wasm",
+  loaderUrl: "game/game_30.loader.js",
+  dataUrl: "game/game_30.data",
+  frameworkUrl: "game/game_30.framework.js",
+  codeUrl: "game/game_30.wasm",
 })
 
 export const PlayView = () => {
@@ -118,15 +118,19 @@ export const PlayView = () => {
   }
 
   unityPlayContext.on("OnUnityLoaded", async () => {
+    // console.log(JSON.stringify(gameState.extractContent()));
     unityPlayContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
+    // console.log(JSON.stringify(gameState.extractDisplayData()));
     unityPlayContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData()));
+    // console.log(JSON.stringify(gameState.extractGameState()));
     unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
   });
 
   unityPlayContext.on("CastCard", async (cardId: number) => {
-    gameState.useCard(cardId, 1)
+    gameState.useCard(cardId, 1);
+    // console.log(JSON.stringify(gameState.extractGameState()));
     unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
-    setStep(step + 1)
+    setStep(step + 1);
   });
 
   unityPlayContext.on("LogAction", async (log: string) => {
@@ -134,9 +138,10 @@ export const PlayView = () => {
     for (let logEntry of logToApply.Steps) {
       if (logEntry.actionType == 0)
       {
-        gameState.useCard(logEntry.data, logEntry.playerId)
+        gameState.useCard(logEntry.data, logEntry.playerId);
+        // console.log(JSON.stringify(gameState.extractGameState()));
         unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
-        setStep(step + 1)
+        setStep(step + 1);
       }
     }
   });
