@@ -20,6 +20,12 @@ export class SLink extends SType {
   writeValue = (value: string, writer: BinaryWriter) => { 
     writer.writePubkey(new PublicKey(value)) 
   }
+  readConstructed = (reader: BinaryReader) => {
+    return reader.readU32()
+  }
+  writeConstructed = (value: number, writer: BinaryWriter) => {
+    return writer.writeU32(value)
+  }
 
   static typedataRender = TypedataRender;
 

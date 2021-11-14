@@ -59,10 +59,29 @@ export class Project extends SolceryAccount {
     await this.updateBricks(connection)
     const projectStorage = await Storage.get(connection, this.templateStorage)
     let constructedTemplates = new Map<string, ConstructedTemplate>();
-    var templates = await TemplateData.getAll(connection, projectStorage.accounts)
+    var templates = await TemplateData.getAll(connection, projectStorage.accounts);
+    let customBricks = new Map<number, ConstructedObject>();
+    let customBricksSchema: ConstructedSchema | undefined = undefined;
     for (var template of templates) {
       let tpl = await template.construct(connection)
-      constructedTemplates.set(tpl.code, tpl)
+      if (template.customData === '') {
+        constructedTemplates.set(template.code, tpl)
+      }
+      else {
+        let customData = JSON.parse(template.customData)
+        if (customData.exportBrick) {
+          customBricksSchema = tpl.schema;
+          customBricks = new Map([...customBricks, ...tpl.objects.raw])
+        }
+      }
+    }
+    if (customBricksSchema) {
+      let customBricksTemplate = new ConstructedTemplate({ 
+        code: 'customBricks',
+        schema: customBricksSchema,
+        objects: new ConstructedObjects({ objects: customBricks, schema: customBricksSchema }),
+      })
+      constructedTemplates.set(customBricksTemplate.code, customBricksTemplate)
     }
     return new ConstructedContent({ templates: constructedTemplates })
   }
@@ -171,7 +190,6 @@ export class TemplateData extends SolceryAccount {
         field.type = new SInt() // Compiling links into IDs
       }
       if (field.type instanceof SArray && (field.type as SArray).subtype instanceof SLink) {
-        console.log(field)
         field.type = new SArray({ subtype: new SInt() }) // Compiling link arrays into IDs
       }
     }

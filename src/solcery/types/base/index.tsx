@@ -30,6 +30,11 @@ export class SType {
   };
 
   writeType: (writer: BinaryWriter) => void = () => {};
+
+  readConstructed = this.readValue;
+  writeConstructed = this.writeValue;
+  toObject = (value: any) => { return value }
+
   static readType = (reader: BinaryReader) => {
   	return new SType()
   }

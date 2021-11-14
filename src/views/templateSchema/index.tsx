@@ -13,7 +13,6 @@ import { programId } from "../../solcery/engine"
 import { TemplateData, SolcerySchema, TemplateField } from "../../solcery/classes"
 import { TypeSelector } from "../../solcery/types/base/components"
 import { SType, SInt } from "../../solcery/types"
-import { AddFieldPopup } from "./AddFieldPopup";
 
 import { deserializeUnchecked, serialize } from "borsh"
 

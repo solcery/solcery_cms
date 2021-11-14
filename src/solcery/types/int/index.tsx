@@ -60,6 +60,8 @@ export class SInt extends SType {
   writeValue = (value: number, writer: BinaryWriter) => { 
     writer.writeI32(value) 
   };
+  readConstructed = this.readValue;
+  writeConstructed = this.writeValue;
 
   static readType = (reader: any) => {
   	return new SInt()

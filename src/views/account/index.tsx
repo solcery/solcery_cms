@@ -5,7 +5,6 @@ import { LAMPORTS_PER_SOL, PublicKey, Account, TransactionInstruction } from "@s
 import { SystemProgram } from "@solana/web3.js";
 import { notify } from "../../utils/notifications";
 import { ConnectButton } from "./../../components/ConnectButton";
-import { LABELS } from "../../constants";
 import {
   deserializeUnchecked, BinaryReader, BinaryWriter, serialize
 } from 'borsh';

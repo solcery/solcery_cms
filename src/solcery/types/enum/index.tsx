@@ -24,6 +24,8 @@ export class SEnum extends SType {
   writeValue = (value: number, writer: BinaryWriter) => { 
     writer.writeU8(value)
   }
+  readConstructed = this.readValue;
+  writeConstructed = this.writeValue;
 
   static readType = (reader: BinaryReader) => {
     var valuesAmount = reader.readU32()

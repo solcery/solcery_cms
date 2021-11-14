@@ -5,10 +5,9 @@ import { usePlayer } from "../../contexts/player";
 import { useParams } from "react-router-dom";
 import Unity, { UnityContext } from "react-unity-webgl";
 import { GameState, GameSchema, Game, programId } from "../../solcery/game"
-import { ConstructedContent, ConstructedObject } from "../../solcery/content"
+import { ConstructedContent } from "../../solcery/content"
 import { Project } from "../../solcery/classes"
-import { Button, Modal, Layout, Row, Col, Divider } from 'antd';
-import { ConnectButton } from "../../components/ConnectButton"
+import { Modal, Row, Col, Divider } from 'antd';
 import { BinaryReader, BinaryWriter, deserializeUnchecked } from "borsh";
 import $ from 'jquery';
 
@@ -18,14 +17,19 @@ import "./style.scss"
 
 import axios from 'axios'
 import {decodeMetadata, getMetadataAccount} from "../../metaplex/metadata";
-import {clusterApiUrl, Connection, PublicKey, Account, TransactionInstruction, SystemProgram, LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { ScrollMenu, VisibilityContext } from "react-horizontal-scrolling-menu";
-
+import { 
+  clusterApiUrl, 
+  Connection,
+  PublicKey,
+  Account,
+  TransactionInstruction,
+  SystemProgram,
+  LAMPORTS_PER_SOL 
+} from "@solana/web3.js";
 import 'animate.css';
 
-const { Header, Footer, Sider, Content } = Layout;
+const {TOKEN_PROGRAM_ID } = require('@solana/spl-token');
 
-const {TOKEN_PROGRAM_ID} = require('@solana/spl-token');
 
 type GameViewParams = {
   gameId: string;
@@ -247,7 +251,6 @@ const loadNftsAsCollectionItems = async (mintPubkeys: PublicKey[], content: any)
   return result
 }
 
-
 export const NftSelector = (props: {
   onChange: (filled: any) => void,
   content: any,
@@ -259,6 +262,7 @@ export const NftSelector = (props: {
   const [ slots, setSlots ] = useState<any>(undefined)
   const [ nfts, setNfts ] = useState<any>(undefined);
   const [ loadingProgress, setLoadingProgress ] = useState(0)
+
 
   const onChange = () => {
     props.onChange(slots.filter((elem: any) => elem.selected).map((elem: any) => {
@@ -457,6 +461,7 @@ export const GameView = (props: {
   useEffect(() => {
     if (!constructedContent)
       return;
+    console.log(constructedContent)
     if (!game) {
       if (gameState)
         setGameState(undefined)

@@ -74,17 +74,16 @@ export const PlayView = () => {
       return
     (async () => {
       var constructedContent = await project.сonstructContent(connection)
-      let buf = constructedContent.toBuffer()
-      console.log(JSON.stringify(buf))
       
-      let cc = ConstructedContent.read(new BinaryReader(buf))
+      // let buf = constructedContent.toBuffer()
+      // let cc = ConstructedContent.read(new BinaryReader(buf))
       // let contentInfo = await connection.getAccountInfo(new PublicKey("7cRU5jAtqRjaSFUb3Dj3e8Mhnnhe2G3J7XbDqSjhrPPc"))
       // if (!contentInfo)
       //   return
       // let constructedContent = ConstructedContent.read(new BinaryReader(contentInfo.data))
-      let gameState = new GameState(cc)
-      // console.log(JSON.stringify(buf))
-      console.log(JSON.stringify(gameState.toBuffer()))
+      // let gameState = new GameState(cc)
+      console.log(constructedContent.toJson())
+      let gameState = new GameState(constructedContent)
 
       let slots = gameState.content.getAll('slots')
       for (let slot of slots.values()) {
@@ -118,12 +117,14 @@ export const PlayView = () => {
   }
 
   unityPlayContext.on("OnUnityLoaded", async () => {
+    console.log(gameState.toJson())
     unityPlayContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
     unityPlayContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData()));
     unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
   });
 
   unityPlayContext.on("CastCard", async (cardId: number) => {
+    console.log('CAST CARD')
     gameState.useCard(cardId, 1)
     unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
     setStep(step + 1)
@@ -191,7 +192,9 @@ export const PlayView = () => {
         </Collapse>
       </Sider>
       <Content className="unityFrame">
-         <Unity tabIndex={3} style={{ width: '100%' }} unityContext={unityPlayContext} />
+        <div style={{ width: '100%' }}>
+          <Unity tabIndex={3} style={{ width: '100%' }} unityContext={unityPlayContext} />
+        </div>
       </Content>
     </Layout>
   );

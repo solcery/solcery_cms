@@ -10,6 +10,10 @@ export class SString extends SType {
   valueRender = ValueRender;
   readValue = (reader: BinaryReader) => { return reader.readString() }
   writeValue = (value: string, writer: BinaryWriter) => { writer.writeString(value) }
+  
+  readConstructed = this.readValue;
+  writeConstructed = this.writeValue;
+
   static readType = (reader: any) => {
   	return new SString()
   }

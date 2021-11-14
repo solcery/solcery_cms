@@ -32,6 +32,19 @@ export class SArray extends SType {
     value.forEach((val) => this.subtype.writeValue(val, writer))
   }
 
+  readConstructed = (reader: BinaryReader) => {
+    var arrayLength = reader.readU32();
+    var result = []
+    for (let i = 0; i < arrayLength; i++) {
+      result.push(this.subtype.readConstructed(reader))
+    }
+    return result
+  }
+  writeConstructed = (value: any[], writer: BinaryWriter) => {
+    writer.writeU32(value.length)
+    value.forEach((val) => this.subtype.writeConstructed(val, writer))
+  }
+
   static readType = (reader: BinaryReader) => {
     return new SArray({ subtype: reader.readSType() })
   }

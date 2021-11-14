@@ -1,6 +1,6 @@
 import { PublicKey, Connection} from "@solana/web3.js";
 import { BinaryReader, BinaryWriter } from 'borsh';
-import { SType } from "../types";
+import { SType, SBrick } from "../types";
 
 export class ConstructedTemplate {
 	code: string;
@@ -24,6 +24,13 @@ export class ConstructedTemplate {
 		writer.writeString(this.code)
 		this.schema.write(writer)
 		this.objects.write(writer, this.schema)
+	}
+
+	toObject() {
+		return {
+			name: this.code,
+			objects: this.objects.toArray(this.schema)
+		}
 	}
 }
 
@@ -101,7 +108,7 @@ export class ConstructedObject {
 		for (let i = 0; i < fieldsNumber; i++) {
 			let fieldId = reader.readU8();
 			let fieldData = schema.getConstructedFieldData(fieldId);
-			let value = fieldData.type.readValue(reader)
+			let value = fieldData.type.readConstructed(reader)
 			data.set(fieldId, value);
 		}
 		return new ConstructedObject({ id, data });
@@ -113,7 +120,7 @@ export class ConstructedObject {
 		for (let [ fieldId, value ] of this.data) {
 			writer.writeU8(fieldId)
 			let fieldData = schema.getConstructedFieldData(fieldId);
-			fieldData.type.writeValue(value, writer)
+			fieldData.type.writeConstructed(value, writer)
 		}
 	}
 
@@ -121,7 +128,7 @@ export class ConstructedObject {
 		let data = new Map<string, any>();
 		for (let [ fieldId, value ] of this.data) {
 			let fieldData = schema.getConstructedFieldData(fieldId);
-			data.set(fieldData.code, value);
+			data.set(fieldData.code, fieldData.type.toObject(value));
 		}
 		var res =  Object.fromEntries(data)
 		res.id = this.id
@@ -157,12 +164,20 @@ export class ConstructedObjects {
 			raw.write(writer, schema)
 		}
 	}
+
+	toArray(schema: ConstructedSchema) {
+		let result: any[] = []
+		for (let raw of this.raw.values()) {
+			result.push(raw.toObject(schema))
+		}
+		return result
+	}
 }
 
 export class ConstructedContent {
 	templates: Map<string, ConstructedTemplate>;
 	constructor(src: { templates: Map<string, ConstructedTemplate>} ) {
-		this.templates = src.templates;
+		this.templates = src.templates
 	}
 
 	static fromBuffer(buf: Buffer) {
@@ -200,6 +215,7 @@ export class ConstructedContent {
 		return tpl.objects.objects
 	}
 
+
 	get(templateCode: string, objectId: number | undefined = undefined, or: any = undefined) {
 		let objects = this.getAll(templateCode)
 		if (!objectId)
@@ -211,6 +227,23 @@ export class ConstructedContent {
 			return or
 		}
 		return obj
+	}
+
+	toObject() {
+		let result: any = {}
+		for (let template of this.templates.values()) {
+			result[template.code] = template.toObject()
+		}
+		return result
+	}
+
+	toJson() {
+		return JSON.stringify(this.toObject(), (k: string, v: any) => {
+			if (v instanceof SType) {
+				return undefined
+			}
+			return v
+		})
 	}
 }
 

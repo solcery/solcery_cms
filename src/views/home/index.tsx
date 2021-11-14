@@ -77,6 +77,7 @@ export const HomeView = () => {
     if (wallet === undefined || !wallet.publicKey)
       return
     let constructed = await project.сonstructContent(connection)
+    console.log('JSON: ' + constructed.toJson())
     let writer = new BinaryWriter()
 
     let gameState = new GameState(constructed)
@@ -94,6 +95,7 @@ export const HomeView = () => {
     constructed.get('projectSettings')[0].gameStateAccount = gameStateAccount.publicKey.toBase58() // TODO: remove hardcode, publish
     
     // rawsetting gameStateAccount
+    // 5ryw6zJjY7VqUetcPhFEpYUzLsQSEntMNhKgiWtCwJSY
     let gameStateAccountKey = gameStateAccount.publicKey.toBase58() 
     let projectSettings = constructed.templates.get("projectSettings")
     if (projectSettings) {
@@ -104,7 +106,6 @@ export const HomeView = () => {
     constructed.write(writer)
     let contentBuf = writer.buf.slice(0, writer.length)
     let readContent = ConstructedContent.read(new BinaryReader(contentBuf))
-    console.log(readContent)
 
     var contentAccount = new Account()
     var createContentAccountIx = SystemProgram.createAccount({
@@ -121,6 +122,7 @@ export const HomeView = () => {
       await setAccountData(gameStateAccount.publicKey, gameStateBuf)
       console.log('CONSTRUCTED!')
       console.log('Content account: ' + contentAccount.publicKey.toBase58())
+      console.log('JSON: ' + constructed.toJson())
     })
   }
 
