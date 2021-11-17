@@ -858,7 +858,7 @@ basicBricks.push({
     { id: 1, code: 'attrName', name: 'Attribute name', type: new SString() }
   ],
   func: (params: any, ctx: any) => {
-    return ctx.games.attrs[params[1]]
+    return ctx.game.attrs[params[1]]
   }
 })
 

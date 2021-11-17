@@ -410,6 +410,7 @@ const constructCardTypes = (content: any) => {
       Metadata: {
         Picture: cardType.pictureNumber,
         PictureUrl: cardType.picture,
+        Icon: cardType.icon,
         Coins: cardType.coins,
         Name: cardType.name,
         Description: cardType.description,
