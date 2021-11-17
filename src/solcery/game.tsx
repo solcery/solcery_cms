@@ -372,6 +372,7 @@ type CardType = { //TODO: from content
   Metadata: {
     Picture: number,
     PictureUrl: string,
+    Icon: number,
     Coins: number,
     Name: string,
     Description: string,
