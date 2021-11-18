@@ -217,28 +217,30 @@ const loadNftsAsCollectionItems = async (mintPubkeys: PublicKey[], content: any)
     if (multipleAccountInfos[i]) {
       let data = decodeMetadata(multipleAccountInfos[i]!.data)
       if (data) {
-        var metadataResponse = await axios.get(data.data.uri)
+        var metadataResponse = await axios.get(data.data.uri).catch(e => {})
         if (metadataResponse && metadataResponse.data) {
           let imageUrl = metadataResponse.data.image;
-          var imageResponse = await axios({
-            method: 'HEAD',
-            url: imageUrl,
-          }).then((result: any ) => { return result }, () => { return undefined });
-          let imageType = imageResponse && imageResponse.headers['content-type']
-          if (imageType === 'image/png' || imageType === 'image/jpg') { // only static images are supported
-            let collectionId = getCollectionId(data, collections)
-            if (collectionId) {
-              let collection = content.get('collections', collectionId)
-              let cardTypeId = getCollectionCardType(mintPubkeys[i], collection)
-              result.push({
-                publicKey: mintPubkeys[i],
-                cardTypeId: cardTypeId,
-                cardType: content.get('cardTypes', cardTypeId),
-                data: data,
-                picture: metadataResponse.data.image,
-                collection: collectionId
-              })
-            } 
+          if (imageUrl) {
+            var imageResponse = await axios({
+              method: 'HEAD',
+              url: imageUrl,
+            }).then((result: any ) => { return result }, () => { return undefined }).catch(e => {})
+            let imageType = imageResponse && imageResponse.headers['content-type']
+            if (imageType === 'image/png' || imageType === 'image/jpg') { // only static images are supported
+              let collectionId = getCollectionId(data, collections)
+              if (collectionId) {
+                let collection = content.get('collections', collectionId)
+                let cardTypeId = getCollectionCardType(mintPubkeys[i], collection)
+                result.push({
+                  publicKey: mintPubkeys[i],
+                  cardTypeId: cardTypeId,
+                  cardType: content.get('cardTypes', cardTypeId),
+                  data: data,
+                  picture: metadataResponse.data.image,
+                  collection: collectionId
+                })
+              } 
+            }
           }
         }
       }
@@ -287,7 +289,6 @@ export const NftSelector = (props: {
       .filter(accInfo => accInfo.account.data.parsed.info.tokenAmount.uiAmount !== 0)
       .map(accInfo => getMetadataAccount(accInfo.account.data.parsed.info.mint))
     );
-
     return mints.map(m => new PublicKey(m));
   }
 
