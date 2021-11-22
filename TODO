@@ -21,3 +21,157 @@ ProjectProvider - провайдер контекста, который соде
 
 
 API это solce
+
+
+
+
+Brick {
+	type: number,
+	subtype: number,
+	params: BrickParams
+}
+
+type BrickParams = {
+	[key: number]: BrickParam;
+};
+
+type BrickParam = {
+	id: number,
+	type: SType,
+	value: any
+}
+
+
+Когда вставляем брик, сначала мапим сигнатуру
+
+
+
+
+Есть реактивный проект. Про него известен список темплейтов и маркировка - из какого темплейта вообще нужно выгружать кастомную механику. 
+
+То есть загрузив какую-то базовую информацию о проекте мы точно знаем все источники кастомной механики и знаем, загружены они или еще требуют загрузки.
+
+В общем случае экспорт и импорт в JSON не должны отличаться от оного в бинарь. То есть это некий конвертер, получается?
+
+
+
+Ровно так же в бинарь может превратиться темплейт и в JSON может превратиться темплейт.
+
+Storage
+
+
+
+Есть объект template. Он для загрузки требует наличие какого-то source.
+
+
+
+
+type Callbacks = {
+	[key: string]: ((...args: any[]) => void)[]
+}
+
+type Objects = {
+	[key: string]: ClassObjects
+}
+
+type ClassObjects = {
+	[key: string]: any
+}
+
+
+export class Dweller {
+	id: any
+	callbacks: Callbacks = {};
+	objects: Objects = {};
+
+	constructor(id: string) {
+		this.id = id
+		let proto = Object.getPrototypeOf(this)
+		if (proto.callbacks) {
+			for (let event in proto.callbacks) {
+				this.callbacks[event] = proto.callbacks[event]
+			}
+		}
+	}
+
+	create(constructor: any, data: any) {
+		let obj = new constructor(data.id)
+		if (!this.objects[constructor.name]) {
+			this.objects[constructor.name] = {}
+		}
+		this.objects[constructor.name][obj.id] = obj
+		return obj
+	}
+
+	get(constructor: any, id: string) {
+		if (!this.objects[constructor.name])
+			return
+		return this.objects[constructor.name][id]
+	}
+
+	getAll(constructor: any) {
+		let result: any[] = []
+		if (!this.objects[constructor.name])
+			return result
+		for (let objId in this.objects[constructor.name])
+			result.push(this.objects[constructor.name][objId])
+		return result
+	}
+
+	execAllMixins(event: string, ...args: any[]) {
+		if (!this.callbacks[event])
+			return;
+		for (let callback of this.callbacks[event]) {
+			callback.apply(this, args)
+		}
+	}
+}
+
+export function extend(object: any, mixin: any)
+{
+    for (var prop in mixin)
+    {
+    	let theProp = mixin[prop]
+    	if (typeof theProp === 'function' && theProp.name.substring(0, 2) === 'on') {
+    		let proto = object.prototype
+    		if (!proto.callbacks) {
+    			let callbacks: Callbacks = {}
+    			proto.callbacks = callbacks
+    		}
+    		if (!proto.callbacks[theProp.name])
+    			proto.callbacks[theProp.name] = []
+    		object.prototype.callbacks[theProp.name].push(theProp)
+    	}
+    	object.prototype[prop] = mixin[prop];
+    }    
+}
+
+
+
+
+
+
+
+
+
+BrickParams: {
+	paramId [number]: {
+		id: number,
+		type: SType, // string
+		value: any
+	}
+}
+
+
+
+ConstructedBrick: {
+	type: number,
+	subtype: number,
+	name: 
+	params: [
+		{
+			id: number.
+			value: number,
+		}
+	]
+}

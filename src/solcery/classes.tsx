@@ -4,8 +4,9 @@ import { BinaryReader, BinaryWriter } from "borsh";
 import { SType, SInt, SLink, SArray } from "./types";
 import { updateCustomBricks, exportBrick, BrickSignature } from './types/brick'
 import { ConstructedTemplate, ConstructedContent, ConstructedObject, ConstructedObjects, ConstructedSchema, ConstructedFieldData } from "./content"
+import './dweller'
 
-
+console.log('solcery classes')
 
 class SolceryAccount {
   publicKey: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz');

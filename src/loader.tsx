@@ -1,5 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
 import { BinaryReader, BinaryWriter } from 'borsh';
+import { User } from './user'
+import { Dweller } from './dweller'
 
 declare module "borsh" {
   interface BinaryReader {
@@ -34,3 +36,15 @@ declare module "borsh" {
   const writer = this;
   writer.writeU8(value ? 1 : 0);
 };
+
+
+export * from './dweller'
+export * from './user'
+export * from './speaker'
+
+
+let engine = Object.create(Dweller)
+let usr = engine.create(User, { id: 'testUser', saying: 'Some phrase' })
+usr.speak()
+usr.execAllMixins('onSmth', 3, 5)
+
