@@ -50,7 +50,7 @@ export class LedgerWalletAdapter extends EventEmitter implements WalletAdapter {
       // @TODO: account selection
       this._publicKey = await getPublicKey(this._transport);
       this.emit("connect", this._publicKey);
-    } catch (error) {
+    } catch (error : any) {
       notify({
         message: "Ledger Error",
         description: error.message,
