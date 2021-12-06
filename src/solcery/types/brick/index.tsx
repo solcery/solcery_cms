@@ -202,7 +202,7 @@ function brickSignatureToBrickConfig(brick: BrickSignature) {
     }
   }
   return {
-    Name: brick.name,
+    Name: brick.subtype > 10000 ? '[' + brick.subtype + '] ' + brick.name : brick.name,
     Type: brick.type,
     Subtype: brick.subtype,
     Description: brick.description,
