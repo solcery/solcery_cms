@@ -6,6 +6,7 @@ import { SystemProgram } from "@solana/web3.js";
 import { useParams, useHistory } from "react-router-dom";
 import { Button, Table, Input } from "antd";
 import { TemplateData, TemplateField, SolcerySchema, Storage, TplObject } from "../../solcery/classes"
+import { Template } from '../../content/template';
 import { programId } from "../../solcery/engine"
 import { useProject } from "../../contexts/project";
 import Cookies from 'universal-cookie';
@@ -21,6 +22,7 @@ export const TemplateView = () => {
   const { Column } = Table;
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
+
   let history = useHistory();
   let { templateKey } = useParams<TemplateViewParams>();
   var [ objects, setObjects ] = useState<TplObject[] | undefined>(undefined);
@@ -160,14 +162,30 @@ export const TemplateView = () => {
     setFilter(cookies.get(templateKey + '.filter.name'))
   }, [])
 
+  // const onTemplateLoaded = (template: any) => {
+  //   templates.push(template)
+  //   setTemplatesAmount(templates.length)
+  // }
+
+  // useEffect(() => {
+  //   if (project) {
+  //     let subscriptionId = project.templateStorage.addEventSubscription('onLoaded', onStorageLoaded)
+  //     return function cleanup() {
+  //       project.templateStorage.removeEventSubscription('onLoaded', subscriptionId);
+  //     };
+  //   }
+  // }, [ project ]);
+
   useEffect(() => { 
-    if (project)
+    if (project) {
       (async () => {
-        const tpl = await TemplateData.get(connection, new PublicKey(templateKey))
-        setTemplate(tpl)
-        var storage = await Storage.get(connection, tpl.storages[0])
-        setObjects(await tpl.getObjects(connection, storage.accounts))
+        let template = project.getTemplate(templateKey)
+        await template.loadAll(connection)
+        console.log('tpl')
+        console.log(template.getObjects())
+        setObjects(template.getAll(TplObject))
       })()
+    }
   }, [ project ]);
 
   if (project && template && objects)

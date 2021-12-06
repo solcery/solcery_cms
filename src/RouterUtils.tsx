@@ -5,10 +5,10 @@ import { ConnectionProvider } from "./contexts/connection";
 import { AppLayout } from "./components/Layout";
 import { AccountView } from "./views";
 
-export function UtilsRouter() {
+export function RouterUtils() {
   return (
     <>
-      <HashRouter basename={"/utils/"}>
+      <HashRouter basename={"/"}>
         <ConnectionProvider>
           <WalletProvider>
             <AppLayout>

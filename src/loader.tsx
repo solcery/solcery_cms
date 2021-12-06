@@ -1,6 +1,5 @@
 import { PublicKey } from "@solana/web3.js";
 import { BinaryReader, BinaryWriter } from 'borsh';
-import { User } from './user'
 import { Dweller } from './dweller'
 
 declare module "borsh" {
@@ -39,12 +38,12 @@ declare module "borsh" {
 
 
 export * from './dweller'
-export * from './user'
-export * from './speaker'
+export * from './content'
+export * from './subscribe'
 
 
-let engine = Object.create(Dweller)
-let usr = engine.create(User, { id: 'testUser', saying: 'Some phrase' })
-usr.speak()
-usr.execAllMixins('onSmth', 3, 5)
+(window as any).root = Object.create(Dweller)
+window.root = Object.create(Dweller)
+window.root.root = window.root
+window.root.classname = 'Root'
 

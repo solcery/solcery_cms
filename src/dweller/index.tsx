@@ -3,7 +3,7 @@ export function mixin(base: any, mixin: any) {
     for (let propName in mixin) {
         let prop = mixin[propName];
         if (typeof prop === 'function' && propName.substring(0, 2) === 'on') {
-            if (!base.eventHandlers) {
+            if (!base.hasOwnProperty('eventHandlers')) {
                 let handlers: EventHandlers = {};
                 base.eventHandlers = handlers;
             }
@@ -12,7 +12,7 @@ export function mixin(base: any, mixin: any) {
             }
             base.eventHandlers[propName].push(prop);
         } else {
-            proto[propName] = mixin[propName];
+            base[propName] = mixin[propName];
         }
     }
 }
@@ -33,10 +33,18 @@ let Dweller: any = {}
 
 Dweller.execAllMixins = function(event: string, ...args: any[]) {
     let proto = Object.getPrototypeOf(this);
+    if (!proto.eventHandlers)
+        return;
     let handlers = proto.eventHandlers[event];
     if (handlers) {
         for (let handler of handlers) {
             handler.apply(this, args);
+        }
+    }
+    handlers = proto.eventHandlers['onEvent'];
+    if (handlers) {
+        for (let handler of handlers) {
+            handler.apply(this, [ event ].concat(args));
         }
     }
 }
@@ -48,13 +56,32 @@ Dweller.create = function(classObject: any, data: any) {
         let objects: Objects = {};
         this.objects = objects;
     }
-    if (!this.objects[classObject.name]) {
+    if (!this.objects[classObject.classname]) {
         let classObjects: ClassObjects = {};
-        this.objects[classObject.name] = classObjects;
+        this.objects[classObject.classname] = classObjects;
     }
-    this.objects[classObject.name][data.id] = obj;
+    this.objects[classObject.classname][data.id] = obj;
+    obj.parent = this
+    obj.root = this.root
     obj.execAllMixins('onCreate', data);
     return obj;
+}
+
+Dweller.get = function(classObject: any, id: any) {
+    if (this.objects && this.objects[classObject.classname]) {
+        return this.objects[classObject.classname][id]
+    }
+}
+
+Dweller.getAll = function(classObject: any) {
+    let result: any[] = [];
+    if (this.objects && this.objects[classObject.classname]) {
+        let objects = this.objects[classObject.classname]
+        for (let objId in objects) {
+            result.push(objects[objId])
+        }
+    }
+    return result
 }
 
 export { Dweller }

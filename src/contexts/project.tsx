@@ -10,11 +10,13 @@ import { ConnectButton } from "../components/ConnectButton";
 import { SolceryMenu } from "../components/SolceryMenu";
 import { useConnection } from "./connection";
 import { useWallet, WalletProvider } from "./wallet";
-import { Project } from "../solcery/classes";
+
+import { Project as Prj } from '../content/project'
+
 import Cookies from 'universal-cookie';
 
 interface ProjectContextInterface {
-  project: Project | undefined;
+  project: any | undefined;
 }
 
 const ProjectContext = React.createContext<ProjectContextInterface>({ 
@@ -27,17 +29,16 @@ export function ProjectProvider({ children = null as any }) {
 	const connection = useConnection()
 	const { connected } = useWallet();
 	const [ projectKey, setProjectKey ] = useState<string>(cookies.get('projectKey'));
-	const [ project, setProject ] = useState<Project|undefined>(undefined)
+	const [ project, setProject ] = useState<any>(undefined)
 	// console.log(connected)
 
 	const login = async () => {
 		if (!projectKey)
 			return
 		cookies.set('projectKey', projectKey)
-		let prj = await Project.get(connection, new PublicKey(projectKey))
-		prj.сonstructContent(connection)
-		setProject(prj)
-
+		let prj = window.root.create(Prj, { id: projectKey, pubkey: new PublicKey(projectKey) })
+		setProject(await prj.await(connection))
+		// setProject(await prj.await(connection))
 	}
 
 	if (project)
