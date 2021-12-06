@@ -9381,7 +9381,7 @@ function unityFramework(Module) {
     targetThread,
   ) {
     target = findEventTarget(target)
-    if (target != null && target.onwheel != null && typeof target.onwheel !== 'undefined') {
+    if (target != null && typeof target.onwheel !== 'undefined') {
       registerWheelEventCallback(
         target,
         userData,
