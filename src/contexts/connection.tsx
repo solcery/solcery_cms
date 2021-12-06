@@ -98,6 +98,7 @@ export function ConnectionProvider({ children = undefined as any }) {
     // fetch token files
     (async () => {
       const res = await new TokenListProvider().resolve();
+      console.log(chain)
       const list = res
         .filterByChainId(chain.chainID)
         .excludeByTag("nft")
@@ -113,8 +114,8 @@ export function ConnectionProvider({ children = undefined as any }) {
         if(!account) {
           return;
         }
-
-        cache.add(new PublicKey(key), account, MintParser);
+        if (key != 'Crm2bpr3ai5QKMNfaq11NkBnHeMGULeP5YDLpkLeJjnw')
+          cache.add(new PublicKey(key), account, MintParser);
       })
 
       setTokenMap(knownMints);
