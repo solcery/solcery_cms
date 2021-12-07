@@ -18,6 +18,7 @@ Master.load = function(connection: Connection) {
 				return null;
 			this.fromBinary(accInfo.data.slice(33))
 			this.execAllMixins('onLoad', accInfo.data.slice(33), connection)
+			this.isLoaded = true
 			return this
 		}))
 

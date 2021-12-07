@@ -112,7 +112,7 @@ export const TemplateSchemaView = () => {
   const setFieldParam = (fieldId: number, param: string, value: any) => {
     if (!template)
       return
-    let field = template.getField(fieldId)
+    let field = template.fields[fieldId]
     if (!field)
       return
     if (param === 'code')
@@ -125,16 +125,17 @@ export const TemplateSchemaView = () => {
   }
 
   useEffect(() => { 
-    var templatePublicKey = new PublicKey(templateKey)
-    if (!template || template.publicKey.toBase58() != templateKey)
+    if (project) {
       (async () => {
-        setTemplate(await TemplateData.get(connection, templatePublicKey))
+        let template = project.getTemplate(templateKey)
+        setTemplate(await template.await(connection))
       })()
-  });
+    }
+  }, [ project ]);
 
   if (template) {
     let tableData: any[] = []
-    for (let field of template.fields) {
+    for (let field of Object.values(template.fields)) {
       tableData.push({
         key: '' + template.id + '.' + field.id,
         id: field.id,
@@ -148,7 +149,6 @@ export const TemplateSchemaView = () => {
       <div style = { { width: '100%' } }>
         Name: <Input defaultValue={template.name} onChange={(e) => { if (template) template.name = e.target.value }}/>
         Code: <Input defaultValue={template.code} onChange={(e) => { if (template) template.code = e.target.value }}/>
-        <a href={"/#/storage/" + template.storages[0].toBase58()}>Objects</a>
         <Table dataSource={tableData} pagination={false}>
           <Column title="ID" dataIndex="id" key="fieldId"/>
           <Column 

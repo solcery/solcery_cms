@@ -12,11 +12,10 @@ const SolceryMenuTemplate = (
 ) => {
   const connection = useConnection();
   const [ tpl, setTpl ] = useState<any>(undefined)
+
   useEffect(() => {
     (async () => {
-      console.log(template)
-      let t = await template.await(connection)
-      console.log(t)
+      let t = await template.template.await(connection) //TODO: template.template?
       setTpl(t)
     })()
   }, [])
@@ -26,6 +25,7 @@ const SolceryMenuTemplate = (
       <Menu.Item key={tpl.id}>
         <a href={'/#/template/' + tpl.id}>{tpl.name}</a>
       </Menu.Item>)
+  return (<></>)
 }
 
 export const SolceryMenu = () => {
@@ -39,7 +39,6 @@ export const SolceryMenu = () => {
         let templateStorage = project.templateStorage
         templateStorage = await templateStorage.await(connection)
         let tpls = templateStorage.getAll(Template)
-        console.log(tpls)
         setTemplates(tpls)
       })()
       // setTemplates(project.templateStorage.getAll(Template))
