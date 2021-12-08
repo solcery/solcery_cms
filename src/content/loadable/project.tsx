@@ -17,14 +17,9 @@ Master.fromBinary = function(data: any) {
 	})
 }
 
-Master.onLoad = function(data: any, connection: Connection) {
-	// if (!this.templateStorage)
-	// 	throw new Error("content/loadable/project: onLoad error: no templateStorage!")
-	// this.templateStorage.load(connection).then(() => {
- //    	this.templateStorage.loadAll(connection).then(() => {
- //    		console.log('loadAll')
- //    	})
-	// })
+Master.onLoad = async function(connection: Connection) {
+  await this.templateStorage.load(connection)
+  await this.templateStorage.loadAll(connection)
 }
 
 export { Master }

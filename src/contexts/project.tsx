@@ -37,10 +37,7 @@ export function ProjectProvider({ children = null as any }) {
 			return
 		cookies.set('projectKey', projectKey)
 		let prj = window.root.create(Prj, { id: projectKey, pubkey: new PublicKey(projectKey) })
-		await prj.await(connection)
-		await prj.templateStorage.await(connection)
-		setProject(prj)
-		// setProject(await prj.await(connection))
+		setProject(await prj.await(connection))
 	}
 
 	if (project)

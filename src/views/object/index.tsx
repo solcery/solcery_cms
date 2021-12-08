@@ -17,23 +17,24 @@ import { useParams, useHistory } from "react-router-dom";
 import { TplObject, TemplateField, TemplateData, SolcerySchema, Storage } from "../../solcery/classes"
 import { programId, projectPublicKey } from "../../solcery/engine"
 
+const { Column } = Table;
 
 export async function onWalletConnected() {}
 
 type ObjectViewParams = {
+  templateKey: string;
   objectId: string;
 };
 
 
 export const ObjectView = () => {
 
-  const { Column } = Table;
   const { project } = useProject();
-  let { objectId } = useParams<ObjectViewParams>();
+  let { templateKey, objectId } = useParams<ObjectViewParams>();
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
-  var [ object, setObject ] = useState<TplObject | undefined>(undefined);
-  var [ template, setTemplate ] = useState<TemplateData | undefined>(undefined);
+  var [ object, setObject ] = useState<any>(undefined);
+  var [ template, setTemplate ] = useState<any>(undefined);
   let history = useHistory();
   var objectPublicKey = new PublicKey(objectId)
 
@@ -118,15 +119,16 @@ export const ObjectView = () => {
   }
 
   useEffect(() => { 
-    if (!object) {
-      (async () => {
-        var tpl = await TplObject.getTemplate(connection, objectPublicKey)
-        var obj = await tpl.getObject(connection, objectPublicKey)
-        setObject(obj)
-        setTemplate(tpl)
-      })()
-    }
-  });
+    if (!project)
+      return;
+    setTemplate(project.getTemplate(templateKey))
+  }, [ project ]);
+
+  useEffect(() => {
+    if (!template)
+      return;
+    setObject(template.getObject(objectId))
+  }, [ template ]);
 
   const setFieldValue = (fieldId: number, value: any) => {
     if (!object)
@@ -147,13 +149,14 @@ export const ObjectView = () => {
     }
     var objectData: ObjectFieldData[] = []
     if (object != undefined && template != undefined) {
-      for (let field of template.fields) {
+      for (let f of Object.values(template.fields)) {
+        let field = f as any
         objectData.push({
           key: field.id,
           fieldId: field.id,
           fieldType: field.fieldType,
           fieldName: field.name,
-          value: object.fields.get(field.id)
+          value: object.fields[field.code]
         })
       }
     }

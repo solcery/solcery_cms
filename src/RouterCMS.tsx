@@ -18,8 +18,8 @@ export function RouterCMS() {
                 <Switch>
                   <Route exact path="/play" component={() => <PlayView/>} />
                   <Route exact path="/template/:templateKey" component={() => <TemplateView/>} />
-                  <Route path="/object/:objectId" component={() => <ObjectView/>} />
-                  <Route path="/template/schema/:templateKey" component={() => <TemplateSchemaView/>} />
+                  <Route exact path="/template/:templateKey/schema" component={() => <TemplateSchemaView/>} />
+                  <Route exact path="/template/:templateKey/:objectId" component={() => <ObjectView/>} />
                   <Route exact path="/" component={() => <HomeView />} />
                 </Switch>
               </ProjectProvider>

@@ -49,6 +49,18 @@ Dweller.execAllMixins = function(event: string, ...args: any[]) {
     }
 }
 
+Dweller.awaitAllMixins = async function(event: string, ...args: any[]) {
+    let proto = Object.getPrototypeOf(this);
+    if (!proto.eventHandlers)
+        return;
+    let handlers = proto.eventHandlers[event];
+    if (handlers) {
+        for (let handler of handlers) {
+            await handler.apply(this, args);
+        }
+    }
+}
+
 Dweller.create = function(classObject: any, data: any) {
     let obj = Object.create(classObject);
     obj.id = data.id;

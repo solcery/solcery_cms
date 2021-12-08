@@ -25,8 +25,8 @@ export const TemplateView = () => {
 
   let history = useHistory();
   let { templateKey } = useParams<TemplateViewParams>();
-  var [ objects, setObjects ] = useState<TplObject[] | undefined>(undefined);
-  var [ template, setTemplate ] = useState<TemplateData | undefined>(undefined);
+  var [ template, setTemplate ] = useState<any>(undefined);
+  var [ objects, setObjects ] = useState<any>(undefined);
   var { project } = useProject();
   let [ filter, setFilter ] = useState<any>(undefined)
 
@@ -72,15 +72,6 @@ export const TemplateView = () => {
     }
     sendTransaction(connection, wallet, instructions, [objectAccount])
   }
-
-  const copyAll = () => {
-    if (!objects)
-      return;
-    for (let obj of objects) {
-      copyToAnotherProject(obj.publicKey)
-    }
-  }
-
 
   const createObject = async (src: PublicKey | undefined = undefined) => {
     if (!publicKey || !project || wallet === undefined || !template) {
@@ -162,45 +153,27 @@ export const TemplateView = () => {
     setFilter(cookies.get(templateKey + '.filter.name'))
   }, [])
 
-  // const onTemplateLoaded = (template: any) => {
-  //   templates.push(template)
-  //   setTemplatesAmount(templates.length)
-  // }
-
-  // useEffect(() => {
-  //   if (project) {
-  //     let subscriptionId = project.templateStorage.addEventSubscription('onLoaded', onStorageLoaded)
-  //     return function cleanup() {
-  //       project.templateStorage.removeEventSubscription('onLoaded', subscriptionId);
-  //     };
-  //   }
-  // }, [ project ]);
-
   useEffect(() => { 
     if (project) {
-      (async () => {
-        let template = project.getTemplate(templateKey)
-        await template.loadAll(connection)
-        console.log('tpl')
-        console.log(template.getObjects())
-        setObjects(template.getAll(TplObject))
-      })()
+      let template = project.getTemplate(templateKey)
+      setTemplate(template)
     }
-  }, [ project ]);
+  }, [ project, templateKey ]);
 
-  if (project && template && objects)
+  useEffect(() => { 
+    if (template) {
+      setObjects(template.getObjects())
+    }
+  }, [ template ]);
+
+  if (objects)
   {
     var tableData: any[] = []
     for (let objectInfo of objects) {
-      var res = Object.fromEntries(objectInfo.fields)
-      if (filter === undefined || (res[1] && res[1].includes(filter))) {
-        res.key = objectInfo.publicKey.toBase58()
-        res.id = objectInfo.id
-        tableData.push(res)
+      if (filter === undefined || (objectInfo.fields.name && objectInfo.fields.name.includes(filter))) {
+        tableData.push(objectInfo)
       }
     }
-
-
 
     const divStyle = {
       width: '100%',
@@ -212,10 +185,10 @@ export const TemplateView = () => {
           title="Object" 
           key="objectKey"
           render={(text, record: any) => (
-              <a href={"/#/object/"+record.key}>{record.id}</a>
+              <a href={"/#/template/"+ template.id + '/' + record.id}>{record.id}</a>
           )}
         />
-        {template.fields.map((field: TemplateField) => { 
+        {Object.values(template.fields).map((field: any) => { 
           return <Column 
             title = { field.name + ((field.id === 1 && filter) ? ' : [' + filter + ']' : '') } 
             key = { field.id } 
@@ -229,7 +202,7 @@ export const TemplateView = () => {
                   field.fieldType.valueRender,
                   { 
                     type: field.fieldType,
-                    defaultValue: object[field.id], 
+                    defaultValue: object.fields[field.code], 
                     readonly: true
                   }
                 )

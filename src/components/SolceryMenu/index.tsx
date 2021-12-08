@@ -35,13 +35,7 @@ export const SolceryMenu = () => {
 
   useEffect(() => {
     if (project) {
-      (async () => {
-        let templateStorage = project.templateStorage
-        templateStorage = await templateStorage.await(connection)
-        let tpls = templateStorage.getAll(Template)
-        setTemplates(tpls)
-      })()
-      // setTemplates(project.templateStorage.getAll(Template))
+      setTemplates(project.templateStorage.getAll(Template))
     }
   }, [ project ]);
 
@@ -54,7 +48,9 @@ export const SolceryMenu = () => {
         <a key='home' href='/#/'>Home</a>
       </Menu.Item>
       {templates.map((tpl: any) => 
-        <SolceryMenuTemplate key={tpl.id} template={tpl}/>
+        <Menu.Item key={tpl.id}>
+          <a href={'/#/template/' + tpl.id}>{tpl.name}</a>
+        </Menu.Item>
       )}
       {project && 
       <Menu.Item key="game">

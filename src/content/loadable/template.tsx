@@ -16,21 +16,18 @@ Master.fromBinary = function(data: any) {
   })
   this.maxFieldIndex = src.maxFieldIndex;
   this.customData = src.customData;
-  src.storages.forEach((storagePubkey: PublicKey) => {
-    this.create(Storage, {
-      id: storagePubkey.toBase58(),
-      pubkey: storagePubkey,
-      storedClass: TplObject,
-    })
+  let storagePubkey = src.storages[0] //TODO: multiple storages
+  this.storage = this.create(Storage, {
+    id: src.storages[0].toBase58(),
+    pubkey: src.storages[0],
+    storedClass: TplObject,
   })
 }
 
-Master.loadAll = function(connection: Connection) {
-  this.getAll(Storage).forEach((storage: any) => {
-    storage.load(connection).then((storage: any) => {
-      storage.loadAll(connection)
-    })
-  })
+Master.onLoad = async function(connection: Connection) {
+  console.log('template onLoad')
+  await this.storage.load(connection)
+  await this.storage.loadAll(connection)
 }
 
 Master.onCreate = function() {
