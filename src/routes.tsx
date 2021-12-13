@@ -19,6 +19,17 @@ export function Routes() {
               <AppLayout>
               <Switch>
                 <Route path="/" component={() => <PlayerProvider><SolitaryView/></PlayerProvider>} />
+                {/* <Route path ="/" component={() => 
+                  <ProjectProvider> 
+                    <Switch>
+                      <Route exact path="/play" component={() => <PlayView/>} />
+                      <Route exact path="/template/:templateKey" component={() => <TemplateView/>} />
+                      <Route path="/object/:objectId" component={() => <ObjectView/>} />
+                      <Route path="/template/schema/:templateKey" component={() => <TemplateSchemaView/>} />
+                      <Route exact path="/" component={() => <HomeView />} />
+                    </Switch>
+                  </ProjectProvider>} 
+                /> */}
               </Switch>
               </AppLayout>
             </AccountsProvider>
