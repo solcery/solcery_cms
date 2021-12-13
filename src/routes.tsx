@@ -18,12 +18,12 @@ export function Routes() {
             <AccountsProvider>
               <AppLayout>
               <Switch>
-                <Route exact path="/account" component={() => <AccountView/>} />
-                <Route exact path="/solitary" component={() => <PlayerProvider><SolitaryView/></PlayerProvider>} />
-                <Route exact path="/store" component={() => <StoreView/>} />
-                <Route exact path="/game/:gameId" component={() => <PlayerProvider><GameView /></PlayerProvider>} />
-                <Route path="/account/:accountKey" component={() => <AccountView/>} />
-                <Route path ="/" component={() => 
+                {/* <Route exact path="/account" component={() => <AccountView/>} /> */}
+                <Route exact path="/" component={() => <PlayerProvider><SolitaryView/></PlayerProvider>} />
+                {/* <Route exact path="/store" component={() => <StoreView/>} /> */}
+                {/* <Route exact path="/game/:gameId" component={() => <PlayerProvider><GameView /></PlayerProvider>} /> */}
+                {/* <Route path="/account/:accountKey" component={() => <AccountView/>} /> */}
+                {/* <Route path ="/" component={() => 
                   <ProjectProvider> 
                     <Switch>
                       <Route exact path="/play" component={() => <PlayView/>} />
@@ -33,7 +33,7 @@ export function Routes() {
                       <Route exact path="/" component={() => <HomeView />} />
                     </Switch>
                   </ProjectProvider>} 
-                />
+                /> */}
               </Switch>
               </AppLayout>
             </AccountsProvider>
