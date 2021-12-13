@@ -18,22 +18,7 @@ export function Routes() {
             <AccountsProvider>
               <AppLayout>
               <Switch>
-                {/* <Route exact path="/account" component={() => <AccountView/>} /> */}
-                <Route exact path="/" component={() => <PlayerProvider><SolitaryView/></PlayerProvider>} />
-                {/* <Route exact path="/store" component={() => <StoreView/>} /> */}
-                {/* <Route exact path="/game/:gameId" component={() => <PlayerProvider><GameView /></PlayerProvider>} /> */}
-                {/* <Route path="/account/:accountKey" component={() => <AccountView/>} /> */}
-                {/* <Route path ="/" component={() => 
-                  <ProjectProvider> 
-                    <Switch>
-                      <Route exact path="/play" component={() => <PlayView/>} />
-                      <Route exact path="/template/:templateKey" component={() => <TemplateView/>} />
-                      <Route path="/object/:objectId" component={() => <ObjectView/>} />
-                      <Route path="/template/schema/:templateKey" component={() => <TemplateSchemaView/>} />
-                      <Route exact path="/" component={() => <HomeView />} />
-                    </Switch>
-                  </ProjectProvider>} 
-                /> */}
+                <Route path="/" component={() => <PlayerProvider><SolitaryView/></PlayerProvider>} />
               </Switch>
               </AppLayout>
             </AccountsProvider>
