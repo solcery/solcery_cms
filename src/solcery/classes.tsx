@@ -41,10 +41,12 @@ export class Project extends SolceryAccount {
           var brickField: number = customParams.exportBrick
           var objects = await tpl.getAllObjects(connection)
           for (let obj of objects) {
-            let brick = obj.fields.get(brickField)
-            if (brick) {
-              result.push(exportBrick(obj.fields.get(1), obj.id, brick))
-            }
+            if (obj.fields.get(2)) { //enabled 
+              let brick = obj.fields.get(brickField)
+              if (brick) {
+                result.push(exportBrick(obj.fields.get(1), obj.id, brick))
+              }
+            } 
           }
         } 
       }
@@ -227,7 +229,12 @@ export class TplObject {
     for (let [fieldId, value] of this.fields) {
       var field = tpl.getField(fieldId)
       if (field) {
-        data.set(fieldId, await field.fieldType.construct(value, connection))
+        try {
+          data.set(fieldId, await field.fieldType.construct(value, connection))
+        }
+        catch (e: any) {
+          throw new Error('Error constructing object ' + id + ': ' + e.message)
+        }
       }
     }
     return new ConstructedObject({ id, data });

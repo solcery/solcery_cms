@@ -48,6 +48,28 @@ export class SBrick extends SType {
     return result
   };
 
+  construct = (value: any) => {
+    if (!value.subtype) // not a bricktree
+      return value
+    let result: any = {
+      type: value.type,
+      subtype: value.subtype,
+      params: new Map(),
+    }
+    var brickSignature = getBrickSignature(value.type, value.subtype)
+    if (!brickSignature) {
+      throw new Error('Error constructing unknown brick ' + value.subtype)
+    }
+    for (let signatureParam of brickSignature.params) {
+      let param = value.params.get(signatureParam.id)
+      if (param === undefined) {
+        throw new Error('Error constructing brick ' + value.subtype + ': missing param ' + signatureParam.code)
+      } 
+      result.params.set(signatureParam.id, this.construct(param))
+    }
+    return result
+  }
+
   writeValue = (value: Brick, writer: BinaryWriter) => { 
     var brickSignature = getBrickSignature(value.type, value.subtype)
     if (!brickSignature) {
@@ -274,7 +296,7 @@ export const brickToOldBrick = (brick: Brick) => { // TODO: construct??
   }
   var brickSignature = getBrickSignature(brick.type, brick.subtype)
   if (!brickSignature) {
-    console.log("Error loading brick. Something morphed into default brick")
+    console.log("Warning loading brick. Something morphed into default brick")
     let res: OldBrick = brickToOldBrick(defaultBricksByType.get(brick.type))
     return res
   }
@@ -541,7 +563,6 @@ basicBricks.push({
     if (ctx.game.attrs[attrName] === undefined)
       throw new Error("Trying to set unknown game attr " + attrName)
     ctx.game.attrs[attrName] = value
-    console.log(ctx.game.attrs)
     if (ctx.diff) {
       ctx.diff.gameAttrs.set(attrName, value)
     }
