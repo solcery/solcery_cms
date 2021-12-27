@@ -120,13 +120,13 @@ export const PlayView = () => {
   unityPlayContext.on("OnUnityLoaded", async () => {
     let content = gameState.content.toJson()
     let state = gameState.toJson()
-    unityPlayContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(testGameContent));
-    unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(testGameState));
+    unityPlayContext.send("ReactToUnity", "UpdateGameContent", content);
+    unityPlayContext.send("ReactToUnity", "UpdateGameState", state);
   });
 
   unityPlayContext.on("CastCard", async (cardId: number) => {
     gameState.useCard(cardId, 1)
-    unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
+    unityPlayContext.send("ReactToUnity", "UpdateGameState", gameState.toJson());
     setStep(step + 1)
   });
 
@@ -136,7 +136,7 @@ export const PlayView = () => {
       if (logEntry.actionType == 0)
       {
         gameState.useCard(logEntry.data, logEntry.playerId)
-        unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
+        unityPlayContext.send("ReactToUnity", "UpdateGameState", gameState.toJson());
         setStep(step + 1)
       }
     }
