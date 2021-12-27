@@ -2,15 +2,13 @@ import { deserializeUnchecked, BinaryReader } from 'borsh';
 import { PublicKey, Connection } from "@solana/web3.js";
 import { schema, TemplateData } from './schema'
 
-let Master: any = {
-  data: {},
-}
+let Master: any = {}
 
 Master.fromBinary = function(data: any) {
   let template = this.parent.parent
   let reader = new BinaryReader(data)
   this.fields = {}
-  reader.readU32() // id
+  this.intId = reader.readU32() // integer id
   reader.readPubkey() // templatePubkey
   var fieldsAmount = reader.readU32()
   var fieldOffsets = [];

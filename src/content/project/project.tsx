@@ -3,6 +3,7 @@ import { Template } from '../template'
 let Master: any = {}
 
 Master.onCreate = function (data: any) {
+	this.childrenById = {}
 	this.templates = {}
 }
 

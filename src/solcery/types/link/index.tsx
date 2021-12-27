@@ -44,8 +44,11 @@ export class SLink extends SType {
   	writer.writePubkey(this.templatePublicKey)
   }
 
-  construct = async (value: PublicKey, connection: Connection) => {
-    return await TplObject.getId(connection, value)
+  construct = (value: any, project: any) => {
+    let obj = project.childrenById[value.toBase58()]
+    if (!obj)
+      throw new Error('Error constructing SLink type!')
+    return obj.intId
   }
 }
 

@@ -1,4 +1,5 @@
 import { Connection } from "@solana/web3.js";
+import { Project } from '../project'
 
 let Master: any = {}
 
@@ -28,6 +29,10 @@ Master.load = async function(connection: Connection, data: any) {
 Master.onCreate = function (data: any) {
 	this.pubkey = data.pubkey // assert without pubkey
 	this.id = data.pubkey.toBase58()
+
+	let project = this.root.getAll(Project)[0] // TODO ??
+	project.childrenById[this.id] = this
+	this.project = project
 }
 
 export { Master }

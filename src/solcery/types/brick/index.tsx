@@ -277,15 +277,10 @@ export type BrickSignature = {
 
 
 export const applyBrick: (brick: any, ctx: any) => any = (brick: any, ctx: any) => {
-  console.log('applyBrick')
-  console.log(brick)
-  if (ctx.args.length > 0) 
-    console.log(ctx.args[ctx.args.length - 1])
   let params: any = {}
   for (let param of brick.params) {
     params[param.name] = param.value
   }
-  console.log(params)
   if (brick.subtype > 10000) {
     let func = (params: any, ctx: any) => {
       ctx.args.push(params)

@@ -73,7 +73,10 @@ export const PlayView = () => {
     if (!project)
       return
     (async () => {
-      var constructedContent = await project.сonstructContent(connection)
+      console.log(project)
+      console.log(project.getTemplate)
+      var constructedContent = await project.construct(connection)
+      
       
       // let buf = constructedContent.toBuffer()
       // let cc = ConstructedContent.read(new BinaryReader(buf))

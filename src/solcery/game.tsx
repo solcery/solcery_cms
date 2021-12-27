@@ -218,7 +218,9 @@ export class GameState {
   }
 
 	useCard = (cardId: number, playerId: number) => {
+    console.log('useCard')
 		let object = this.objects.get(cardId)
+    console.log(object)
 		if (!object)
 			throw new Error("Attempt to cast unexistent card!")
 		let ctx = new Context({
@@ -231,6 +233,7 @@ export class GameState {
       objectAttrs: new Map()
     }
 		let cardType = this.content.get('cardTypes', object.tplId)
+    console.log(cardType)
 		applyBrick(cardType.action, ctx)
     return ctx.diff
 	}
