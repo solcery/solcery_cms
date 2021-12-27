@@ -28,6 +28,8 @@ Master.fromBinary = function(data: any) {
     var stype = field.fieldType
     this.fields[field.code] = stype.readValue(valueReader)
   }
+  if (this.intId === 966 )
+    console.log(this)
 }
 
 export { Master }

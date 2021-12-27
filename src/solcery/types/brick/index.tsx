@@ -9,6 +9,10 @@ import { solceryTypes } from '../solceryTypes'
 import { ValueRender, TypedataRender } from './components'
 import { TplObject } from '../../classes'
 
+const debug = {
+  on: false,
+}
+
 export class SBrick extends SType {
   id = 6;
   static typename = "Brick";
@@ -75,6 +79,7 @@ export class SBrick extends SType {
   readConstructed = (reader: BinaryReader) => { // reading ignoring brick signatures and this.brickType
     var type = reader.readU32()
     var subtype = reader.readU32()
+    var name = reader.readString()
     var params: any[] = []
     var paramsAmount = reader.readU32()
     for (var i = 0; i < paramsAmount; i++) {
@@ -88,15 +93,16 @@ export class SBrick extends SType {
       }
       params.push(param)
     }
-    var result: Brick = {
-      type: type,
-      subtype: subtype,
-      params: params,
+    var result: ConstructedBrick = {
+      name,
+      type,
+      subtype,
+      params,
     }
     return result
   };
 
-  writeConstructed = (value: Brick, writer: BinaryWriter) => { 
+  writeConstructed = (value: ConstructedBrick, writer: BinaryWriter) => { 
     var brickSignature = getBrickSignature(value.type, value.subtype)
     if (!brickSignature) {
       let def = defaultBricksByType.get(value.type)
@@ -105,6 +111,7 @@ export class SBrick extends SType {
     }
     writer.writeU32(value.type)
     writer.writeU32(value.subtype)
+    writer.writeString(value.name)
     writer.writeU32(brickSignature.params.length)
     for (let param of value.params) {
       writer.writeString(param.name)
@@ -113,10 +120,13 @@ export class SBrick extends SType {
     }
   };
 
-  construct = async (value: Brick, connection: Connection) => {
+  construct = async (value: Brick, project: any) => {
+    // console.log('construct brick')
     let result: any[] = []
     let constructedParams: any[] = []
     let brickSignature = getBrickSignature(value.type, value.subtype)
+    // console.log(value.type + ' ' + value.subtype)
+    // console.log(brickSignature)
     if (!brickSignature) {
       return {
         name: "unknown brick",
@@ -132,7 +142,7 @@ export class SBrick extends SType {
           id: param.id,
           type: paramSignature.type,
           name: paramSignature.code,
-          value: await paramSignature.type.construct(param.value, connection)
+          value: await paramSignature.type.construct(param.value, project)
         }) 
       }
     }
@@ -147,7 +157,7 @@ export class SBrick extends SType {
     }
   }
 
-  toObject = (value: Brick) => {
+  toObject = (value: ConstructedBrick) => {
     let brickSignature = getBrickSignature(value.type, value.subtype)
     if (!brickSignature) {
       return defaultBricksByType.get(value.type)
@@ -164,6 +174,7 @@ export class SBrick extends SType {
       }
     }
     return {
+      name: value.name,
       type: value.type,
       subtype: value.subtype,
       params: params,
@@ -228,7 +239,7 @@ const exportArgsAsParams = (brick: Brick, result: Map<string, BrickParamSignatur
   }
   for (let param of brick.params) {
     let value = param.value
-    if (value instanceof Object && value.type && value.subtype) { // TODO: check if brick
+    if (value instanceof Object && value.type !== undefined && value.subtype !== undefined) { // TODO: check if brick
       exportArgsAsParams(value, result)
     }
   }
@@ -437,7 +448,13 @@ export const brickToOldBrick = (brick: Brick) => { // TODO: construct??
 
 export const exportBrick = (name: string, id: number, brick: Brick) => {
   let paramsMap = new Map<string, BrickParamSignature>()
+  if (id === 967) {
+    debug.on = true
+    console.log('EXPORT 967')
+    console.log(brick)
+  }
   exportArgsAsParams(brick, paramsMap)
+  debug.on = false
   let subtype = 10000 + id
   return {
     type: brick.type,
@@ -975,7 +992,7 @@ basicBricks.push({
     { id: 1, code: 'attr_name', name: 'Attribute name', type: new SString() }
   ],
   func: (params: any, ctx: any) => {
-    return ctx.games.attrs[params.attr_name]
+    return ctx.game.attrs[params.attr_name]
   }
 })
 

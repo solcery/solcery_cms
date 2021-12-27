@@ -1,10 +1,35 @@
 import { ConstructedTemplate, ConstructedSchema, ConstructedObject, ConstructedObjects, ConstructedContent } from '../../solcery/content'
 import { PublicKey, Connection } from "@solana/web3.js";
 import { Template } from '../template'
+import { exportBrick, updateCustomBricks, BrickSignature } from '../../solcery/types/brick'
 
 let Master: any = {}
 
+Master.updateBricks = function() {
+  var result: BrickSignature[] = []
+  for (var tpl of this.getTemplates()) {
+    if (tpl.customData !== '') {
+      console.log(tpl.customData)
+      var customParams = JSON.parse(tpl.customData)
+      if (customParams.exportBrick) {
+        var objects = tpl.getObjects()
+        let brickField = tpl.fields[customParams.exportBrick].code
+        for (let obj of objects) {
+          let brick = obj.fields[brickField]
+          if (brick) {
+            result.push(exportBrick(obj.fields[brickField], obj.intId, brick))
+          }
+        }
+      } 
+    }
+  }
+  console.log(result)
+  updateCustomBricks(result)
+}
+
+
 Master.construct = async function(connection: Connection) {
+  this.updateBricks()
   let templates = this.templateStorage.getAll(Template)
   let constructMetadata: any = {
     ids: {}
