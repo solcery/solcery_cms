@@ -1174,26 +1174,26 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 5009844: function() {
+ 5008900: function() {
   Module["emscripten_get_now_backup"] = performance.now;
  },
- 5009899: function($0) {
+ 5008955: function($0) {
   performance.now = function() {
    return $0;
   };
  },
- 5009947: function($0) {
+ 5009003: function($0) {
   performance.now = function() {
    return $0;
   };
  },
- 5009995: function() {
+ 5009051: function() {
   performance.now = Module["emscripten_get_now_backup"];
  },
- 5010050: function() {
+ 5009106: function() {
   return Module.webglContextAttributes.premultipliedAlpha;
  },
- 5010111: function() {
+ 5009167: function() {
   return Module.webglContextAttributes.preserveDrawingBuffer;
  }
 };
@@ -1498,9 +1498,12 @@ function _JS_Cursor_SetShow(show) {
 function _JS_DOM_MapViewportCoordinateToElementLocalCoordinate(viewportX, viewportY, targetX, targetY) {
  var canvasSelector = "#" + (Module["canvas"] ? Module["canvas"].id : "unity-canvas");
  var canvas = document.querySelector(canvasSelector);
- var rect = canvas.getBoundingClientRect();
- HEAPU32[targetX >> 2] = viewportX - rect.left;
- HEAPU32[targetY >> 2] = viewportY - rect.top;
+ if (canvas != null)
+    {
+    var rect = canvas.getBoundingClientRect()
+    HEAPU32[targetX >> 2] = viewportX - rect.left
+    HEAPU32[targetY >> 2] = viewportY - rect.top
+    }
 }
 
 function stringToNewUTF8(jsString) {

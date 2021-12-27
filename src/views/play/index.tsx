@@ -121,7 +121,7 @@ export const PlayView = () => {
     let content = gameState.content.toJson()
     let state = gameState.toJson()
     unityPlayContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(testGameContent));
-    // unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(testGameState));
+    unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(testGameState));
   });
 
   unityPlayContext.on("CastCard", async (cardId: number) => {
