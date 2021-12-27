@@ -233,7 +233,6 @@ export class GameState {
       objectAttrs: new Map()
     }
 		let cardType = this.content.get('cardTypes', object.tplId)
-    console.log(cardType)
 		applyBrick(cardType.action, ctx)
     return ctx.diff
 	}

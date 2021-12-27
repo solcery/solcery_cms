@@ -11,6 +11,9 @@ import { GameState } from "../../solcery/game"
 import { Project } from "../../solcery/classes"
 import { ConstructedContent } from "../../solcery/content"
 
+import testGameContent from "./game_content_test.json"
+import testGameState from "./game_state_test.json"
+
 import { PublicKey } from "@solana/web3.js";
 
 
@@ -38,11 +41,19 @@ export const GameObjectView = (props: {
     </div>)
 }
 
+// const unityPlayContext = new UnityContext({
+//   loaderUrl: "game/game_25.loader.js",
+//   dataUrl: "game/game_25.data",
+//   frameworkUrl: "game/game_25.framework.js",
+//   codeUrl: "game/game_25.wasm",
+// })
+
 const unityPlayContext = new UnityContext({
-  loaderUrl: "game/game_25.loader.js",
-  dataUrl: "game/game_25.data",
-  frameworkUrl: "game/game_25.framework.js",
-  codeUrl: "game/game_25.wasm",
+  loaderUrl: "new_game/WebGl.loader.js",
+  dataUrl: "new_game/WebGl.data",
+  frameworkUrl: "new_game/WebGl.framework.js",
+  codeUrl: "new_game/WebGl.wasm",
+  streamingAssetsUrl: "StreamingAssets",
 })
 
 export const PlayView = () => {
@@ -73,21 +84,8 @@ export const PlayView = () => {
     if (!project)
       return
     (async () => {
-      console.log(project)
-      console.log(project.getTemplate)
       var constructedContent = await project.construct(connection)
-      
-      
-      // let buf = constructedContent.toBuffer()
-      // let cc = ConstructedContent.read(new BinaryReader(buf))
-      // let contentInfo = await connection.getAccountInfo(new PublicKey("7cRU5jAtqRjaSFUb3Dj3e8Mhnnhe2G3J7XbDqSjhrPPc"))
-      // if (!contentInfo)
-      //   return
-      // let constructedContent = ConstructedContent.read(new BinaryReader(contentInfo.data))
-      // let gameState = new GameState(cc)
-      console.log(constructedContent.toJson())
       let gameState = new GameState(constructedContent)
-
       let slots = gameState.content.getAll('slots')
       for (let slot of slots.values()) {
         let defaultCardTypeId = slot.default
@@ -115,19 +113,18 @@ export const PlayView = () => {
 
   const onCardAttrChange = (cardId: number, attrName: string, value: number) => {
     gameState.objects.get(cardId).attrs[attrName] = value;
-    unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
+    unityPlayContext.send("ReactToUnity", "UpdateGameState", gameState.toJson());
     setStep(step + 1)
   }
 
   unityPlayContext.on("OnUnityLoaded", async () => {
-    console.log(gameState.toJson())
-    unityPlayContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
-    unityPlayContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData()));
-    unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
+    let content = gameState.content.toJson()
+    let state = gameState.toJson()
+    unityPlayContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(testGameContent));
+    // unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(testGameState));
   });
 
   unityPlayContext.on("CastCard", async (cardId: number) => {
-    console.log('CAST CARD')
     gameState.useCard(cardId, 1)
     unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
     setStep(step + 1)

@@ -9,10 +9,6 @@ import { solceryTypes } from '../solceryTypes'
 import { ValueRender, TypedataRender } from './components'
 import { TplObject } from '../../classes'
 
-const debug = {
-  on: false,
-}
-
 export class SBrick extends SType {
   id = 6;
   static typename = "Brick";
@@ -448,13 +444,7 @@ export const brickToOldBrick = (brick: Brick) => { // TODO: construct??
 
 export const exportBrick = (name: string, id: number, brick: Brick) => {
   let paramsMap = new Map<string, BrickParamSignature>()
-  if (id === 967) {
-    debug.on = true
-    console.log('EXPORT 967')
-    console.log(brick)
-  }
   exportArgsAsParams(brick, paramsMap)
-  debug.on = false
   let subtype = 10000 + id
   return {
     type: brick.type,

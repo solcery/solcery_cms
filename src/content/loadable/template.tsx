@@ -25,7 +25,6 @@ Master.fromBinary = function(data: any) {
 }
 
 Master.onLoad = async function(connection: Connection) {
-  console.log('template onLoad')
   await this.storage.load(connection)
   await this.storage.loadAll(connection)
 }

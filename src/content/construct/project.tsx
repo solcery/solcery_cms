@@ -9,7 +9,6 @@ Master.updateBricks = function() {
   var result: BrickSignature[] = []
   for (var tpl of this.getTemplates()) {
     if (tpl.customData !== '') {
-      console.log(tpl.customData)
       var customParams = JSON.parse(tpl.customData)
       if (customParams.exportBrick) {
         var objects = tpl.getObjects()
@@ -23,7 +22,6 @@ Master.updateBricks = function() {
       } 
     }
   }
-  console.log(result)
   updateCustomBricks(result)
 }
 

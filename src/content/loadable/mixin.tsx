@@ -14,11 +14,10 @@ Master.load = async function(connection: Connection, data: any) {
   if (!this.pubkey)
     throw new Error('content/loadable/mixin error - trying to load object without set pubkey')
   if (!data) {
-  	console.log('no data')
-	let accInfo = await connection.getAccountInfo(this.pubkey)
-	if (!accInfo)
-		throw new Error('content/loadable/mixin error - account data error')
-  	data = accInfo.data.slice(33)
+		let accInfo = await connection.getAccountInfo(this.pubkey)
+		if (!accInfo)
+			throw new Error('content/loadable/mixin error - account data error')
+	  	data = accInfo.data.slice(33)
   }
   this.fromBinary(data)
   await this.awaitAllMixins('onLoad', connection)
