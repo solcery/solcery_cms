@@ -26,7 +26,7 @@ Master.updateBricks = function() {
 }
 
 
-Master.construct = async function(connection: Connection) {
+Master.construct = function(connection: Connection) {
   this.updateBricks()
   let templates = this.templateStorage.getAll(Template)
   let constructMetadata: any = {
@@ -36,7 +36,7 @@ Master.construct = async function(connection: Connection) {
   let customBricks = new Map<number, ConstructedObject>();
   let customBricksSchema: ConstructedSchema | undefined = undefined;
   for (var template of templates) {
-    let tpl = await template.construct(connection)
+    let tpl = template.construct(connection)
     if (template.customData === '') {
       constructedTemplates.set(template.code, tpl)
     }

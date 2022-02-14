@@ -116,7 +116,7 @@ export class SBrick extends SType {
     }
   };
 
-  construct = async (value: Brick, project: any) => {
+  construct = (value: Brick, project: any) => {
     // console.log('construct brick')
     let result: any[] = []
     let constructedParams: any[] = []
@@ -138,7 +138,7 @@ export class SBrick extends SType {
           id: param.id,
           type: paramSignature.type,
           name: paramSignature.code,
-          value: await paramSignature.type.construct(param.value, project)
+          value: paramSignature.type.construct(param.value, project)
         }) 
       }
     }
@@ -670,6 +670,38 @@ basicBricks.push({
       ctx.diff.gameAttrs.set(attrName, value)
     }
   }
+})
+
+basicBricks.push({
+  type: 0,
+  subtype: 10,
+  name: 'Pause',
+  func: () => {},
+  params: [],
+})
+
+basicBricks.push({
+  type: 0,
+  subtype: 11,
+  name: 'Event',
+  func: () => {},
+  params: [],
+})
+
+basicBricks.push({
+  type: 0,
+  subtype: 12,
+  name: 'CreateEntity',
+  func: () => {},
+  params: [],
+})
+
+basicBricks.push({
+  type: 0,
+  subtype: 13,
+  name: 'DeleteEntity',
+  func: () => {},
+  params: [],
 })
 
 

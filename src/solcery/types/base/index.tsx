@@ -45,7 +45,7 @@ export class SType {
   	return writer.buf.slice(0, writer.length)
   }
 
-  construct = async (value: any, project: any) => { return value }
+  construct = (value: any, project: any) => { return value }
 }
 
 
