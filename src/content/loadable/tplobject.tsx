@@ -1,4 +1,4 @@
-import { deserializeUnchecked, BinaryReader } from 'borsh';
+import { deserializeUnchecked, BinaryReader, BinaryWriter } from 'borsh';
 import { PublicKey, Connection } from "@solana/web3.js";
 import { schema, TemplateData } from './schema'
 
@@ -28,6 +28,27 @@ Master.fromBinary = function(data: any) {
     var stype = field.fieldType
     this.fields[field.code] = stype.readValue(valueReader)
   }
+}
+
+Master.toBinary = function() {
+  let template = this.parent.parent
+  let offsetWriter = new BinaryWriter()
+  let dataWriter = new BinaryWriter()
+  offsetWriter.writeU32(Object.keys(this.fields).length)
+  for (let fieldId of Object.keys(template.fields)) {
+    let templateField = template.fields[fieldId]
+    if (this.fields[templateField.code]) {
+      offsetWriter.writeU32(templateField.id)
+      offsetWriter.writeU32(dataWriter.length)
+      templateField.fieldType.writeValue(this.fields[templateField.code], dataWriter)
+      offsetWriter.writeU32(dataWriter.length)
+    }
+  }
+  offsetWriter.writeU32(dataWriter.length)
+  return Buffer.concat([
+    offsetWriter.buf.slice(0, offsetWriter.length),
+    dataWriter.buf.slice(0, dataWriter.length)
+  ])
 }
 
 export { Master }

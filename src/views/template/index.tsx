@@ -79,11 +79,8 @@ export const TemplateView = () => {
     }
     var instructions = [];
 
-    if (!template.storages)
+    if (!template.storage)
       throw new Error("Template.createObject error - storage is empty")
-    var storagePublicKey = template.storages[0]// TODO
-
-    var storage = await Storage.get(connection, storagePublicKey)
     var objectAccount = new Account()
     instructions.push(SystemProgram.createAccount({
       programId: programId,
@@ -95,9 +92,9 @@ export const TemplateView = () => {
     instructions.push(new TransactionInstruction({
       keys: [
         { pubkey: publicKey, isSigner: true, isWritable: false },
-        { pubkey: project.publicKey, isSigner: false, isWritable: true },
-        { pubkey: storage.template, isSigner: false, isWritable: false },
-        { pubkey: storagePublicKey, isSigner: false, isWritable: true },
+        { pubkey: project.pubkey, isSigner: false, isWritable: true },
+        { pubkey: template.pubkey, isSigner: false, isWritable: false },
+        { pubkey: template.storage.pubkey, isSigner: false, isWritable: true },
         { pubkey: objectAccount.publicKey, isSigner: false, isWritable: true },
       ],
       programId: programId,
@@ -107,7 +104,7 @@ export const TemplateView = () => {
       instructions.push(new TransactionInstruction({
         keys: [
           { pubkey: publicKey, isSigner: true, isWritable: false },
-          { pubkey: project.publicKey, isSigner: false, isWritable: false },
+          { pubkey: project.pubkey, isSigner: false, isWritable: false },
           { pubkey: objectAccount.publicKey, isSigner: false, isWritable: true },
           { pubkey: src, isSigner: false, isWritable: false },
         ],
@@ -116,7 +113,7 @@ export const TemplateView = () => {
       }));
     }
     sendTransaction(connection, wallet, instructions, [objectAccount]).then(() => {
-      history.push('/object/' + objectAccount.publicKey.toBase58());
+      history.push('/template/' + template.pubkey.toBase58() + '/' + objectAccount.publicKey.toBase58());
     })
   }
 
@@ -126,14 +123,13 @@ export const TemplateView = () => {
       return;
     if (!project || !template)
       return
-    if (!template.storages)
+    if (!template.storage)
       throw new Error("Template.createObject error - storage is empty")
-    var storagePublicKey = template.storages[0]// TODO
     const popFromStorageIx = new TransactionInstruction({
       keys: [
         { pubkey: publicKey, isSigner: true, isWritable: false },
-        { pubkey: project.publicKey, isSigner: false, isWritable: false },
-        { pubkey: storagePublicKey, isSigner: false, isWritable: true },
+        { pubkey: project.pubkey, isSigner: false, isWritable: false },
+        { pubkey: template.storage.pubkey, isSigner: false, isWritable: true },
         { pubkey: objectPublicKey, isSigner: false, isWritable: false },
       ],
       programId: programId,
@@ -215,8 +211,8 @@ export const TemplateView = () => {
           key="actions"
           render={(text, object: any) =>
           <div>
-            <Button onClick={() => { createObject(new PublicKey(object.key)) }}>Copy</Button>  
-            <Button onClick={() => { deleteObject(new PublicKey(object.key)) }}>Delete</Button>  
+            <Button onClick={() => { createObject(new PublicKey(object.pubkey)) }}>Copy</Button>  
+            <Button onClick={() => { deleteObject(new PublicKey(object.pubkey)) }}>Delete</Button>  
           </div>} //TODO: delete: accountCleanup, confirmation
         />
       </Table>

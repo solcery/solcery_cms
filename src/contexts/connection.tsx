@@ -222,7 +222,6 @@ export const sendTransaction = async (
     };
   
     const txid = await connection.sendRawTransaction(rawTransaction, options);
-  
     if (awaitConfirmation) {
       const status = (
         await connection.confirmTransaction(

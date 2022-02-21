@@ -59,7 +59,7 @@ export const ObjectView = () => {
           data,
         ]),
       });
-      await sendTransaction(connection, wallet, [saveAccountIx], [], true, () => { history.push("/template/" + template?.publicKey.toBase58()); }).then(() => {  // TODO: remove hardcode
+      await sendTransaction(connection, wallet, [saveAccountIx], [], true).then(() => {  // TODO: remove hardcode
         notify({ message: "Object saved successfully", description: objectId })
       },
       () => {
@@ -94,20 +94,21 @@ export const ObjectView = () => {
   const saveObject = async () => {
     if (!object || !template || !project)
       return;
-    let data = await object.serialize(connection)
+    let data = object.toBinary()
+    console.log(data)
     if (data.length < 700) {
       if (!publicKey || wallet === undefined)
         return;
         const saveObjectIx = new TransactionInstruction({
           keys: [
             { pubkey: publicKey, isSigner: true, isWritable: false },
-            { pubkey: project.publicKey, isSigner: false, isWritable: false },
+            { pubkey: project.pubkey, isSigner: false, isWritable: false },
             { pubkey: objectPublicKey, isSigner: false, isWritable: true },
           ],
           programId: programId,
           data: Buffer.concat([ Buffer.from([1, 1]), data]),
         });
-        await sendTransaction(connection, wallet, [saveObjectIx], [], true, () => { history.push("/template/" + template?.publicKey.toBase58()); }).then(() => {
+        await sendTransaction(connection, wallet, [saveObjectIx], [], true).then(() => {
           notify({ message: "Object saved successfully", description: objectId })
         },
         () => {
@@ -130,19 +131,17 @@ export const ObjectView = () => {
     setObject(template.getObject(objectId))
   }, [ template ]);
 
-  const setFieldValue = (fieldId: number, value: any) => {
+  const setFieldValue = (code: string, value: any) => {
     if (!object)
       return;
-    if (value) 
-      object.fields.set(fieldId, value)
-    else
-      object.fields.delete(fieldId)
+    object.fields[code] = value
   }
 
   if (object && template) {
     type ObjectFieldData = {
       key: number,
       fieldId: number,
+      code: string,
       fieldName: string,
       fieldType: SType,
       value: any,
@@ -154,6 +153,7 @@ export const ObjectView = () => {
         objectData.push({
           key: field.id,
           fieldId: field.id,
+          code: field.code,
           fieldType: field.fieldType,
           fieldName: field.name,
           value: object.fields[field.code]
@@ -177,7 +177,7 @@ export const ObjectView = () => {
                   type: record.fieldType,
                   defaultValue: record.value, 
                   onChange: (newValue: any) => { 
-                    setFieldValue(record.fieldId, newValue) 
+                    setFieldValue(record.code, newValue) 
                   } 
                 }
               )
