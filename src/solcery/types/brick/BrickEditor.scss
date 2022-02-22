@@ -1,0 +1,157 @@
+.brick-editor {
+	font-family: sans-serif;
+	color: #FFF;
+	background-color: #000;
+	
+	.react-flow__handle {
+		border-color: #1F1B19;
+		background-color: #88674B;
+		cursor: auto;
+		width: 0.4rem;
+		height: 0.4rem;
+	}
+
+	.react-flow__handle-bottom {
+		bottom: -0.15rem;
+	}
+
+	.react-flow__handle-top {
+		top: -0.15rem;
+	}
+
+	.react-flow__edge-path {
+		stroke: #A99D91;
+	}
+
+	.add-brick-button {
+		width: 4rem;
+		height: 4rem;
+		font-size: 4rem;
+		line-height: 4rem;
+		text-align: center;
+		font-weight: bold;
+		border: solid 1px #88674B;
+		border-radius: 0.5rem;
+		color: #FFF;
+		background-color: #604E3F;
+		cursor: pointer;
+	}
+
+	.brick-subtype-selector {
+		position: absolute;
+		margin-top: -2rem;
+		margin-left: 2rem;
+		min-width: 7rem;
+		font-size: 0.8rem;
+
+		.react-select__control {
+			min-height: auto;
+			box-shadow: none;
+			border-color: #2A2128;
+			border-radius: 0.2rem 0.2rem 0 0;
+			background-color: #1A1619;
+
+			.react-select__input-container {
+				color: #FFF;
+
+				input::placeholder {
+					color: blue;
+				}
+			}
+		}
+
+		.react-select__control:active {
+			border-color: none;
+		}
+
+		.react-select__indicator {
+			padding: 0.15rem;
+		}
+
+		.react-select__value-container {
+			padding: 0 0 0 0.4rem;
+		}
+
+		.react-select__menu {
+			margin: 0;
+			box-shadow: none;
+			border: solid 1px #2A2128;
+			border-top: none;
+			border-radius: 0 0 0.2rem 0.2rem;
+			background-color: #1A1619;
+		}
+
+		.react-select__menu-list {
+			padding: 0;
+		}
+
+		.react-select__option, .react-select__menu-notice {
+			padding: 0.2rem 0 0.2rem 0.4rem;
+			text-align: left;
+			color: #FFF;
+		}
+
+		.react-select__option--is-focused {
+			background-color: #2D232A;
+		}
+	}
+	
+	.brick {
+		width: 15rem;
+		padding: 1.5rem;
+		border: solid 1px #40342C;
+		border-radius: 0.5rem;
+		background-color: #261F1C;
+		text-align: center;
+	
+		.brick-name {
+			font-size: 1.1rem;
+		}
+	
+		.remove-button {
+			position: absolute;
+			right: 0.5rem;
+			top: 0.5rem;
+			width: 1.3rem;
+			height: 1.3rem;
+			line-height: 1.12rem;
+			font-weight: bold;
+			border: solid 1px #88674B;
+			border-radius: 1.3rem;
+			background-color: #604E3F;
+			cursor: pointer;
+		}
+	
+		.field-container {
+			font-size: 0.8rem;
+	
+			input {
+				text-align: center;
+			}
+	
+			input[type="number"] {
+				width: 3rem;
+				margin-left: 0.3rem;
+			}
+	
+			input[type="text"] {
+				width: 100%;
+			}
+		}
+	
+		.handle-label {
+			width: 6rem;
+			margin-left: -2.8rem;
+			margin-top: -1.2rem;
+			font-size: 0.8rem;
+		}
+	}
+
+	.brick:hover {
+		background-color: #302621;
+	}
+
+	.add-brick-button:hover {
+		background-color: #71563F;
+	}
+}

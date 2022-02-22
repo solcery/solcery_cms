@@ -3,6 +3,7 @@ import { PublicKey, Connection } from "@solana/web3.js";
 import { schema, TemplateData } from './schema';
 import { Storage } from '../storage';
 import { TplObject } from '../tplobject';
+import { addCustomBrick, exportBrick } from '../../solcery/types'
 
 let Master: any = {}
 
@@ -15,7 +16,7 @@ Master.fromBinary = function(data: any) {
     this.fields[fieldData.id] = fieldData
   })
   this.maxFieldIndex = src.maxFieldIndex;
-  this.customData = src.customData;
+  this.customData = src.customData != '' ? JSON.parse(src.customData) : {}
   let storagePubkey = src.storages[0] //TODO: multiple storages
   this.storage = this.create(Storage, {
     id: src.storages[0].toBase58(),
@@ -27,6 +28,16 @@ Master.fromBinary = function(data: any) {
 Master.onLoad = async function(connection: Connection) {
   await this.storage.load(connection)
   await this.storage.loadAll(connection)
+  if (this.customData.exportBrick) {
+    let fieldId: number = this.customData.exportBrick
+    let field = this.fields[fieldId].code
+    for (let obj of this.getObjects()) {
+      let brick = obj.fields[field]
+      if (brick) {
+        addCustomBrick(exportBrick(obj.fields.name, obj.intId, brick))
+      }
+    }
+  }
 }
 
 Master.onCreate = function() {

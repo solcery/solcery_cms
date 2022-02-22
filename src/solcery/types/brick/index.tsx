@@ -1,13 +1,12 @@
 import Unity, { UnityContext } from "react-unity-webgl";
 import { Connection} from "@solana/web3.js";
 import React, { useState, useEffect } from "react";
-import { SType, SInt, SString } from "../index";
+import { SType, SInt, SString, SBool } from "../index";
 import { Select, Button } from 'antd';
 import { PublicKey } from "@solana/web3.js";
 import { BinaryReader, BinaryWriter } from 'borsh';
 import { solceryTypes } from '../solceryTypes'
 import { ValueRender, TypedataRender } from './components'
-import { TplObject } from '../../classes'
 
 export class SBrick extends SType {
   id = 6;
@@ -477,6 +476,16 @@ export const updateCustomBricks = (src: BrickSignature[]) => {
     solceryBricks.push(brick)
 }
 
+export const addCustomBrick = (brick: BrickSignature) => {
+  customBricks.push(brick)
+  customBricks.sort(aplhabetSortBricks)
+  solceryBricks.length = 0
+  for (let brick of basicBricks)
+    solceryBricks.push(brick)
+  for (let brick of customBricks)
+    solceryBricks.push(brick)
+}
+
 export const getBricks = () => {
   return solceryBricks
 }
@@ -729,7 +738,7 @@ basicBricks.push({
   subtype: 0,
   name: 'Constant',
   params: [
-    { id: 1, code: 'value', name: 'Value', type: new SInt() }, //TODO
+    { id: 1, code: 'value', name: 'Value', type: new SBool() }, //TODO
   ],
   func: (params: any, ctx: any) => {
     return params.value != 0

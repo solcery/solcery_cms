@@ -135,57 +135,41 @@ export const ObjectView = () => {
     if (!object)
       return;
     object.fields[code] = value
+    console.log(object)
   }
 
   if (object && template) {
-    type ObjectFieldData = {
-      key: number,
-      fieldId: number,
-      code: string,
-      fieldName: string,
-      fieldType: SType,
-      value: any,
-    }
-    var objectData: ObjectFieldData[] = []
-    if (object != undefined && template != undefined) {
-      for (let f of Object.values(template.fields)) {
-        let field = f as any
-        objectData.push({
-          key: field.id,
-          fieldId: field.id,
-          code: field.code,
-          fieldType: field.fieldType,
-          fieldName: field.name,
-          value: object.fields[field.code]
-        })
+    console.log(object)
+    var objectData = Object.values(template.fields).map((field: any) => {
+      return { 
+        key: field.id,
+        fieldName: field.name,
+        field: field,
       }
-    }
-    const divStyle = {
-      width: '100%',
-    };
+    })
     return (
-    <div style={divStyle}>
-      <p>{ 'Object [ ' + object.id + ' ]' }</p>
-      <Table dataSource={objectData} pagination={false}>
-          <Column title="Field" dataIndex="fieldName" key="fieldName"/>
-          <Column
-            title="Value"
-            key="value"
-            render={(text, record: ObjectFieldData) => React.createElement(
-                record.fieldType.valueRender,
-                { 
-                  type: record.fieldType,
-                  defaultValue: record.value, 
-                  onChange: (newValue: any) => { 
-                    setFieldValue(record.code, newValue) 
-                  } 
-                }
-              )
-            }
-          />
-        </Table>
-        <Button onClick={saveObject}>Save</Button>
-    </div>
+      <div style={ { width: '100%' } } >
+        <p>{ 'Object [ ' + object.id + ' ]' }</p>
+        <Table dataSource={objectData} pagination={false}>
+            <Column title="Field" dataIndex="fieldName" key="fieldName"/>
+            <Column
+              title="Value"
+              key="value"
+              render={(text, record: any) => React.createElement(
+                  record.field.fieldType.valueRender,
+                  { 
+                    type: record.field.fieldType,
+                    defaultValue: object.fields[record.field.code], 
+                    onChange: (newValue: any) => {
+                      setFieldValue(record.field.code, newValue) 
+                    } 
+                  }
+                )
+              }
+            />
+          </Table>
+          <Button onClick={saveObject}>Save</Button>
+      </div>
     )
   }
 

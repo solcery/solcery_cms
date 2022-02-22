@@ -1,79 +1,81 @@
 import Unity, { UnityContext } from "react-unity-webgl";
 import { useProject } from "../../../contexts/project"
 import { useConnection } from "../../../contexts/connection"
+
+import { BrickEditor } from './BrickEditor';
 import React, { useState, useEffect } from "react";
 import { OldBrick, oldBrickToBrick, getBrickConfigs, brickToOldBrick, getBricks } from "./index"
 import { Select, Button, Modal } from 'antd';
 import { SInt, SString, ValueRenderParams, SBrick } from '../index'
 
-
-const unityContext = new UnityContext({
-  loaderUrl: "node_editor/node_editor_12.loader.js",
-  dataUrl: "node_editor/node_editor_12.data",
-  frameworkUrl: "node_editor/node_editor_12.framework.js",
-  codeUrl: "node_editor/node_editor_12.wasm",
-})
-
 export const ValueRender = (props: ValueRenderParams) => {
 
-	var [ value, setValue ] = useState<any>(undefined)
-  var [ newValue, setNewValue ] = useState<any>(undefined)
-  var [ enabled, setEnabled ] = useState(false)
-  var { project } = useProject()
-  var connection = useConnection()
-  // const [ unityContext, setUnityContext ] = useState<UnityContext|undefined>(undefined)
+  let [ value, setValue ] = useState<any>(undefined)
 
   useEffect(() => {
-    if (unityContext) {
-      unityContext.on("SaveBrickTree", (stringTree) => {
-        if (!props.onChange)
-          return
-        var oldBrick: OldBrick = JSON.parse(stringTree).Genesis
-        if (!oldBrick) {
-          setNewValue(undefined)
-          return
-        }
-        var newBrick = oldBrickToBrick(oldBrick)
-        setNewValue(newBrick)
-      })
-
-      unityContext.on("OnNodeEditorLoaded", async () => {
-        if (!project)
-          throw new Error("No project on node editor, panic")
-        await project.updateBricks(connection)
-        var configs = getBrickConfigs(getBricks())
-        var brickData = {
-          Genesis: value ? brickToOldBrick(value) : null
-        }
-        console.log((props.type as SBrick).brickType)
-        unityContext.send("NodeEditorReactToUnity", "SetNodeEditorData", JSON.stringify({ 
-          BrickConfigsData: configs,
-          GenesisBrickType: (props.type as SBrick).brickType,
-          BrickTree: brickData,
-        }));
-      });
-    }
-  }, [value] )
-
-  useEffect(() => {
-    setValue(props.defaultValue)
-    setNewValue(props.defaultValue)
+    setValue(reformat2(props.defaultValue))
   }, [])
 
+  const onBrickEditorChange = (bt: any) => {
+    if (!props.onChange)
+      return;
+
+    let reformatted = reformat(bt)
+    if (checkCompleteness(reformatted)) {
+      props.onChange(reformatted);
+    }
+  };
+
+  const checkCompleteness: (brickTree: any) => boolean = (brickTree: any) => {
+    if (!brickTree)
+      return false
+    if (!brickTree.params)
+      return true
+    let result: boolean = true
+    for (let param of brickTree.params) {
+      result = result && checkCompleteness(param.value)
+    }
+    return result
+  }
+
+  const reformat = (brickTree: any) => {
+    if (!brickTree)
+      return undefined
+    if (!brickTree.params)
+      return brickTree
+    let newParams: any[] = []
+    for (let key of Object.keys(brickTree.params)) {
+      newParams.push({
+        id: parseInt(key),
+        value: reformat(brickTree.params[key]),
+      })
+    }
+    return {
+      type: brickTree.type,
+      subtype: brickTree.subtype,
+      params: newParams,
+    }
+  }
+
+  const reformat2 = (brickTree: any) => {
+    if (!brickTree)
+      return undefined
+    if (!brickTree.params)
+      return brickTree
+    let newParams: any = {}
+    for (let param of brickTree.params) {
+      newParams[param.id] = reformat2(param.value)
+    }
+    return {
+      type: brickTree.type,
+      subtype: brickTree.subtype,
+      params: newParams,
+    }
+  }
+
+  const [ enabled, setEnabled ] = useState(false)
 
   const changeEnabled = () => {
-    setEnabled(!enabled)
-  }
-
-  const apply = () => {
-    setValue(newValue)
-    if (props.onChange)
-      props.onChange(newValue)
-    setEnabled(!enabled)
-  }
-
-  const cancel = () => {
-    setNewValue(value)
     setEnabled(!enabled)
   }
 
@@ -92,13 +94,21 @@ export const ValueRender = (props: ValueRenderParams) => {
 	if (!props.onChange)
 		return (<p>Brick</p>)
   if (!enabled)
-    return (<Button onClick = {changeEnabled}>Edit</Button>)
+    return (<Button onClick = { changeEnabled }>Edit</Button>)
+  let brickType = (props.type as SBrick).brickType
 	return (
     <div>
       <div style={style}>
-        <Button onClick = {apply}>Apply</Button>
-        <Button onClick = {cancel}>Cancel</Button>
-        <Unity style={{ width: '100%', height: '100%' }} unityContext={unityContext} />
+        <Button onClick = {changeEnabled}>Close</Button>
+
+        <BrickEditor
+            width={window.innerWidth}
+            height={window.innerHeight}
+            brickSignatures={getBricks()}
+            brickClass={SBrick}
+            brickTree={value}
+            brickType={brickType}
+            onChange={onBrickEditorChange} />
       </div>
     </div>
 	);

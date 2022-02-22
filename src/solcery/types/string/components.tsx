@@ -3,7 +3,6 @@ import { Input } from 'antd';
 import { ValueRenderParams} from '../index'
 
 export const ValueRender = (props: ValueRenderParams) => {
-	var [value, setValue] = useState(props.defaultValue)
 
 	if (!props.onChange)
     return (<p>{props.defaultValue}</p>)
