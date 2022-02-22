@@ -685,32 +685,38 @@ basicBricks.push({
   type: 0,
   subtype: 10,
   name: 'Pause',
-  func: () => {},
-  params: [],
+  params: [
+    { id: 1, code: 'duration', name: 'Duration', type: new SBrick({ brickType: 2 }) }, 
+  ],
+  func: (params: any, ctx: any) => {}
 })
 
 basicBricks.push({
   type: 0,
   subtype: 11,
   name: 'Event',
-  func: () => {},
-  params: [],
+  params: [
+    { id: 1, code: 'event_name', name: 'Event name', type: new SString() }, 
+  ],
+  func: (params: any, ctx: any) => {}
 })
 
 basicBricks.push({
   type: 0,
   subtype: 12,
   name: 'CreateEntity',
-  func: () => {},
-  params: [],
+  params: [
+    { id: 1, code: 'card_type', name: 'Card type', type: new SString() }, 
+  ],
+  func: (params: any, ctx: any) => {}
 })
 
 basicBricks.push({
   type: 0,
   subtype: 13,
   name: 'DeleteEntity',
-  func: () => {},
   params: [],
+  func: (params: any, ctx: any) => {}
 })
 
 
@@ -836,6 +842,72 @@ basicBricks.push({
   },
 })
 
+
+basicBricks.push({ // TODO: reuse code
+  type: 1,
+  subtype: 8,
+  name: 'OR Iterator',
+  params: [
+    { id: 1, code: 'iter_condition',name: 'Iteration Condition', type: new SBrick({ brickType: 1 }) },
+    { id: 2, code: 'condition',name: 'Condition', type: new SBrick({ brickType: 1 }) },
+    { id: 3, code: 'limit', name: 'Limit', type: new SBrick({ brickType: 2 }) }
+  ],
+  func: (params: any, ctx: any) => {
+    let limit = applyBrick(params.limit, ctx)
+    let objs: any[] = []
+    let oldOlbj = ctx.object 
+    let amount = 0
+    let objects = [...ctx.game.objects.values()]
+    shuffleArray(objects)
+    while (limit > 0 && objects.length > 0) {
+      ctx.object = objects.pop()
+      if (applyBrick(params.iter_condition, ctx)) {
+        objs.push(ctx.object)
+        limit--;
+      }
+    }
+    let result = false
+    for (let obj of objs) {
+      ctx.object = obj
+      result = result || applyBrick(params.condition, ctx)
+    }
+    ctx.object = oldOlbj
+    return result
+  }
+})
+
+basicBricks.push({ // TODO: reuse code
+  type: 1,
+  subtype: 9,
+  name: 'AND Iterator',
+  params: [
+    { id: 1, code: 'iter_condition',name: 'Iteration Condition', type: new SBrick({ brickType: 1 }) },
+    { id: 2, code: 'condition',name: 'Condition', type: new SBrick({ brickType: 1 }) },
+    { id: 3, code: 'limit', name: 'Limit', type: new SBrick({ brickType: 2 }) }
+  ],
+  func: (params: any, ctx: any) => {
+    let limit = applyBrick(params.limit, ctx)
+    let objs: any[] = []
+    let oldOlbj = ctx.object 
+    let amount = 0
+    let objects = [...ctx.game.objects.values()]
+    shuffleArray(objects)
+    while (limit > 0 && objects.length > 0) {
+      ctx.object = objects.pop()
+      if (applyBrick(params.iter_condition, ctx)) {
+        objs.push(ctx.object)
+        limit--;
+      }
+    }
+    let result = true
+    for (let obj of objs) {
+      ctx.object = obj
+      result = result && applyBrick(params.condition, ctx)
+    }
+    ctx.object = oldOlbj
+    return result
+  }
+})
 
 basicBricks.push({
   type: 2,
@@ -1024,6 +1096,39 @@ basicBricks.push({
   ],
   func: (params: any, ctx: any) => {
     return ctx.game.attrs[params.attr_name]
+  }
+})
+
+basicBricks.push({ // TODO: reuse code
+  type: 2,
+  subtype: 14,
+  name: 'Sum Iterator',
+  params: [
+    { id: 1, code: 'iter_condition',name: 'Iteration Condition', type: new SBrick({ brickType: 1 }) },
+    { id: 2, code: 'value',name: 'Value', type: new SBrick({ brickType: 2 }) },
+    { id: 3, code: 'limit', name: 'Limit', type: new SBrick({ brickType: 2 }) }
+  ],
+  func: (params: any, ctx: any) => {
+    let limit = applyBrick(params.limit, ctx)
+    let objs: any[] = []
+    let oldOlbj = ctx.object 
+    let amount = 0
+    let objects = [...ctx.game.objects.values()]
+    shuffleArray(objects)
+    while (limit > 0 && objects.length > 0) {
+      ctx.object = objects.pop()
+      if (applyBrick(params.iter_condition, ctx)) {
+        objs.push(ctx.object)
+        limit--;
+      }
+    }
+    let result = 0
+    for (let obj of objs) {
+      ctx.object = obj
+      result = result + applyBrick(params.value, ctx)
+    }
+    ctx.object = oldOlbj
+    return result
   }
 })
 

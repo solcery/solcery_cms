@@ -182,7 +182,7 @@ export const TemplateView = () => {
           title="Object" 
           key="objectKey"
           render={(text, record: any) => (
-              <a href={"/#/template/"+ template.id + '/' + record.id}>{record.id}</a>
+              <a href={"/#/template/"+ template.id + '/' + record.id}>{ record.id.substring(0,4) + ' . . . ' + record.id.substring(40)}</a>
           )}
         />
         {Object.values(template.fields).map((field: any) => { 
