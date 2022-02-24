@@ -17,11 +17,15 @@ Master.load = async function(connection: Connection, data: any) {
 		let accInfo = await connection.getAccountInfo(this.pubkey)
 		if (!accInfo)
 			throw new Error('content/loadable/mixin error - account data error')
-	  	data = accInfo.data.slice(33)
+	  data = accInfo.data.slice(33)
   }
   this.fromBinary(data)
   await this.awaitAllMixins('onLoad', connection)
   this.isLoaded = true
+  if (!this.loadableSubscription) 
+  	this.loadableSubscription = connection.onAccountChange(this.pubkey, 
+  		(accInfo) => this.load(connection, accInfo.data.slice(33))
+  	);
   return this
 }
 

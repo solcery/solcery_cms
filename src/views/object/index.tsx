@@ -95,8 +95,10 @@ export const ObjectView = () => {
   const saveObject = async () => {
     if (!object || !template || !project)
       return;
+    let oldFields = object.fields
+    object.fields = fields
     let data = object.toBinary()
-    console.log(data)
+    object.fields = oldFields
     if (data.length < 700) {
       if (!publicKey || wallet === undefined)
         return;
@@ -141,10 +143,10 @@ export const ObjectView = () => {
   const setFieldValue = (code: string, value: any) => {
     if (!object)
       return;
-    object.fields[code] = value;
+    fields[code] = value;
   }
 
-  if (object && template) {
+  if (object && template && fields) {
     var objectData = Object.values(template.fields).map((field: any) => {
       return { 
         key: field.id,
@@ -164,7 +166,7 @@ export const ObjectView = () => {
                   record.field.fieldType.valueRender,
                   { 
                     type: record.field.fieldType,
-                    defaultValue: object.fields[record.field.code], 
+                    defaultValue: fields[record.field.code], 
                     onChange: (newValue: any) => {
                       setFieldValue(record.field.code, newValue) 
                     } 

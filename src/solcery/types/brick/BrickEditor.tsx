@@ -263,8 +263,6 @@ export const BrickEditor = (props: {
 	}, [brickTree, makeBrickTreeElements, makeAddButtonElement]);
 
 	useEffect(() => {
-		console.log('active')
-		console.log(active)
 		sleepAndFit()
 	}, [ active ])
 
