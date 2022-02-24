@@ -35,7 +35,6 @@
 		border-radius: 0.5rem;
 		color: #FFF;
 		background-color: #604E3F;
-		cursor: pointer;
 	}
 
 	.brick-subtype-selector {
@@ -120,6 +119,9 @@
 			border: solid 1px #88674B;
 			border-radius: 1.3rem;
 			background-color: #604E3F;
+		}
+
+		.remove-button-active {
 			cursor: pointer;
 		}
 	
@@ -148,11 +150,11 @@
 		}
 	}
 
-	.brick:hover {
+	.brick-active:hover {
 		background-color: #302621;
 	}
 
-	.add-brick-button:hover {
+	.add-brick-button-active:hover {
 		background-color: #71563F;
 	}
 }

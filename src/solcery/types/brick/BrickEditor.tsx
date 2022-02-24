@@ -22,25 +22,82 @@ export const BrickEditor = (props: {
 	brickType: number,
 	brickTree?: any,
 	onChange?: (brickTree: any) => void
-	active?: boolean,
 }) => {
+
+
+	const [ active, setActive ] = useState(false)
+	let width = active ? window.innerWidth : props.width;
+	let height = active ? window.innerHeight : props.height;
+
+	const reformat = (brickTree: any) => {
+		if (!brickTree)
+			return undefined
+		if (!brickTree.params)
+			return brickTree
+		let newParams: any[] = []
+		for (let key of Object.keys(brickTree.params)) {
+			newParams.push({
+			id: parseInt(key),
+			value: reformat(brickTree.params[key]),
+			})
+		}
+		return {
+			type: brickTree.type,
+			subtype: brickTree.subtype,
+			params: newParams,
+		}
+	}
+
+	const reformat2 = (brickTree: any) => {
+		if (!brickTree)
+			return undefined
+		if (!brickTree.params)
+			return brickTree
+		let newParams: any = {}
+		for (let param of brickTree.params) {
+			newParams[param.id] = reformat2(param.value)
+		}
+		return {
+			type: brickTree.type,
+			subtype: brickTree.subtype,
+			params: newParams,
+		}
+	}
+
 	const [ state, setState ] = useState <any> ({ elements: [], isLayouted: false });
-	const [ brickTree, brickTreeSet ] = useState<any>(props.brickTree);
+	const [ brickTree, brickTreeSet ] = useState<any>(reformat2(props.brickTree));
 	const [ redraw, setRedraw ] = useState(true);
 	const { fitView } = useZoomPanHelper()
 
 	const setBrickTree = (brickTree: any) => {
 		brickTreeSet(brickTree)
-		if (props.onChange)
-			props.onChange(brickTree)
+		onChange(brickTree)
 	}
 
-	// useEffect(() => {
-	// 	if (props.onChange)
-	// 		props.onChange(brickTree)
-	// }, [ brickTree ])
+	const onChange = (brickTree: any) => {
+		if (props.onChange) {
+			if (checkCompleteness(brickTree)) {
+		 		props.onChange(reformat(brickTree));
+		 	}
+		}
+	}
+
+	const checkCompleteness: (brickTree: any) => boolean = (brickTree: any) => {
+		if (!brickTree)
+			return false
+		if (!brickTree.params)
+			return true
+		let result: boolean = true
+		for (let param of Object.values(brickTree.params)) {
+			result = result && checkCompleteness(param)
+		}
+		return result
+	}
+
+
 
 	const addBrick = useCallback((brickSignature: any, bt: any, parentBrick: any, paramID: number) => {
+		if (!props.onChange || !active) return;
 		// making simple brick object from brick signature
 		const brick: any = {
 			type: brickSignature.type,
@@ -57,19 +114,22 @@ export const BrickEditor = (props: {
 		} else {
 			setBrickTree(brick)
 		}
-	}, [props]);
+	}, [ active, props ]);
 
 	const removeBrick = useCallback((bt: any, parentBrick: any, paramID: number) => {
+		if (!props.onChange || !active) return;
+
 		if (parentBrick) {
 			parentBrick.params[paramID] = null;
 			setBrickTree(JSON.parse(JSON.stringify(bt)))
 		} else {
+			sleepAndFit()
 			setBrickTree(null)
 		}
-	}, [props]);
+	}, [ props, active ]);
 
 	const onPaste = useCallback((pastedBrickTree: any, bt: any, parentBrick: any, paramID: number) => {
-		if (!props.onChange) return;
+		if (!props.onChange || !active) return;
 
 		if (parentBrick) {
 			const brickSignature = props.brickSignatures.find((bs: any) => bs.type === parentBrick.type && bs.subtype === parentBrick.subtype);
@@ -81,9 +141,10 @@ export const BrickEditor = (props: {
 				alert('Unable to paste brick tree: incompatible brick types.');
 			}
 		} else if (pastedBrickTree.type === 0) { //??
+			sleepAndFit()
 			setBrickTree(pastedBrickTree)
 		}
-	}, [props]);
+	}, [ props, active ]);
 
 	const makeAddButtonElement = useCallback((brickID: string, brickType: number, brickTree: any, parentBrick: any, paramID: number) => {
 		return {
@@ -100,12 +161,13 @@ export const BrickEditor = (props: {
 				onBrickSubtypeSelected: addBrick,
 				onPaste: onPaste,
 				onChange: () => { if (props.onChange) props.onChange(brickTree) },
+				readonly: !active || !props.onChange,
 			}
 		};
-	}, [props.brickSignatures, props.brickClass, addBrick, onPaste]);
+	}, [ active, props.brickSignatures, props.brickClass, addBrick, onPaste]);
 
 	const makeAddButtonWithEdgeElements = useCallback((brickID: string, brickType: number, brickTree: any, parentBrick: any,
-	                                                   parentBrickID: any, paramID: number) => {
+														 parentBrickID: any, paramID: number) => {
 		const elements: any[] = [makeAddButtonElement(brickID, brickType, brickTree, parentBrick, paramID)];
 		elements.push({
 			id: `e${parentBrickID}-${brickID}`,
@@ -132,12 +194,13 @@ export const BrickEditor = (props: {
 				onRemoveButtonClicked: removeBrick,
 				onPaste: onPaste,
 				onChange: () => { if (props.onChange) props.onChange(brickTree) },
+				readonly: !active || !props.onChange,
 			}
 		}
 	}, [props.brickSignatures, props.brickClass, removeBrick, onPaste]);
 
 	const makeBrickWithEdgeElements = useCallback((brickID: string, brick: any, brickTree: any, parentBrick: any,
-		                                             parentBrickID: any, paramID: number) => {
+													 parentBrickID: any, paramID: number) => {
 		const elements: any[] = [makeBrickElement(brickID, brick, brickTree, parentBrick, paramID)];
 		if (parentBrickID) {
 			elements.push({
@@ -176,24 +239,19 @@ export const BrickEditor = (props: {
 		processBrick(brickTree);
 
 		return elements;
-	}, [props.brickSignatures, props.brickClass, makeAddButtonWithEdgeElements, makeBrickWithEdgeElements]);
+	}, [props.brickSignatures, active, props.brickClass, makeAddButtonWithEdgeElements, makeBrickWithEdgeElements]);
 
 	const onNodeSizesChange = (nodeSizesByID: any) => {
-		const rootNodePos = { 'x': props.width * 0.5, 'y': props.height * 0.1 };
+		const rootNodePos = { 'x': width * 0.5, 'y': height * 0.1 };
 		setState({
 			elements: makeLayoutedElements(state.elements, nodeSizesByID, rootNodePos, isNode),
 			isLayouted: true
 		});
 	};
 
-	// fitView();
-	// for (let i = 1; i < 15; i++)
-	// 	zoomOut();
 	useEffect(() => {
-		console.log(brickTree)
 		let elements = null;
 		if (brickTree) {
-			console.log('makeBrickTreeElements')
 			elements = makeBrickTreeElements(brickTree);
 		}	else {
 			elements = [makeAddButtonElement(Number(++brickUniqueID).toString(), props.brickType, null, null, 0)];
@@ -205,11 +263,10 @@ export const BrickEditor = (props: {
 	}, [brickTree, makeBrickTreeElements, makeAddButtonElement]);
 
 	useEffect(() => {
-		(async() => {
-			await new Promise(r => setTimeout(r, 10));
-			fitView()
-		})()
-	}, [ props.active ])
+		console.log('active')
+		console.log(active)
+		sleepAndFit()
+	}, [ active ])
 
 	useEffect(() => {
 		if (state.isLayouted && editorRef.current) {
@@ -219,29 +276,59 @@ export const BrickEditor = (props: {
 
 	const editorRef = useRef <any> (null);
 	const onLoad = (reactFlowInstance: any) => {
-		reactFlowInstance.fitView();
+		sleepAndFit()
 	};
 
+	const sleepAndFit = () => {
+		(async() => {
+			await new Promise(r => setTimeout(r, 50));
+			fitView();
+		})()
+	}
+
+	const changeActive = () => {
+		setActive(!active)
+	}
+
+	let style = {
+		backgroundColor: active ? 'black' : 'transparent',
+		pointerEvents: active ? 'auto' : 'none',
+		position: active ? 'fixed' : 'relative',
+		left: 0,
+		top: 0,
+		bottom: 0,
+		right: 0,
+		zIndex: active ? 100 : 10,
+		display: active ? 'inline' : 'block',
+  	} as React.CSSProperties
 
 	return (
-		<div ref={editorRef} className="brick-editor" style={{ width: props.width, height: props.height }}>
-			<ReactFlow 
-				nodeTypes={nodeTypes}
-				elements={state.elements}
-				nodesDraggable={false}
-				nodesConnectable={false}
-				zoomOnDoubleClick={false}
-				paneMoveable={props.active}
-				zoomOnScroll={props.active}
-				zoomOnPinch={props.active}
-				onLoad={onLoad}
-				minZoom={0.001}
-				maxZoom={1}
-			>
-			<LayoutHelper onNodeSizesChange={onNodeSizesChange} />
-			</ReactFlow>
+	<>
+	  <div onClick={() => { if (!active) changeActive() }}>
+		<div style={style}>
+		  {active && (!props.onChange || checkCompleteness(brickTree)) && (<Button onClick = {() => { if (active) changeActive(); } }>OK</Button>)}
+			<div ref={editorRef} className="brick-editor" style={{ 
+				width: width, 
+				height: height 
+			}}>
+				<ReactFlow 
+					nodeTypes={nodeTypes}
+					elements={state.elements}
+					nodesDraggable={false}
+					nodesConnectable={false}
+					zoomOnDoubleClick={false}
+					paneMoveable={active}
+					zoomOnScroll={active}
+					zoomOnPinch={active}
+					onLoad={onLoad}
+					minZoom={ active ? 0.4 : 0.001}
+					maxZoom={1}>
+					<LayoutHelper onNodeSizesChange={onNodeSizesChange} />
+				</ReactFlow>
+			</div>
 		</div>
-	);
+	  </div>
+	</>);
 }
 
 export default BrickEditor;

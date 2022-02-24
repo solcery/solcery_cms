@@ -5,6 +5,7 @@ export default function Brick(props: {
 	id: string,
 	data: any
 }) {
+
 	const brick = props.data.brick;
 	const brickClass = props.data.brickClass;
 	const brickSignature = props.data.brickSignatures.find((bs: any) => bs.type === brick.type && bs.subtype === brick.subtype);
@@ -60,8 +61,8 @@ export default function Brick(props: {
 	});
 
 	return (
-		<div className="brick" onPointerEnter={() => isHovered = true} onPointerLeave={() => isHovered = false}>
-			<div className="remove-button" onClick={onRemoveButtonClicked}>x</div>
+		<div className={ props.data.readonly ? "brick" : "brick brick-active" } onPointerEnter={() => isHovered = true} onPointerLeave={() => isHovered = false}>
+			<div className={ props.data.readonly ? "remove-button" : "remove-button remove-button-active" } onClick={onRemoveButtonClicked}>x</div>
 			<div className="brick-name">{brickSignature.name}</div>
 			{inlineParams.map((param: any) =>
 				<div className="field-container" key={param.id}>

@@ -34,6 +34,7 @@ export const ObjectView = () => {
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
   var [ object, setObject ] = useState<any>(undefined);
+  const [ fields, setFields ] = useState<any>(undefined)
   var [ template, setTemplate ] = useState<any>(undefined);
   let history = useHistory();
   var objectPublicKey = new PublicKey(objectId)
@@ -131,15 +132,19 @@ export const ObjectView = () => {
     setObject(template.getObject(objectId))
   }, [ template ]);
 
+  useEffect(() => {
+    if (!object)
+      return;
+    setFields(JSON.parse(JSON.stringify(object.fields)))
+  }, [ object ]);
+
   const setFieldValue = (code: string, value: any) => {
     if (!object)
       return;
-    object.fields[code] = value
-    console.log(object)
+    object.fields[code] = value;
   }
 
   if (object && template) {
-    console.log(object)
     var objectData = Object.values(template.fields).map((field: any) => {
       return { 
         key: field.id,
