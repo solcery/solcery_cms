@@ -2,6 +2,8 @@ import Unity, { UnityContext } from "react-unity-webgl";
 import { useProject } from "../../../contexts/project"
 import { useConnection } from "../../../contexts/connection"
 
+
+import ReactFlow, { ReactFlowProvider } from 'react-flow-renderer';
 import { BrickEditor } from './BrickEditor';
 import React, { useState, useEffect } from "react";
 import { OldBrick, oldBrickToBrick, getBrickConfigs, brickToOldBrick, getBricks } from "./index"
@@ -77,40 +79,42 @@ export const ValueRender = (props: ValueRenderParams) => {
 
   const changeEnabled = () => {
     setEnabled(!enabled)
+    setValue(reformat2(props.defaultValue))
   }
 
   let style = {
-    background: 'black',
-    position: 'fixed',
+    backgroundColor: enabled ? 'black' : 'transparent',
+    pointerEvents: enabled ? 'auto' : 'none',
+    position: enabled ? 'fixed' : 'relative',
     left: 0,
     top: 0,
     bottom: 0,
     right: 0,
     zIndex: 100,
-    display: enabled ? 'inline' : 'none',
+    display: enabled ? 'inline' : 'block',
   } as React.CSSProperties
   
-
-	if (!props.onChange)
-		return (<p>Brick</p>)
-  if (!enabled)
-    return (<Button onClick = { changeEnabled }>Edit</Button>)
   let brickType = (props.type as SBrick).brickType
 	return (
-    <div>
-      <div style={style}>
-        <Button onClick = {changeEnabled}>Close</Button>
-
-        <BrickEditor
-            width={window.innerWidth}
-            height={window.innerHeight}
-            brickSignatures={getBricks()}
-            brickClass={SBrick}
-            brickTree={value}
-            brickType={brickType}
-            onChange={onBrickEditorChange} />
+    <>
+      <div onClick={() => { if (!enabled) changeEnabled() }}>
+        <div style={style}>
+          {enabled && (<Button onClick = {changeEnabled}>{enabled ? 'Close' : 'Open' }</Button>)}
+            <ReactFlowProvider>
+            <BrickEditor
+              width={enabled ? window.innerWidth : 300}
+              height={enabled ? window.innerHeight : 200}
+              brickSignatures={getBricks()}
+              brickClass={SBrick}
+              brickTree={reformat2(props.defaultValue)}
+              brickType={brickType}
+              onChange={onBrickEditorChange}
+              active={props.onChange && enabled}
+            />
+            </ReactFlowProvider>
+        </div>
       </div>
-    </div>
+    </>
 	);
 }
 

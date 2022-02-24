@@ -706,7 +706,7 @@ basicBricks.push({
   subtype: 12,
   name: 'CreateEntity',
   params: [
-    { id: 1, code: 'card_type', name: 'Card type', type: new SString() }, 
+    { id: 1, code: 'card_type', name: 'Card type', type: new SInt() }, 
   ],
   func: (params: any, ctx: any) => {}
 })

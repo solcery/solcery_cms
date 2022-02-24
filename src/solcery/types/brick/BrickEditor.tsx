@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import ReactFlow, { isNode } from 'react-flow-renderer';
+import ReactFlow, { isNode, useZoomPanHelper } from 'react-flow-renderer';
 import AddBrickButton from './AddBrickButton';
 import Brick from './Brick';
+import { Button } from 'antd';
 import LayoutHelper from './LayoutHelper';
 import makeLayoutedElements from './dagreLayout';
 import './BrickEditor.scss';
@@ -21,14 +22,23 @@ export const BrickEditor = (props: {
 	brickType: number,
 	brickTree?: any,
 	onChange?: (brickTree: any) => void
+	active?: boolean,
 }) => {
 	const [ state, setState ] = useState <any> ({ elements: [], isLayouted: false });
-	const [ brickTree, setBrickTree ] = useState<any>(props.brickTree);
+	const [ brickTree, brickTreeSet ] = useState<any>(props.brickTree);
+	const [ redraw, setRedraw ] = useState(true);
+	const { fitView } = useZoomPanHelper()
 
-	useEffect(() => {
+	const setBrickTree = (brickTree: any) => {
+		brickTreeSet(brickTree)
 		if (props.onChange)
 			props.onChange(brickTree)
-	}, [ brickTree ])
+	}
+
+	// useEffect(() => {
+	// 	if (props.onChange)
+	// 		props.onChange(brickTree)
+	// }, [ brickTree ])
 
 	const addBrick = useCallback((brickSignature: any, bt: any, parentBrick: any, paramID: number) => {
 		// making simple brick object from brick signature
@@ -66,7 +76,7 @@ export const BrickEditor = (props: {
 			const param = brickSignature.params.find((p: any) => p.id === paramID);
 			if (param.type.brickType === pastedBrickTree.type) {
 				parentBrick.params[paramID] = pastedBrickTree;
-				setBrickTree(bt)
+				setBrickTree(JSON.parse(JSON.stringify(bt)))
 			} else {
 				alert('Unable to paste brick tree: incompatible brick types.');
 			}
@@ -176,9 +186,14 @@ export const BrickEditor = (props: {
 		});
 	};
 
+	// fitView();
+	// for (let i = 1; i < 15; i++)
+	// 	zoomOut();
 	useEffect(() => {
+		console.log(brickTree)
 		let elements = null;
 		if (brickTree) {
+			console.log('makeBrickTreeElements')
 			elements = makeBrickTreeElements(brickTree);
 		}	else {
 			elements = [makeAddButtonElement(Number(++brickUniqueID).toString(), props.brickType, null, null, 0)];
@@ -190,17 +205,40 @@ export const BrickEditor = (props: {
 	}, [brickTree, makeBrickTreeElements, makeAddButtonElement]);
 
 	useEffect(() => {
+		(async() => {
+			await new Promise(r => setTimeout(r, 10));
+			fitView()
+		})()
+	}, [ props.active ])
+
+	useEffect(() => {
 		if (state.isLayouted && editorRef.current) {
 			editorRef.current.style.visibility = 'visible';
 		}
 	}, [state.isLayouted]);
 
 	const editorRef = useRef <any> (null);
+	const onLoad = (reactFlowInstance: any) => {
+		reactFlowInstance.fitView();
+	};
+
 
 	return (
 		<div ref={editorRef} className="brick-editor" style={{ width: props.width, height: props.height }}>
-			<ReactFlow nodeTypes={nodeTypes} elements={state.elements} nodesDraggable={false} nodesConnectable={false} zoomOnDoubleClick={false}>
-				<LayoutHelper onNodeSizesChange={onNodeSizesChange} />
+			<ReactFlow 
+				nodeTypes={nodeTypes}
+				elements={state.elements}
+				nodesDraggable={false}
+				nodesConnectable={false}
+				zoomOnDoubleClick={false}
+				paneMoveable={props.active}
+				zoomOnScroll={props.active}
+				zoomOnPinch={props.active}
+				onLoad={onLoad}
+				minZoom={0.001}
+				maxZoom={1}
+			>
+			<LayoutHelper onNodeSizesChange={onNodeSizesChange} />
 			</ReactFlow>
 		</div>
 	);
