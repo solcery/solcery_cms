@@ -86,7 +86,7 @@ export const BrickEditor = (props: {
 	}
 
 	const checkCompleteness: (brickTree: any) => boolean = (brickTree: any) => {
-		if (!brickTree)
+		if (brickTree === undefined || brickTree === null)
 			return false
 		if (!brickTree.params)
 			return true
@@ -302,7 +302,7 @@ export const BrickEditor = (props: {
 		zIndex: active ? 100 : 10,
 		display: active ? 'inline' : 'block',
   	} as React.CSSProperties
-  	
+
 	return (
 	<>
 	  <div onClick={() => { if (!active) changeActive() }}>
