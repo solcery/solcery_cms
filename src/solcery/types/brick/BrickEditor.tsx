@@ -24,6 +24,7 @@ export const BrickEditor = (props: {
 	onChange?: (brickTree: any) => void
 }) => {
 
+	const [ valid, setValid ] = useState(true)
 
 	const [ active, setActive ] = useState(false)
 	let width = active ? window.innerWidth : props.width;
@@ -76,7 +77,9 @@ export const BrickEditor = (props: {
 
 	const onChange = (brickTree: any) => {
 		if (props.onChange) {
-			if (checkCompleteness(brickTree)) {
+			let isValid = checkCompleteness(brickTree)
+			setValid(isValid)
+			if (isValid) {
 		 		props.onChange(reformat(brickTree));
 		 	}
 		}
@@ -179,7 +182,7 @@ export const BrickEditor = (props: {
 		return elements;
 	}, [makeAddButtonElement]);
 
-	const makeBrickElement = useCallback((brickID: string, brick: any, brickTree: any, parentBrick: any, paramID: number) => {
+	const makeBrickElement = useCallback((brickID: string, brick: any, bt: any, parentBrick: any, paramID: number) => {
 		return {
 			id: brickID,
 			type: 'brick',
@@ -193,7 +196,7 @@ export const BrickEditor = (props: {
 				paramID,
 				onRemoveButtonClicked: removeBrick,
 				onPaste: onPaste,
-				onChange: () => { if (props.onChange) props.onChange(brickTree) },
+				onChange: () => { onChange(bt) },
 				readonly: !active || !props.onChange,
 			}
 		}
@@ -299,12 +302,12 @@ export const BrickEditor = (props: {
 		zIndex: active ? 100 : 10,
 		display: active ? 'inline' : 'block',
   	} as React.CSSProperties
-
+  	
 	return (
 	<>
 	  <div onClick={() => { if (!active) changeActive() }}>
 		<div style={style}>
-		  {active && (!props.onChange || checkCompleteness(brickTree)) && (<Button onClick = {() => { if (active) changeActive(); } }>OK</Button>)}
+		  {active && (!props.onChange || valid) && (<Button onClick = {() => { if (active) changeActive(); } }>OK</Button>)}
 			<div ref={editorRef} className="brick-editor" style={{ 
 				width: width, 
 				height: height 
