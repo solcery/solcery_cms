@@ -33,31 +33,38 @@ let Dweller: any = {}
 
 Dweller.execAllMixins = function(event: string, ...args: any[]) {
     let proto = Object.getPrototypeOf(this);
-    if (!proto.eventHandlers)
-        return;
-    let handlers = proto.eventHandlers[event];
-    if (handlers) {
-        for (let handler of handlers) {
-            handler.apply(this, args);
+    if (proto.eventHandlers) {
+        let handlers = proto.eventHandlers[event];
+        if (handlers) {
+            for (let handler of handlers) {
+                handler.apply(this, args);
+            }
         }
-    }
-    handlers = proto.eventHandlers['onEvent'];
-    if (handlers) {
-        for (let handler of handlers) {
-            handler.apply(this, [ event ].concat(args));
+        handlers = proto.eventHandlers['onEvent'];
+        if (handlers) {
+            for (let handler of handlers) {
+                handler.apply(this, [ event ].concat(args));
+            }
         }
     }
 }
 
 Dweller.awaitAllMixins = async function(event: string, ...args: any[]) {
     let proto = Object.getPrototypeOf(this);
-    if (!proto.eventHandlers)
-        return;
-    let handlers = proto.eventHandlers[event];
-    if (handlers) {
-        for (let handler of handlers) {
-            await handler.apply(this, args);
+    if (proto.eventHandlers) {
+        let handlers = proto.eventHandlers[event];
+        if (handlers) {
+            for (let handler of handlers) {
+                await handler.apply(this, args);
+            }
         }
+        handlers = proto.eventHandlers['onEvent'];
+        if (handlers) {
+            for (let handler of handlers) {
+                await handler.apply(this, [ event ].concat(args));
+            }
+        }
+
     }
 }
 

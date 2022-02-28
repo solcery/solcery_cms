@@ -27,7 +27,9 @@ export const TemplateView = () => {
   let { templateKey } = useParams<TemplateViewParams>();
   var [ template, setTemplate ] = useState<any>(undefined);
   var [ objects, setObjects ] = useState<any>(undefined);
+  var [ storage, setStorage ] = useState<any>(undefined);
   var { project } = useProject();
+  var [ revision, setRevision ] = useState(0)
   let [ filter, setFilter ] = useState<any>(undefined)
 
 
@@ -152,6 +154,7 @@ export const TemplateView = () => {
   useEffect(() => { 
     if (project) {
       let template = project.getTemplate(templateKey)
+      setStorage(template.storage)
       setTemplate(template)
     }
   }, [ project, templateKey ]);
@@ -161,6 +164,20 @@ export const TemplateView = () => {
       setObjects(template.getObjects())
     }
   }, [ template ]);
+
+
+  useEffect(() => {
+    if (!storage)
+      return
+    let subscriptionId = storage.addEventSubscription('onLoaded', (storage: any) => {
+      console.log('ON LOADED')
+      console.log(template.getObjects())
+      setObjects(template.getObjects())
+    })
+    // return () => {
+    //   storage.removeEventSubscription('onLoad', subscriptionId)
+    // };
+  }, [ storage ])
 
   if (objects)
   {

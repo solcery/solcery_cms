@@ -30,4 +30,8 @@ Master.loadAll = async function(connection: Connection) { //TODO Promise
   }
 }
 
+Master.onSolanaAccountChanged = function (connection: Connection, data: any) {
+  this.load(connection, data)
+}
+
 export { Master }

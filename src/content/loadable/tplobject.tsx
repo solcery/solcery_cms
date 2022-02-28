@@ -51,4 +51,8 @@ Master.toBinary = function() {
   ])
 }
 
+Master.onSolanaAccountChanged = function (connection: Connection, data: any) {
+
+}
+
 export { Master }

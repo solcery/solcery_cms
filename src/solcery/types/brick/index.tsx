@@ -1132,6 +1132,24 @@ basicBricks.push({ // TODO: reuse code
   }
 })
 
+basicBricks.push({
+  type: 2,
+  subtype: 15,
+  name: 'Set variable',
+  params: [
+    { id: 1, code: 'var_name', name: 'Var name', type: new SString() },
+    { id: 2, code: 'value', name: 'Value', type: new SBrick({ brickType: 2 }) }
+  ],
+  func: (params: any, ctx: any) => {
+    let varName = params.var_name
+    let value = params.value
+    ctx.vars[varName] = applyBrick(value, ctx)
+    return ctx.vars[varName]
+  }
+})
+
+
+
 for (let brick of basicBricks)
   solceryBricks.push(brick)
 
