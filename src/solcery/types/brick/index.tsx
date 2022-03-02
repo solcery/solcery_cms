@@ -1,5 +1,3 @@
-import Unity, { UnityContext } from "react-unity-webgl";
-import { Connection} from "@solana/web3.js";
 import React, { useState, useEffect } from "react";
 import { SType, SInt, SString, SBool } from "../index";
 import { Select, Button } from 'antd';
@@ -7,6 +5,19 @@ import { PublicKey } from "@solana/web3.js";
 import { BinaryReader, BinaryWriter } from 'borsh';
 import { solceryTypes } from '../solceryTypes'
 import { ValueRender, TypedataRender } from './components'
+
+const checkValidity: (brickTree: any) => boolean = (brickTree: any) => {
+  if (brickTree === undefined || brickTree === null)
+    return false
+  if (!brickTree.params)
+    return true
+  let result: boolean = true
+  for (let param of brickTree.params) {
+    result = result && checkValidity(param.value)
+  }
+  return result
+}
+
 
 export class SBrick extends SType {
   id = 6;
@@ -97,6 +108,10 @@ export class SBrick extends SType {
     return result
   };
 
+  validate = (value: any, object: any) => {
+    return checkValidity(value)
+  }
+
   writeConstructed = (value: ConstructedBrick, writer: BinaryWriter) => { 
     var brickSignature = getBrickSignature(value.type, value.subtype)
     if (!brickSignature) {
@@ -116,12 +131,9 @@ export class SBrick extends SType {
   };
 
   construct = (value: Brick, project: any) => {
-    // console.log('construct brick')
     let result: any[] = []
     let constructedParams: any[] = []
     let brickSignature = getBrickSignature(value.type, value.subtype)
-    // console.log(value.type + ' ' + value.subtype)
-    // console.log(brickSignature)
     if (!brickSignature) {
       return {
         name: "unknown brick",
@@ -182,6 +194,7 @@ solceryTypes.set(6, SBrick)
 export const basicBricks: BrickSignature[] = [];
 export const customBricks: BrickSignature[] = [];
 export const solceryBricks: BrickSignature[] = [];
+export const customBricksMap: any = {};
 
 
 export const getParamSignatureById = (brickSignature: BrickSignature, paramId: number) => {
@@ -280,8 +293,6 @@ export type BrickSignature = {
   func: any,
 }
 
-
-
 export const applyBrick: (brick: any, ctx: any) => any = (brick: any, ctx: any) => {
   let params: any = {}
   for (let param of brick.params) {
@@ -302,137 +313,6 @@ export const applyBrick: (brick: any, ctx: any) => any = (brick: any, ctx: any) 
   return brickSignature.func(params, ctx)
 }
 
-
-function brickSignatureToBrickConfig(brick: BrickSignature) {
-  var Slots = []
-  var lastField = {
-    HasField: false,
-    FieldType: 0,
-    FieldName: "",
-  }
-  for (var brickParam of brick.params) {
-    if (brickParam.type instanceof SBrick) {
-      var paramBrick = brickParam.type as SBrick
-      Slots.push({
-        Type: paramBrick.brickType,
-        Name: brickParam.name
-      })
-    }
-    else {
-      lastField.HasField = true
-      lastField.FieldType = (brickParam.type instanceof SInt) ? 0 : 1
-      lastField.FieldName = brickParam.name
-    }
-  }
-  return {
-    Name: brick.name,
-    Type: brick.type,
-    Subtype: brick.subtype,
-    Description: brick.description,
-    HasField: lastField.HasField,
-    FieldType: lastField.FieldType,
-    FieldName: lastField.FieldName,
-    HasObjectSelection: false,
-    Slots: Slots
-  }
-}
-
-export type OldBrick = {
-  Type: number,
-  Subtype: number,
-  HasField: boolean,
-  IntField: number,
-  StringField: string | null,
-  Slots: OldBrick[],
-}
-
-export function oldBrickToBrick(oldBrick: OldBrick) {
-  let brickSignature = getBrickSignature(oldBrick.Type, oldBrick.Subtype)
-  if (!brickSignature)
-    throw new Error("Unknown brick")
-  var result: Brick = {
-    type: oldBrick.Type,
-    subtype: oldBrick.Subtype,
-    params: [],
-  }
-  let params: any[] = []
-  var paramId = 1
-  if (oldBrick.HasField) {
-    params.push({
-      id: paramId,
-      value: oldBrick.StringField ? oldBrick.StringField : oldBrick.IntField,
-      type: oldBrick.StringField ? new SString() : new SInt()
-    })
-    paramId++;
-  }
-  for (var slot of oldBrick.Slots) {
-    params.push({
-      id: paramId,
-      type: new SBrick({ brickType: slot.Type }),
-      value: oldBrickToBrick(slot),
-    })
-    paramId++;
-  }
-  result.params = params
-  return result
-}
-
-export function getBrickConfigs(bricks: any) {
-  var actions = []
-  var conditions = []
-  var values = []
-  for (var brickSignature of bricks) {
-    var brickConfig = brickSignatureToBrickConfig(brickSignature)
-    if (brickConfig.Type == 0)
-      actions.push(brickConfig)
-    if (brickConfig.Type == 1)
-      conditions.push(brickConfig)
-    if (brickConfig.Type == 2)
-      values.push(brickConfig)
-  }
-  return {
-    ConfigsByType: {
-      Action: actions,
-      Condition: conditions,
-      Value: values,
-    }
-  }
-}
-
-export const brickToOldBrick = (brick: Brick) => { // TODO: construct??
-  var result: OldBrick = {
-    Type: brick.type,
-    Subtype: brick.subtype,
-    HasField: false,
-    IntField: 0,
-    StringField: null,
-    Slots: [],
-  }
-  var brickSignature = getBrickSignature(brick.type, brick.subtype)
-  if (!brickSignature) {
-    let res: OldBrick = brickToOldBrick(defaultBricksByType.get(brick.type))
-    return res
-  }
-  for (var param of brick.params) {
-    var paramSignature = getParamSignatureById(brickSignature, param.id)
-    if (paramSignature) {
-      if (paramSignature.type instanceof SInt) {
-        result.HasField = true
-        result.IntField = param.value
-        result.StringField = null
-      }
-      if (paramSignature.type instanceof SString) {
-        result.HasField = true
-        result.StringField = param.value
-        result.IntField = 0
-      }
-      if (paramSignature.type instanceof SBrick) {
-        result.Slots.push(brickToOldBrick(param.value))
-      } 
-    }
-  }
-  return result
-}
 
 // const snakeCase = (string: string) => {
 //     return string.replace(/\W+/g, " ")
@@ -477,7 +357,9 @@ export const updateCustomBricks = (src: BrickSignature[]) => {
 }
 
 export const addCustomBrick = (brick: BrickSignature) => {
-  customBricks.push(brick)
+  let key = 'b' + brick.type + '-' + brick.subtype
+  customBricksMap[key] = brick
+  let customBricks = Object.values(customBricksMap).map(brick => brick as BrickSignature)
   customBricks.sort(aplhabetSortBricks)
   solceryBricks.length = 0
   for (let brick of basicBricks)

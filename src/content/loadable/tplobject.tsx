@@ -23,10 +23,12 @@ Master.fromBinary = function(data: any) {
   var rawData = reader.readFixedArray(dataLength)
   for (let fieldOffset of fieldOffsets) {
     var field = template.fields[fieldOffset.id]
-    var rawFieldData = Buffer.from(rawData.subarray(fieldOffset.start, fieldOffset.end))
-    var valueReader = new BinaryReader(rawFieldData)
-    var stype = field.fieldType
-    this.fields[field.code] = stype.readValue(valueReader)
+    if (field) {
+      var rawFieldData = Buffer.from(rawData.subarray(fieldOffset.start, fieldOffset.end))
+      var valueReader = new BinaryReader(rawFieldData)
+      var stype = field.fieldType
+      this.fields[field.code] = stype.readValue(valueReader)
+    }
   }
 }
 
@@ -52,7 +54,7 @@ Master.toBinary = function() {
 }
 
 Master.onSolanaAccountChanged = function (connection: Connection, data: any) {
-
+  this.fromBinary(data)
 }
 
 export { Master }

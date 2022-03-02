@@ -170,8 +170,6 @@ export const TemplateView = () => {
     if (!storage)
       return
     let subscriptionId = storage.addEventSubscription('onLoaded', (storage: any) => {
-      console.log('ON LOADED')
-      console.log(template.getObjects())
       setObjects(template.getObjects())
     })
     // return () => {

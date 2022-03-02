@@ -31,6 +31,8 @@ export class SType {
 
   writeType: (writer: BinaryWriter) => void = () => {};
 
+  validate: (value: any, object: any) => boolean = () => true;
+
   readConstructed = this.readValue;
   writeConstructed = this.writeValue;
   toObject = (value: any) => { return value }

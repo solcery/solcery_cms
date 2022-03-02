@@ -69,11 +69,12 @@ export default function Brick(props: {
 					<div>{param.name}</div>
 					<param.type.valueRender 
 						defaultValue={brick.params[param.id]} 
-						onChange={(value: any) => {
+						onChange={ !props.data.readonly ?
+						(value: any) => {
 							brick.params[param.id] = value
 							props.data.onChange()
-						}
-					} />
+						} : null } 
+					/>
 				</div>
 			)}
 			{props.data.parentBrick &&

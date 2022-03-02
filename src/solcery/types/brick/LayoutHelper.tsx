@@ -1,11 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useStoreState } from 'react-flow-renderer';
-
-let lastNodeSizesByIDJSON: any = null;
 
 export default function LayoutHelper(props: {
 	onNodeSizesChange: (nodeSizesByID: any) => void
 }) {
+
+	const [ lastNodeSizesByIDJSON, setLastNodeSizesByIDJSON ] = useState('')
 	const nodes = useStoreState((state) => state.nodes);
 	useEffect(() => {
 		const nodeSizesByID: any = {};
@@ -17,7 +17,7 @@ export default function LayoutHelper(props: {
 		if (allSizesAreValid) {
 			const nodeSizesByIDJSON = JSON.stringify(nodeSizesByID);
 			if (nodeSizesByIDJSON !== lastNodeSizesByIDJSON) {
-				lastNodeSizesByIDJSON = nodeSizesByIDJSON;
+				setLastNodeSizesByIDJSON(nodeSizesByIDJSON)
 				props.onNodeSizesChange(nodeSizesByID);
 			}
 		}

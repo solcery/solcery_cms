@@ -6,7 +6,7 @@ import { construct, projectPublicKey, projectStoragePublicKey } from "../../solc
 import { useParams, useHistory } from "react-router-dom";
 import Unity, { UnityContext } from "react-unity-webgl";
 import { Button, Layout, InputNumber, Collapse, Divider, Space, Input } from "antd";
-import { applyBrick, brickToOldBrick, oldBrickToBrick } from "../../solcery/types/brick";
+import { applyBrick } from "../../solcery/types/brick";
 import { GameState } from "../../solcery/game"
 import { Project } from "../../solcery/classes"
 import { ConstructedContent } from "../../solcery/content"

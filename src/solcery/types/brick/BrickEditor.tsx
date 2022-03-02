@@ -23,9 +23,6 @@ export const BrickEditor = (props: {
 	brickTree?: any,
 	onChange?: (brickTree: any) => void
 }) => {
-
-	const [ valid, setValid ] = useState(true)
-
 	const [ active, setActive ] = useState(false)
 	let width = active ? window.innerWidth : props.width;
 	let height = active ? window.innerHeight : props.height;
@@ -66,9 +63,14 @@ export const BrickEditor = (props: {
 	}
 
 	const [ state, setState ] = useState <any> ({ elements: [], isLayouted: false });
-	const [ brickTree, brickTreeSet ] = useState<any>(reformat2(props.brickTree));
-	const [ redraw, setRedraw ] = useState(true);
+	const [ BRICK_TREE, BRICK_TREE_SET ] = useState<any>({ tree: reformat2(props.brickTree)});
+	const [ brickTree, brickTreeSet ] = useState<any>(reformat2(props.brickTree))
 	const { fitView } = useZoomPanHelper()
+
+	const reset = () => {
+		setBrickTree(reformat2(props.brickTree))
+		BRICK_TREE_SET({ tree: reformat2(props.brickTree)})
+	}
 
 	const setBrickTree = (brickTree: any) => {
 		brickTreeSet(brickTree)
@@ -76,28 +78,8 @@ export const BrickEditor = (props: {
 	}
 
 	const onChange = (brickTree: any) => {
-		if (props.onChange) {
-			let isValid = checkCompleteness(brickTree)
-			setValid(isValid)
-			if (isValid) {
-		 		props.onChange(reformat(brickTree));
-		 	}
-		}
+		BRICK_TREE.tree = brickTree
 	}
-
-	const checkCompleteness: (brickTree: any) => boolean = (brickTree: any) => {
-		if (brickTree === undefined || brickTree === null)
-			return false
-		if (!brickTree.params)
-			return true
-		let result: boolean = true
-		for (let param of Object.values(brickTree.params)) {
-			result = result && checkCompleteness(param)
-		}
-		return result
-	}
-
-
 
 	const addBrick = useCallback((brickSignature: any, bt: any, parentBrick: any, paramID: number) => {
 		if (!props.onChange || !active) return;
@@ -163,11 +145,9 @@ export const BrickEditor = (props: {
 				paramID,
 				onBrickSubtypeSelected: addBrick,
 				onPaste: onPaste,
-				onChange: () => { if (props.onChange) props.onChange(brickTree) },
-				readonly: !active || !props.onChange,
 			}
 		};
-	}, [ active, props.brickSignatures, props.brickClass, addBrick, onPaste]);
+	}, [ brickTree, active, props.brickSignatures, props.brickClass, addBrick, onPaste]);
 
 	const makeAddButtonWithEdgeElements = useCallback((brickID: string, brickType: number, brickTree: any, parentBrick: any,
 														 parentBrickID: any, paramID: number) => {
@@ -196,11 +176,11 @@ export const BrickEditor = (props: {
 				paramID,
 				onRemoveButtonClicked: removeBrick,
 				onPaste: onPaste,
-				onChange: () => { onChange(bt) },
+				onChange: props.onChange ? () => { onChange(bt) } : null,
 				readonly: !active || !props.onChange,
 			}
 		}
-	}, [props.brickSignatures, props.brickClass, removeBrick, onPaste]);
+	}, [brickTree, props.brickSignatures, props.brickClass, removeBrick, onPaste]);
 
 	const makeBrickWithEdgeElements = useCallback((brickID: string, brick: any, brickTree: any, parentBrick: any,
 													 parentBrickID: any, paramID: number) => {
@@ -287,8 +267,20 @@ export const BrickEditor = (props: {
 		})()
 	}
 
-	const changeActive = () => {
-		setActive(!active)
+	const enable = () => {
+		setActive(true)
+	}
+
+	const save = () => {
+		if (props.onChange && active && save) {
+			props.onChange(reformat(BRICK_TREE.tree))
+		}
+		setActive(false)
+	}
+
+	const cancel = () => {
+		reset()
+		setActive(false)
 	}
 
 	let style = {
@@ -305,9 +297,10 @@ export const BrickEditor = (props: {
 
 	return (
 	<>
-	  <div onClick={() => { if (!active) changeActive() }}>
+	  <div onClick={!active ? enable : undefined}>
 		<div style={style}>
-		  {active && (!props.onChange || valid) && (<Button onClick = {() => { if (active) changeActive(); } }>OK</Button>)}
+		  {active && <Button onClick = {save}>OK</Button>}
+		  {active && <Button onClick = {cancel}>Cancel</Button>}
 			<div ref={editorRef} className="brick-editor" style={{ 
 				width: width, 
 				height: height 

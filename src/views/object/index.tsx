@@ -35,6 +35,7 @@ export const ObjectView = () => {
   const { wallet, publicKey } = useWallet();
   var [ object, setObject ] = useState<any>(undefined);
   const [ fields, setFields ] = useState<any>(undefined)
+  const [ revision, setRevision ] = useState(0)
   var [ template, setTemplate ] = useState<any>(undefined);
   let history = useHistory();
   var objectPublicKey = new PublicKey(objectId)
@@ -60,13 +61,12 @@ export const ObjectView = () => {
           data,
         ]),
       });
-      await sendTransaction(connection, wallet, [saveAccountIx], [], true).then(() => {  // TODO: remove hardcode
+      await sendTransaction(connection, wallet, [saveAccountIx], [], true, () => { history.push('/template/' + templateKey) }).then(() => {  // TODO: remove hardcode
         notify({ message: "Object saved successfully", description: objectId })
       },
       () => {
         notify({ message: "Object saving error", description: objectId })
       })
-
       return true
     }
     else {
@@ -91,32 +91,39 @@ export const ObjectView = () => {
     }
   }
 
-
   const saveObject = async () => {
     if (!object || !template || !project)
       return;
+
+    let newFields: any = {}
+    Object.values(fields).forEach((field:any) => {
+      if (field.value)
+        newFields[field.field.code] = field.value
+    })
     let oldFields = object.fields
-    object.fields = fields
+    object.fields = newFields
     let data = object.toBinary()
+
     object.fields = oldFields
+
     if (data.length < 700) {
       if (!publicKey || wallet === undefined)
         return;
-        const saveObjectIx = new TransactionInstruction({
-          keys: [
-            { pubkey: publicKey, isSigner: true, isWritable: false },
-            { pubkey: project.pubkey, isSigner: false, isWritable: false },
-            { pubkey: objectPublicKey, isSigner: false, isWritable: true },
-          ],
-          programId: programId,
-          data: Buffer.concat([ Buffer.from([1, 1]), data]),
-        });
-        await sendTransaction(connection, wallet, [saveObjectIx], [], true).then(() => {
-          notify({ message: "Object saved successfully", description: objectId })
-        },
-        () => {
-          notify({ message: "Object saving error", description: objectId })
-        })
+      const saveObjectIx = new TransactionInstruction({
+        keys: [
+          { pubkey: publicKey, isSigner: true, isWritable: false },
+          { pubkey: project.pubkey, isSigner: false, isWritable: false },
+          { pubkey: objectPublicKey, isSigner: false, isWritable: true },
+        ],
+        programId: programId,
+        data: Buffer.concat([ Buffer.from([1, 1]), data]),
+      });
+      await sendTransaction(connection, wallet, [saveObjectIx], [], true, () => { history.push('/template/' + templateKey) }).then(() => {
+        notify({ message: "Object saved successfully", description: objectId })
+      },
+      () => {
+        notify({ message: "Object saving error", description: objectId })
+      })
     } else {
       setAccountData(objectPublicKey, data, 33 + 36)
     }
@@ -137,41 +144,50 @@ export const ObjectView = () => {
   useEffect(() => {
     if (!object)
       return;
-    setFields(JSON.parse(JSON.stringify(object.fields)))
+    let fields: any = {}
+    Object.values(template.fields).forEach((field: any) => {
+      let value = object.fields[field.code]
+      fields[field.code] = {
+        field: field,
+        value: value ? JSON.parse(JSON.stringify(value)) : undefined,
+        valid: true,
+      }
+    })
+    setFields(fields)
+
   }, [ object ]);
 
   const setFieldValue = (code: string, value: any) => {
     if (!object)
       return;
-    fields[code] = value;
+    fields[code] = {
+      key: code,
+      value: value,
+      field: fields[code].field,
+      valid: fields[code].field.fieldType.validate(value, object),
+    }
+    setRevision(revision + 1)
   }
 
-  if (object && template && fields) {
-    var objectData = Object.values(template.fields).map((field: any) => {
-      return { 
-        key: field.id,
-        fieldName: field.name,
-        field: field,
-      }
-    })
+  if (fields) {
+    var objectData = Object.values(fields).map((objField: any) => objField)
     return (
       <div style={ { width: '100%' } } >
-        <p>{ 'Object [ ' + object.id + ' ]' }</p>
+        <p>{'[ ' + object.intId + ' ] ' + object.id}</p>
         <Table dataSource={objectData} pagination={false}>
-            <Column title="Field" dataIndex="fieldName" key="fieldName"/>
             <Column
-              title="Value"
-              key="value"
-              render={(text, record: any) => React.createElement(
-                  record.field.fieldType.valueRender,
-                  { 
-                    type: record.field.fieldType,
-                    defaultValue: fields[record.field.code], 
-                    onChange: (newValue: any) => {
-                      setFieldValue(record.field.code, newValue) 
-                    } 
-                  }
-                )
+              title="Field" key="field"
+              render={(text, record: any) => <p style = {!record.valid ? { color: 'red' } : undefined}>{record.field.name}</p>}
+            />
+            <Column
+              title="Value" key="value"
+              render={(text, record: any) => <record.field.fieldType.valueRender  
+                type={record.field.fieldType}
+                defaultValue={record.value} 
+                onChange= {(newValue: any) => {
+                  setFieldValue(record.field.code, newValue) 
+                }}
+              />     
               }
             />
           </Table>
@@ -182,7 +198,7 @@ export const ObjectView = () => {
 
   return (
     <div>
-      Loading
+      Loading ...
     </div>
   );
 };

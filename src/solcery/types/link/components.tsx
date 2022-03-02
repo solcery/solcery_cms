@@ -10,48 +10,33 @@ import { PublicKey } from "@solana/web3.js";
 export const ValueRender = (props: any) => {
 
   const connection = useConnection();
+  const { project } = useProject();
+  const [ template, setTemplate ] = useState<any>(undefined);
   const { Option } = Select;
-  var [ objects, setObjects] = useState<TplObject[]>([]);
-  var [ object, setObject ] = useState<TplObject|undefined>();
 
   useEffect(() => { 
-    if (!props.readonly && objects.length == 0) {
-      (async () => {
-        const tpl = await TemplateData.get(connection, props.type.templatePublicKey)
-        const storages = await Storage.getAll(connection, tpl.storages)
-        var objectsToLoad: PublicKey[] = []
-        for (let storage of storages) {
-          objectsToLoad = objectsToLoad.concat(storage.accounts)
-        }
-        setObjects(await tpl.getObjects(connection, objectsToLoad))
-      })()
-    }
-    if (props.defaultValue && object === undefined) {
-      (async () => {
-        const tpl = await TemplateData.get(connection, props.type.templatePublicKey)
-        var obj = await tpl.getObject(connection, props.defaultValue)
-        setObject(obj)
-      })()
-    }
-  });
+    setTemplate(project.getTemplate(props.type.templatePublicKey))
+  }, [ project ]);
 
-  if (!props.onChange) {
-    return (<a href={'/#/object/'+ props.defaultValue?.toBase58()}>{ object ? object.getName() : props.defaultValue?.toBase58() }</a>)
+
+  if (!props.onChange && project) {
+    let object = project.childrenById[props.defaultValue]
+    return (<a href={'/#/object/'+ props.defaultValue?.toBase58()}>{ object ? object.fields.name : props.defaultValue?.toBase58() }</a>)
   }
 
-  if (objects) {
+  if (template) {
     return (
       <Select defaultValue={ props.defaultValue ? props.defaultValue.toBase58() : 'None' } onChange={(objectKey) => { 
         props?.onChange && props.onChange(objectKey != 'None' ? new PublicKey(objectKey) : undefined)
       }}>
       <Option key='none' value='None'>None</Option>
-      {objects.map( (obj) => {
-        return (<Option key={obj.publicKey.toBase58()} value={ obj.publicKey.toBase58()}>{ obj.getName() }</Option>) //TODO
+      {template.getObjects().map( (obj: any) => {
+        return (<Option key={obj.publicKey.toBase58()} value={ obj.publicKey.toBase58()}>{ obj.fields.name }</Option>) //TODO
       })} 
       </Select>
     )
   }
-  return (<div></div>)
+  return (<></>)
 }
 
 export const TypedataRender = (props: { 
@@ -86,7 +71,7 @@ export const TypedataRender = (props: {
       </Select>
     )
   }
-  return (<div></div>)
+  return (<></>)
 }
 
 export const NameRender = (props: { 

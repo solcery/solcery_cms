@@ -6,7 +6,7 @@ import { useConnection } from "../../../contexts/connection"
 import ReactFlow, { ReactFlowProvider } from 'react-flow-renderer';
 import { BrickEditor } from './BrickEditor';
 import React, { useState, useEffect } from "react";
-import { OldBrick, oldBrickToBrick, getBrickConfigs, brickToOldBrick, getBricks } from "./index"
+import { getBricks } from "./index"
 import { Select, Button, Modal } from 'antd';
 import { SInt, SString, ValueRenderParams, SBrick } from '../index'
 
