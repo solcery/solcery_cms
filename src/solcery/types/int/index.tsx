@@ -44,12 +44,9 @@ declare module "borsh" {
 };
 
 
-
-
 export class SInt extends SType {
   id = 2;
   static typename = "Integer";
-  typename = "Integer";
   valueRender = ValueRender;
   sorter = (a: number | undefined, b: number | undefined) => { if (!a) a = 0; if (!b) b = 0; return a - b }
 

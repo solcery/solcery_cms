@@ -10,15 +10,15 @@ import { ValueRender, TypedataRender, NameRender } from "./components"
 export class SLink extends SType {
   id = 5;
   static typename = "Link";
-  typename = "Link";
+  valueRender = ValueRender;
 
   templatePublicKey: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz');
   
   readValue = (reader: BinaryReader) => { 
     return reader.readPubkey() 
   }
-  writeValue = (value: string, writer: BinaryWriter) => { 
-    writer.writePubkey(new PublicKey(value)) 
+  writeValue = (value: PublicKey, writer: BinaryWriter) => { 
+    writer.writePubkey(value) 
   }
   readConstructed = (reader: BinaryReader) => {
     return reader.readU32()
@@ -32,8 +32,7 @@ export class SLink extends SType {
   constructor(src: { templatePublicKey: PublicKey }) {
   	super()
   	this.templatePublicKey = src.templatePublicKey;
-    this.nameRender = <NameRender templatePublicKey={ src.templatePublicKey }/>; //TOD: name
-    this.valueRender = ValueRender;
+    
   }
 
   static readType = (reader: BinaryReader) => {
@@ -43,6 +42,8 @@ export class SLink extends SType {
   writeType = (writer: BinaryWriter) => {
   	writer.writePubkey(this.templatePublicKey)
   }
+
+  cloneValue = (value: PublicKey) => new PublicKey(value)
 
   construct = (value: any, project: any) => {
     let obj = project.childrenById[value.toBase58()]

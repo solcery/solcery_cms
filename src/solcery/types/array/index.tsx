@@ -7,13 +7,12 @@ import { Connection } from "@solana/web3.js";
 export class SArray extends SType {
   id = 7;
   static typename = "Array";
-  typename = "Array";
   subtype: SType;
 
   valueRender = ValueRender;
   static typedataRender = TypedataRender;
 
-   constructor(src: { subtype: SType }) {
+  constructor(src: { subtype: SType }) {
     super()
     this.subtype = src.subtype;
     this.nameRender = (<p>Array: {this.subtype.nameRender}</p>); 
@@ -49,6 +48,8 @@ export class SArray extends SType {
     return new SArray({ subtype: reader.readSType() })
   }
 
+  cloneValue = (value: any[]) => value.map((v) => this.subtype.cloneValue(v))
+  
   writeType = (writer: BinaryWriter) => {
     writer.writeSType(this.subtype)
   }

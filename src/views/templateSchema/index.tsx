@@ -28,13 +28,17 @@ type TemplateSchemaViewParams = {
   templateKey: string;
 };
 
+
+
 export const TemplateSchemaView = () => {
 
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
   let { templateKey } = useParams<TemplateSchemaViewParams>();
   let { project } = useProject();
-  var [ template, setTemplate ] = useState<TemplateData | undefined>()
+  
+  var [ template, setTemplate ] = useState<any>(undefined)
+  var [ templateData, setTemplateData ] = useState<any>(undefined)
   var [ revision, setRevision ] = useState(0)
 
   const newStorage = async () => {
@@ -65,35 +69,48 @@ export const TemplateSchemaView = () => {
   }
 
   const update = () => {
-    if (!project || !template)
+    if (!project || !template || !templateData)
       return
     if (!publicKey || wallet === undefined) {
       return;
     }
-    var buf = Buffer.from(serialize(SolcerySchema, template))
+    let oldValues = {
+      name: template.name,
+      code: template.code,
+      customData: template.customData,
+      fields: template.fields,
+      maxFieldIndex: template.maxFieldIndex,
+    }
+    Object.assign(template, templateData)
+    try { JSON.parse(templateData.customDataJSON) } catch { throw new Error("Custom data is not a valid JSON") }
+    template.customData = template.customDataJSON
+    var buf = template.toBinary()
+    Object.assign(template, oldValues)
       // let newProjectKey = new PublicKey("J5kfxFrjjouSb3MmScWXMUAYRqkjnbZ8zzaCokVdAv2h")
     const changeNameIx = new TransactionInstruction({
       keys: [
         { pubkey: publicKey, isSigner: true, isWritable: false },
-        { pubkey: project.publicKey, isSigner: false, isWritable: false },
-        { pubkey: template.publicKey, isSigner: false, isWritable: true },
+        { pubkey: project.pubkey, isSigner: false, isWritable: false },
+        { pubkey: template.pubkey, isSigner: false, isWritable: true },
       ],
       programId: programId,
-      data: Buffer.concat([Buffer.from([0, 5]), buf]),
+      data: Buffer.concat([ Buffer.from([0, 5]), Buffer.from(buf) ]),
     });
     sendTransaction(connection, wallet, [changeNameIx], [])
   }
 
   const addField = async() => {
-    if (!template)
+    if (!templateData)
       return
-    template.fields.push(new TemplateField({
-       id: template.maxFieldIndex + 1, 
-       code: 'newTemplateField', 
+    let id = templateData.maxFieldIndex + 1
+    templateData.fields[id] = {
+       id: id,
+       code: 'field' + id, 
        fieldType: new SInt(), 
-       name: 'New template field'
-    }));
-    template.maxFieldIndex++;
+       name: 'Field ' + id, 
+    };
+    templateData.maxFieldIndex++;
+    console.log(templateData)
     setRevision(revision + 1)
   }
 
@@ -110,45 +127,47 @@ export const TemplateSchemaView = () => {
   }
 
   const setFieldParam = (fieldId: number, param: string, value: any) => {
-    if (!template)
+    if (!templateData)
       return
-    let field = template.fields[fieldId]
+    let field = templateData.fields[fieldId]
     if (!field)
       return
-    if (param === 'code')
-      field.code = value
-    if (param === 'name')
-      field.name = value
-    if (param === 'fieldType')
-      field.fieldType = value
+    field[param] = value
     setRevision(revision + 1)
   }
 
   useEffect(() => { 
-    if (project) {
-      (async () => {
-        let template = project.getTemplate(templateKey)
-        setTemplate(await template.await(connection))
-      })()
-    }
+    if (!project) return;
+    setTemplate(project.getTemplate(templateKey))
   }, [ project ]);
 
-  if (template) {
-    let tableData: any[] = []
-    for (let field of Object.values(template.fields)) {
-      tableData.push({
-        key: '' + template.id + '.' + field.id,
+  useEffect(() => {
+    if (!template) return;
+    console.log(template)
+    setTemplateData({
+      name:template.name,
+      code: template.code,
+      maxFieldIndex: template.maxFieldIndex,
+      fields: Object.assign({}, template.fields),
+      customDataJSON: JSON.stringify(template.customData),
+    })
+  }, [ template ]);
+
+  if (templateData) {
+    let tableData = Object.values(templateData.fields).map((field: any) => {
+      return {
+        key: field.id,
         id: field.id,
         fieldType: field.fieldType,
         name: field.name,
         code: field.code,
-      })
-    }
+      }
+    })
 
     return (
       <div style = { { width: '100%' } }>
-        Name: <Input defaultValue={template.name} onChange={(e) => { if (template) template.name = e.target.value }}/>
-        Code: <Input defaultValue={template.code} onChange={(e) => { if (template) template.code = e.target.value }}/>
+        Name: <Input defaultValue={templateData.name} onChange={(e) => { if (templateData) templateData.name = e.target.value }}/>
+        Code: <Input defaultValue={templateData.code} onChange={(e) => { if (templateData) templateData.code = e.target.value }}/>
         <Table dataSource={tableData} pagination={false}>
           <Column title="ID" dataIndex="id" key="fieldId"/>
           <Column 
@@ -157,11 +176,7 @@ export const TemplateSchemaView = () => {
             render={(text, record: any) => <Input 
               defaultValue={record.name}
               onChange={(event) => { 
-                if (template) {
-                  let field = template?.getField(record.id); 
-                  if (field)
-                    field.name = event.target.value 
-                }
+                setFieldParam(record.id, 'name', event.target.value)
               }}
             />}
           />
@@ -171,17 +186,13 @@ export const TemplateSchemaView = () => {
             render={(text, record: any) => <Input 
               defaultValue={record.code}
               onChange={(event) => { 
-                if (template) {
-                  let field = template?.getField(record.id); 
-                  if (field)
-                    field.code = event.target.value 
-                }
+                setFieldParam(record.id, 'code', event.target.value)
               }}
             />}
           />
           <Column
             title="Type"
-            key="fieldTyp"
+            key="fieldType"
             render={(text, record: any) => <TypeSelector defaultValue={record.fieldType} onChange={(value) => { 
               setFieldParam(record.id, 'fieldType', value)
             }}/>}
@@ -194,10 +205,9 @@ export const TemplateSchemaView = () => {
             )}
           />
         </Table>
-        <TextArea rows={4} defaultValue={template && template.customData} onChange={(e) => { 
-          if (template) {
-            template.customData = e.target.value
-            console.log(template)
+        <TextArea rows={4} defaultValue={templateData && templateData.customDataJSON} onChange={(e) => { 
+          if (templateData) {
+            templateData.customDataJSON = e.target.value
           }
         }} />
         <Button onClick={addField}>Add field</Button>

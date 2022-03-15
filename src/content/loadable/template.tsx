@@ -1,6 +1,6 @@
-import { deserializeUnchecked } from 'borsh';
+import { deserializeUnchecked, BinaryWriter, serialize } from 'borsh';
 import { PublicKey, Connection } from "@solana/web3.js";
-import { schema, TemplateData } from './schema';
+import { schema, TemplateData, TemplateFieldData} from './schema';
 import { Storage } from '../storage';
 import { TplObject } from '../tplobject';
 import { addCustomBrick, exportBrick } from '../../solcery/types'
@@ -16,6 +16,7 @@ Master.fromBinary = function(data: any) {
     this.fields[fieldData.id] = fieldData
   })
   this.maxFieldIndex = src.maxFieldIndex;
+  this.customDataJSON = src.customData
   this.customData = src.customData != '' ? JSON.parse(src.customData) : {}
   let storagePubkey = src.storages[0] //TODO: multiple storages
   this.storage = this.create(Storage, {
@@ -23,6 +24,15 @@ Master.fromBinary = function(data: any) {
     pubkey: src.storages[0],
     storedClass: TplObject,
   })
+}
+
+Master.toBinary = function() {
+  let templateData = new TemplateData(this)
+  templateData.storages = [ this.storage.pubkey ] 
+  templateData.fields = Object.values(this.fields).map((field: any) => new TemplateFieldData(field))
+  return serialize(schema, templateData)
+  
+  // this.fields.map((field: any) => new TemplateFieldData(field));
 }
 
 Master.onLoad = async function(connection: Connection) {

@@ -26,12 +26,12 @@ export const ValueRender = (props: any) => {
 
   if (template) {
     return (
-      <Select defaultValue={ props.defaultValue ? props.defaultValue.toBase58() : 'None' } onChange={(objectKey) => { 
+      <Select defaultValue={ (props.defaultValue && props.defaultValue.toBase58 )? props.defaultValue.toBase58() : 'None' } onChange={(objectKey) => { 
         props?.onChange && props.onChange(objectKey != 'None' ? new PublicKey(objectKey) : undefined)
       }}>
       <Option key='none' value='None'>None</Option>
       {template.getObjects().map( (obj: any) => {
-        return (<Option key={obj.publicKey.toBase58()} value={ obj.publicKey.toBase58()}>{ obj.fields.name }</Option>) //TODO
+        return (<Option key={obj.pubkey.toBase58()} value={ obj.pubkey.toBase58()}>{ obj.fields.name }</Option>) //TODO
       })} 
       </Select>
     )
@@ -47,47 +47,31 @@ export const TypedataRender = (props: {
   const { Option } = Select;
   const { project } = useProject()
 
-  var [ templates, setTemplates ] = useState<TemplateData[]>([]);
-  useEffect(() => { 
-    if (!project)
-      return
-    (async () => {
-      let strg = await Storage.get(connection, project.templateStorage)
-      var tpls = await TemplateData.getAll(connection, strg.accounts)
-      props.onChange && props.onChange(new SLink({templatePublicKey: tpls[0].publicKey}))
-      setTemplates(tpls)
-    })()
-  }, []);
-
-
-  if (templates.length > 0) {
-    return (
-      <Select defaultValue={ props.defaultValue ? props.defaultValue.templatePublicKey.toBase58() : templates[0].publicKey.toBase58() } onChange={(templateKey) => { 
-        props?.onChange && props.onChange(new SLink({templatePublicKey: new PublicKey(templateKey)})) 
-      }}>
-      {templates.map((tpl) => {
-        return (<Option key={tpl.publicKey.toBase58()} value={tpl.publicKey.toBase58()}>{tpl.name}</Option>)
-      })}
-      </Select>
-    )
-  }
-  return (<></>)
+  if (!project) return <></>
+  let templates = project.getTemplates()
+console.log(templates)
+console.log(props.defaultValue)
+console.log(templates[0])
+  return (
+    <Select defaultValue={ props.defaultValue ? props.defaultValue.templatePublicKey.toBase58() : templates[0].pubkey.toBase58() } onChange={(templateKey) => { 
+      props?.onChange && props.onChange(new SLink({ templatePublicKey: new PublicKey(templateKey) })) 
+    }}>
+    {templates.map((tpl: any) => 
+      <Option key={ tpl.pubkey.toBase58()} value={tpl.pubkey.toBase58() }>{tpl.name}</Option>
+    )}
+    </Select>
+  )
 }
 
 export const NameRender = (props: { 
   templatePublicKey: PublicKey,
 }) => {
-  const connection = useConnection();
-  var [ template, setTemplate ] = useState<TemplateData>();
+  const { project } = useProject()
 
-  useEffect(() => { 
-    if (!template)
-      (async () => {
-        setTemplate(await TemplateData.get(connection, props.templatePublicKey))
-      })()
-  });
-
+  if (!project) return <></>
+  let template = project.getTemplate(props.templatePublicKey)
+  if (!template) return <></>
   return (
-    <p>Link to: <a href = {'/#/template/'+props.templatePublicKey.toBase58()}>{ template ? template.name : props.templatePublicKey.toBase58() }</a></p>
+    <p>Link to: <a href = {'/#/template/' + props.templatePublicKey.toBase58()}>{ template ? template.name : props.templatePublicKey.toBase58() }</a></p>
   )
 }

@@ -5,7 +5,6 @@ import { ValueRender } from './components';
 export class SString extends SType {
   id = 3;
   static typename = 'String';
-  typename = 'String';
   
   valueRender = ValueRender;
   readValue = (reader: BinaryReader) => { return reader.readString() }

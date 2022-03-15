@@ -149,7 +149,7 @@ export const ObjectView = () => {
       let value = object.fields[field.code]
       fields[field.code] = {
         field: field,
-        value: value ? JSON.parse(JSON.stringify(value)) : undefined,
+        value: value ? field.fieldType.cloneValue(value) : undefined,
         valid: true,
       }
     })
