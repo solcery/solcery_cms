@@ -236,6 +236,10 @@ export const BrickEditor = (props: {
 	};
 
 	useEffect(() => {
+		brickTreeSet(reformat2(props.brickTree))
+	}, [ props.brickTree ])
+
+	useEffect(() => {
 		let elements = null;
 		if (brickTree) {
 			elements = makeBrickTreeElements(brickTree);

@@ -166,20 +166,20 @@ export const TemplateView = () => {
   }, [ template ]);
 
 
-  useEffect(() => {
-    if (!storage)
-      return
-    let subscriptionId = storage.addEventSubscription('onLoaded', (storage: any) => {
-      setObjects(template.getObjects())
-    })
-    // return () => {
-    //   storage.removeEventSubscription('onLoad', subscriptionId)
-    // };
-  }, [ storage ])
+  // useEffect(() => {
+  //   if (!storage)
+  //     return
+  //   let subscriptionId = storage.addEventSubscription('onLoaded', (storage: any) => {
+  //     setObjects(template.getObjects())
+  //   })
+  //   // return () => {
+  //   //   storage.removeEventSubscription('onLoad', subscriptionId)
+  //   // };
+  // }, [ storage ])
 
   if (objects)
   {
-    var tableData: any[] = []
+    let tableData: any[] = []
     for (let objectInfo of objects) {
       let name = objectInfo.fields.name
       if (filter === undefined || (name && name.toLowerCase().includes(filter.toLowerCase()))) {
@@ -208,17 +208,11 @@ export const TemplateView = () => {
             sorter = { field.fieldType.sorter && ((a: any, b: any) => { 
               return field.fieldType.sorter(a[field.id], b[field.id]) 
             }) }
-            render = {
-              (text, object: any) => {
-                return React.createElement(
-                  field.fieldType.valueRender,
-                  { 
-                    type: field.fieldType,
-                    defaultValue: object.fields[field.code], 
-                    readonly: true
-                  }
-                )
-              }
+            render = {(text, object: any) => <field.fieldType.valueRender 
+                type={field.fieldType}
+                defaultValue={object.fields[field.code]}
+                readonly={true}
+              />
             }
           />
         })}
