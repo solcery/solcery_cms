@@ -103,7 +103,7 @@ export const AccountView = () => {
     });
     await sendTransaction(connection, wallet, [createProjectAccountIx, createStorageAccountIx, createProjectIx], [projectAccount, storageAccount]).then(() => {
       cookies.set('projectKey', projectAccount.publicKey.toBase58())
-      history.push("/#/account/" + storageAccount.publicKey.toBase58());
+      history.push("/account/" + projectAccount.publicKey.toBase58());
     })
   }
 
