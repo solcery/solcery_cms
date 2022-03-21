@@ -9,10 +9,9 @@ Master.updateBricks = function() {
   var result: BrickSignature[] = []
   for (var tpl of this.getTemplates()) {
     if (tpl.customData !== '') {
-      var customParams = JSON.parse(tpl.customData)
-      if (customParams.exportBrick) {
+      if (tpl.customData.exportBrick) {
         var objects = tpl.getObjects()
-        let brickField = tpl.fields[customParams.exportBrick].code
+        let brickField = tpl.fields[tpl.customData.exportBrick].code
         for (let obj of objects) {
           let brick = obj.fields[brickField]
           if (brick) {
@@ -37,15 +36,13 @@ Master.construct = function(connection: Connection) {
   let customBricksSchema: ConstructedSchema | undefined = undefined;
   for (var template of templates) {
     let tpl = template.construct(connection)
-    if (template.customData === '') {
-      constructedTemplates.set(template.code, tpl)
+    if (template.customData.exportBrick) {
+      customBricksSchema = tpl.schema;
+      customBricks = new Map([...customBricks, ...tpl.objects.raw])
     }
     else {
-      let customData = JSON.parse(template.customData)
-      if (customData.exportBrick) {
-        customBricksSchema = tpl.schema;
-        customBricks = new Map([...customBricks, ...tpl.objects.raw])
-      }
+
+      constructedTemplates.set(template.code, tpl)
     }
   }
   if (customBricksSchema) {
