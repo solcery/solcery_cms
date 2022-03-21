@@ -203,8 +203,11 @@ export const BrickEditor = (props: {
 		const processBrick = (brick: any, parentBrickID: any = null, parentBrick: any = null, paramID: number = 0) => {
 			const brickID = Number(++brickUniqueID).toString();
 			elements.push(...makeBrickWithEdgeElements(brickID, brick, brickTree, parentBrick, parentBrickID, paramID));
-			const brickSignature = props.brickSignatures.find((bs: any) => bs.type === brick.type && bs.subtype === brick.subtype);
+			let brickSignature = props.brickSignatures.find((bs: any) => bs.type === brick.type && bs.subtype === brick.subtype);
 
+			if (!brickSignature) {
+				return elements;
+			}
 			brickSignature.params.forEach((param: any) => {
 				if (!(param.type instanceof props.brickClass)) return;
 
@@ -273,6 +276,7 @@ export const BrickEditor = (props: {
 
 	const save = () => {
 		if (props.onChange && active && save) {
+			console.log(BRICK_TREE.tree)
 			props.onChange(reformat(BRICK_TREE.tree))
 		}
 		setActive(false)

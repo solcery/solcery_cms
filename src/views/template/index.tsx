@@ -226,9 +226,9 @@ export const TemplateView = () => {
           title="Actions"
           key="actions"
           render={(text, object: any) =>
-          <div>
-            <Button onClick={() => { createObject(new PublicKey(object.pubkey)) }}>Copy</Button>  
-            <Button onClick={() => { deleteObject(new PublicKey(object.pubkey)) }}>Delete</Button>  
+          <div key={ 'actions.' + object.pubkey.toBase58() }>
+            <Button key={ 'copy.' + object.pubkey.toBase58() } onClick={() => { createObject(new PublicKey(object.pubkey)) }}>Copy</Button>  
+            <Button key={ 'delete.' + object.pubkey.toBase58() } onClick={() => { deleteObject(new PublicKey(object.pubkey)) }}>Delete</Button>  
           </div>} //TODO: delete: accountCleanup, confirmation
         />
       </Table>

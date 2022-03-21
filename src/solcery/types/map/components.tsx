@@ -27,16 +27,17 @@ export const ValueRender = (props: ValueRenderParams) => {
   return (
     <>
       {value.map((entry: any, index: number) => <div key={index}>
-      <mapType.keyType.valueRender 
-        defaultValue={entry.key}
-        type={mapType.keyType}
-        onChange={ (newValue: any) => { onChange(newValue, index, 'key') }}
-      />
-      <mapType.valueType.valueRender 
-        defaultValue={entry.value}
-        type={mapType.valueType}
-        onChange={ (newValue: any) => { onChange(newValue, index, 'value') }}
-      /></div>)}
+        <mapType.keyType.valueRender 
+          defaultValue={entry.key}
+          type={mapType.keyType}
+          onChange={ (newValue: any) => { onChange(newValue, index, 'key') }}
+        />
+        <mapType.valueType.valueRender 
+          defaultValue={entry.value}
+          type={mapType.valueType}
+          onChange={ (newValue: any) => { onChange(newValue, index, 'value') }}
+        />
+      </div>)}
       <Button onClick={addNewElement}>+</Button>
     </>
   );

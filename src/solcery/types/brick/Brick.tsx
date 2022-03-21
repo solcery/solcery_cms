@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Handle, Position } from 'react-flow-renderer';
+import { defaultBricksByType } from './index'
 
 export default function Brick(props: {
 	id: string,
@@ -8,11 +9,14 @@ export default function Brick(props: {
 
 	const brick = props.data.brick;
 	const brickClass = props.data.brickClass;
-	const brickSignature = props.data.brickSignatures.find((bs: any) => bs.type === brick.type && bs.subtype === brick.subtype);
-	
+	let brickSignature = props.data.brickSignatures.find((bs: any) => bs.type === brick.type && bs.subtype === brick.subtype);
+	if (!brickSignature) {
+		brickSignature = defaultBricksByType.get(brick.type)
+	}
 	let nestedParams: any[] = [];
 	let inlineParams: any[] = [];
 	brickSignature.params.forEach((param: any) => {
+
 		if (param.type instanceof brickClass) nestedParams.push(param);
 		else inlineParams.push(param);
 	});
@@ -59,7 +63,6 @@ export default function Brick(props: {
 			window.removeEventListener('keyup', onKeyUp);
 		};
 	});
-
 	return (
 		<div className={ props.data.readonly ? "brick" : "brick brick-active" } onPointerEnter={() => isHovered = true} onPointerLeave={() => isHovered = false}>
 			<div className={ props.data.readonly ? "remove-button" : "remove-button remove-button-active" } onClick={onRemoveButtonClicked}>x</div>

@@ -218,7 +218,7 @@ export const getBasicBrickSignature = (type: number, subtype: number) => { // TO
   }
 }
 
-let defaultBricksByType = new Map()
+export const defaultBricksByType = new Map()
 
 
 
@@ -588,7 +588,9 @@ basicBricks.push({
   subtype: 12,
   name: 'CreateEntity',
   params: [
-    { id: 1, code: 'card_type', name: 'Card type', type: new SInt() }, 
+    { id: 1, code: 'card_type', name: 'Card type', type: new SBrick({ brickType: 2 }) }, 
+    { id: 2, code: 'place', name: 'Place', type: new SBrick({ brickType: 2 }) }, 
+    { id: 3, code: 'action', name: 'Action', type: new SBrick({ brickType: 0 }) }, 
   ],
   func: (params: any, ctx: any) => {}
 })
