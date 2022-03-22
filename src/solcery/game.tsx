@@ -119,7 +119,7 @@ export class GameState {
         }
         if (cardType.action_on_init) {
           let ctx = new Context({ game: this, object: this.objects.get(cardId), extra: {} })
-          applyBrick(cardType.initializer, ctx)
+          applyBrick(cardType.action_on_init, ctx)
         }
 	      cardId++;
 	    }
