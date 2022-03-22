@@ -78,11 +78,11 @@ export class SMap extends SType {
     }
   })
 
-  construct = async (value: Map<any,any>, connection: Connection) => {
+  construct = async (value: Map<any,any>, project: any) => {
     let result: any
     value.forEach(async (v, k) => {
-      let constructedKey = await this.keyType.construct(k, connection)
-      let constructedValue = await this.valueType.construct(v, connection)
+      let constructedKey = await this.keyType.construct(k, project)
+      let constructedValue = await this.valueType.construct(v, project)
       result[constructedKey] = constructedValue
     })
     return result

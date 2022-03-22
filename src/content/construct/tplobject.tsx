@@ -5,7 +5,7 @@ import { Project } from '../project'
 
 let Master: any = {}
 
-Master.construct = function(connection: Connection) {
+Master.construct = function() {
   var data = new Map<number, any>();
   let tpl = this.parent.parent
   let project = this.root.getAll(Project)[0]

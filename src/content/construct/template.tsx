@@ -6,7 +6,7 @@ import { SInt, SLink, SArray } from '../../solcery/types'
 
 let Master: any = {}
 
-Master.construct = function(connection: Connection) {
+Master.construct = function() {
   let code = this.code
   let fields = new Map<number, ConstructedFieldData>();
   for (let fieldKey of Object.keys(this.fields)) {
@@ -23,7 +23,7 @@ Master.construct = function(connection: Connection) {
   let rawObjects = this.getObjects()
   for (let object of rawObjects) {
     if (object.fields.enabled) {
-      constructedObjects.set(object.id, object.construct(connection, this))
+      constructedObjects.set(object.id, object.construct())
     }
   }
 

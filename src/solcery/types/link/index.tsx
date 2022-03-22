@@ -49,6 +49,10 @@ export class SLink extends SType {
     let obj = project.childrenById[value.toBase58()]
     if (!obj)
       throw new Error('Error constructing SLink type!')
+    let customData = obj.parent.parent.customData
+    if (customData.linkKey) {
+      return obj.fields[customData.linkKey]
+    }
     return obj.intId
   }
 }

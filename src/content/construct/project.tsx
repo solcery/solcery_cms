@@ -25,7 +25,7 @@ Master.updateBricks = function() {
 }
 
 
-Master.construct = function(connection: Connection) {
+Master.construct = function() {
   this.updateBricks()
   let templates = this.templateStorage.getAll(Template)
   let constructMetadata: any = {
@@ -35,7 +35,7 @@ Master.construct = function(connection: Connection) {
   let customBricks = new Map<number, ConstructedObject>();
   let customBricksSchema: ConstructedSchema | undefined = undefined;
   for (var template of templates) {
-    let tpl = template.construct(connection)
+    let tpl = template.construct()
     if (template.customData.exportBrick) {
       customBricksSchema = tpl.schema;
       customBricks = new Map([...customBricks, ...tpl.objects.raw])

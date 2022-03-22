@@ -54,10 +54,10 @@ export class SArray extends SType {
     writer.writeSType(this.subtype)
   }
 
-  construct = async (value: any[], connection: Connection) => {
+  construct = (value: any[], project: any) => {
     let result: any[] = []
     for (let val of value) {
-      result.push(await this.subtype.construct(val, connection) )
+      result.push(this.subtype.construct(val, project) )
     }
     return result
   }

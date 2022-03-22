@@ -218,9 +218,7 @@ export class GameState {
   }
 
 	useCard = (cardId: number, playerId: number) => {
-    console.log('useCard')
 		let object = this.objects.get(cardId)
-    console.log(object)
 		if (!object)
 			throw new Error("Attempt to cast unexistent card!")
 		let ctx = new Context({
