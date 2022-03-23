@@ -26,6 +26,8 @@ type ObjectViewParams = {
   objectId: string;
 };
 
+const MAX_DATA_SIZE = 700
+
 
 export const ObjectView = () => {
 
@@ -41,8 +43,91 @@ export const ObjectView = () => {
   var objectPublicKey = new PublicKey(objectId)
 
 
+  const sendTransactionChain = async (transactionChain: any[]) => {
+    if (!publicKey || wallet === undefined)
+      return;
+    (async () => {
+      for (let transactionData of transactionChain) {
+        await sendTransaction(connection, wallet, transactionData.instructions, transactionData.accounts, true)
+      }
+    })().then(() => {  // TODO: remove hardcode
+      notify({ message: "Object saved successfully", description: objectId })
+      history.push('/template/' + templateKey)
+    },
+    () => {
+      notify({ message: "Object saving error", description: objectId })
+    });
+  }
+
+  const setAccountDataWithNonce = (accountPublicKey: PublicKey, data: Buffer) => {
+    if (!publicKey || wallet === undefined)
+      return;
+
+    var nonceAccount = new Account()
+    let transactions: any[] = []
+
+    let instructions: TransactionInstruction[] = []
+    instructions.push(SystemProgram.createAccount({
+      programId: programId,
+      space: 3200 - 69, // TODO
+      lamports: 10000, // TODO:
+      fromPubkey: publicKey,
+      newAccountPubkey: nonceAccount.publicKey,
+    }));
+    transactions.push({
+      instructions: instructions, 
+      accounts: [ nonceAccount ]
+    })
+
+    let pos = 0
+    while (pos < data.length) {
+      let pos2 = Math.min(data.length, pos + MAX_DATA_SIZE)
+      let writer = new BinaryWriter()
+      writer.writeU8(3) // crud
+      writer.writeU8(0) // write
+      writer.writeU64(pos)
+      const saveAccountIx = new TransactionInstruction({
+        keys: [
+          { pubkey: publicKey, isSigner: true, isWritable: false },
+          { pubkey: nonceAccount.publicKey, isSigner: false, isWritable: true },
+        ],
+        programId: programId,
+        data: Buffer.concat([ 
+          writer.buf.slice(0, writer.length),
+          data.slice(pos, pos2),
+        ]),
+      });
+      transactions.push({
+        instructions: [ saveAccountIx ],
+        accounts: [ nonceAccount ]
+      })
+      pos = pos2
+    }
+
+
+
+
+
+    let copyIx = new TransactionInstruction({
+      keys: [
+        { pubkey: publicKey, isSigner: true, isWritable: false },
+        { pubkey: project.pubkey, isSigner: false, isWritable: false },
+        { pubkey: accountPublicKey, isSigner: false, isWritable: true },
+        { pubkey: nonceAccount.publicKey, isSigner: false, isWritable: false },
+      ],
+      programId: programId,
+      data: Buffer.from([1, 2]),
+    });
+    transactions.push({
+      instructions: [ copyIx ],
+      accounts: [ nonceAccount ]
+    })
+
+    sendTransactionChain(transactions)
+  }
+
   const setAccountData = async (accountPublicKey: PublicKey, data: Buffer, offset: number = 0) => {
-    const MAX_DATA_SIZE = 700
+
     if (wallet === undefined || !wallet.publicKey)
       return
     if (data.length <= MAX_DATA_SIZE) {
@@ -97,8 +182,9 @@ export const ObjectView = () => {
 
     let newFields: any = {}
     Object.values(fields).forEach((field:any) => {
-      if (field.value)
+      if (field.value) {
         newFields[field.field.code] = field.value
+      }
     })
     let oldFields = object.fields
     object.fields = newFields
@@ -106,7 +192,7 @@ export const ObjectView = () => {
 
     object.fields = oldFields
 
-    if (data.length < 700) {
+    if (data.length < MAX_DATA_SIZE) {
       if (!publicKey || wallet === undefined)
         return;
       const saveObjectIx = new TransactionInstruction({
@@ -118,14 +204,18 @@ export const ObjectView = () => {
         programId: programId,
         data: Buffer.concat([ Buffer.from([1, 1]), data]),
       });
-      await sendTransaction(connection, wallet, [saveObjectIx], [], true, () => { history.push('/template/' + templateKey) }).then(() => {
+      await sendTransaction(connection, wallet, [saveObjectIx], [], true, () => { 
+        history.push('/template/' + templateKey) 
+      }).then(() => {
         notify({ message: "Object saved successfully", description: objectId })
       },
       () => {
         notify({ message: "Object saving error", description: objectId })
       })
     } else {
-      setAccountData(objectPublicKey, data, 33 + 36)
+      console.log('setAccountDataWithNonce')
+      setAccountDataWithNonce(objectPublicKey, data)
+      // setAccountData(objectPublicKey, data, 33 + 36)
     }
   }
 
