@@ -28,15 +28,15 @@ export const BrickEditor = (props: {
 	let height = active ? window.innerHeight : props.height;
 
 	const reformat = (brickTree: any) => {
-		if (!brickTree)
+		if (brickTree === null || brickTree === undefined)
 			return undefined
 		if (!brickTree.params)
 			return brickTree
 		let newParams: any[] = []
 		for (let key of Object.keys(brickTree.params)) {
 			newParams.push({
-			id: parseInt(key),
-			value: reformat(brickTree.params[key]),
+				id: parseInt(key),
+				value: reformat(brickTree.params[key]),
 			})
 		}
 		return {
@@ -47,7 +47,7 @@ export const BrickEditor = (props: {
 	}
 
 	const reformat2 = (brickTree: any) => {
-		if (!brickTree)
+		if (brickTree === null || brickTree === undefined)
 			return undefined
 		if (!brickTree.params)
 			return brickTree
@@ -74,10 +74,13 @@ export const BrickEditor = (props: {
 
 	const setBrickTree = (brickTree: any) => {
 		brickTreeSet(brickTree)
+		console.log(brickTree)
 		onChange(brickTree)
 	}
 
 	const onChange = (brickTree: any) => {
+		console.log('onChange')
+		console.log(brickTree)
 		BRICK_TREE.tree = brickTree
 	}
 
