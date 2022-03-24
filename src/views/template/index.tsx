@@ -182,7 +182,7 @@ export const TemplateView = () => {
     let tableData: any[] = []
     for (let objectInfo of objects) {
       let name = objectInfo.fields.name
-      if (filter === undefined || (name && name.toLowerCase().includes(filter.toLowerCase()))) {
+      if (!filter || (name && name.toLowerCase().includes(filter.toLowerCase()))) {
         tableData.push(objectInfo)
       }
     }
