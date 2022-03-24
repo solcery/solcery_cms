@@ -14,6 +14,7 @@ const nodeTypes = {
 	brick: Brick
 };
 
+
 export const BrickEditor = (props: {
 	width: number,
 	height: number
