@@ -1044,6 +1044,7 @@ if (signature) {
     type: 0,
     subtype: 0,
     params: [],
+    error: true,
   })
 }
 
@@ -1056,6 +1057,8 @@ if (signature) {
       id: 1,
       code: 'value',
       value: 0,
+      type: new SBool(),
+      error: true,
     }]
   })
 }
@@ -1069,6 +1072,8 @@ if (signature) {
       id: 1,
       code: 'value',
       value: 0,
+      type: new SInt(),
+      error: true,
     }]
   })
 }
