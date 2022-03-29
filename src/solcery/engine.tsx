@@ -5,7 +5,6 @@ import {
 import { Project, Storage, TplObject, TemplateData } from './classes';
 
 
-
 export const programId = new PublicKey('DZyJMt5pQWJS9gzbeLydrwcoi6SyswKFkHhKU9c6Arij');
 
 export const projectPublicKey = new PublicKey("2pVVWZHQ82As7EJuDfsAPkeMqRx1BtsN4yET5LdFut9o");

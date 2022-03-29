@@ -117,9 +117,9 @@ export class GameState {
           let ctx = new Context({ game: this, object: this.objects.get(cardId),  extra: { vars: { cardNumber: i } } })
           applyBrick(cardPack.initializer, ctx)
         }
-        if (cardType.initializer) {
+        if (cardType.action_on_create) {
           let ctx = new Context({ game: this, object: this.objects.get(cardId), extra: {} })
-          applyBrick(cardType.initializer, ctx)
+          applyBrick(cardType.action_on_create, ctx)
         }
 	      cardId++;
 	    }
@@ -269,6 +269,40 @@ export class GameState {
 		}
 		return result
 	}	
+
+  toObject() {
+    let globalAttrs: any[] = []
+    for (let [name, value] of Object.entries(this.attrs).values()) {
+      globalAttrs.push({
+        key: name,
+        value: value
+      })
+    }
+    let objects: any[] = []
+    for (let obj of this.objects.values()) {
+      let object: any = {
+        id: obj.id,
+        tplId: obj.tplId,
+      }
+      let attrs: any[] = []
+      for (let [name, value] of Object.entries(obj.attrs).values()) {
+        attrs.push({
+          key: name,
+          value: value
+        })
+      }
+      object.attrs = attrs
+      objects.push(object)
+    }
+    return {
+      attrs: globalAttrs,
+      objects: objects,
+    }
+  }
+
+  toJson() {
+    return JSON.stringify(this.toObject())
+  }
 
 }
 

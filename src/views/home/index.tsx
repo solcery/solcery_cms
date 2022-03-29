@@ -76,52 +76,57 @@ export const HomeView = () => {
       return
     if (wallet === undefined || !wallet.publicKey)
       return
-    let constructed = await project.сonstructContent(connection)
+    let constructed = project.construct(connection)
+    console.log('GAME CONTENT JSON: ' + constructed.toJson())
     let writer = new BinaryWriter()
 
     let gameState = new GameState(constructed)
+
+    console.log('GAME STATE JSON:' + gameState.toJson())
     let gameStateBuf = gameState.toBuffer()
 
-    var gameStateAccount = new Account()
-    var createGameStateAccountIx = SystemProgram.createAccount({
-      programId: programId,
-      space: gameStateBuf.length, // TODO
-      lamports: await connection.getMinimumBalanceForRentExemption(gameStateBuf.length, 'singleGossip'),
-      fromPubkey: wallet.publicKey,
-      newAccountPubkey: gameStateAccount.publicKey,
-    });
 
-    constructed.get('projectSettings')[0].gameStateAccount = gameStateAccount.publicKey.toBase58() // TODO: remove hardcode, publish
+    // var gameStateAccount = new Account()
+    // var createGameStateAccountIx = SystemProgram.createAccount({
+    //   programId: programId,
+    //   space: gameStateBuf.length, // TODO
+    //   lamports: await connection.getMinimumBalanceForRentExemption(gameStateBuf.length, 'singleGossip'),
+    //   fromPubkey: wallet.publicKey,
+    //   newAccountPubkey: gameStateAccount.publicKey,
+    // });
+
+    // constructed.get('projectSettings')[0].gameStateAccount = gameStateAccount.publicKey.toBase58() // TODO: remove hardcode, publish
     
-    // rawsetting gameStateAccount
-    let gameStateAccountKey = gameStateAccount.publicKey.toBase58() 
-    let projectSettings = constructed.templates.get("projectSettings")
-    if (projectSettings) {
-      for (let projectSetting of projectSettings.objects.raw.values()) {
-        projectSetting.data.set(13, gameStateAccountKey)
-      }
-    }
-    constructed.write(writer)
-    let contentBuf = writer.buf.slice(0, writer.length)
-    let readContent = ConstructedContent.read(new BinaryReader(contentBuf))
-    console.log(readContent)
+    // // rawsetting gameStateAccount
+    // // 5ryw6zJjY7VqUetcPhFEpYUzLsQSEntMNhKgiWtCwJSY
+    // let gameStateAccountKey = gameStateAccount.publicKey.toBase58() 
+    // let projectSettings = constructed.templates.get("projectSettings")
+    // if (projectSettings) {
+    //   for (let projectSetting of projectSettings.objects.raw.values()) {
+    //     projectSetting.data.set(13, gameStateAccountKey)
+    //   }
+    // }
+    // constructed.write(writer)
+    // let contentBuf = writer.buf.slice(0, writer.length)
+    // let readContent = ConstructedContent.read(new BinaryReader(contentBuf))
 
-    var contentAccount = new Account()
-    var createContentAccountIx = SystemProgram.createAccount({
-      programId: programId,
-      space: contentBuf.length, // TODO
-      lamports: await connection.getMinimumBalanceForRentExemption(contentBuf.length, 'singleGossip'),
-      fromPubkey: wallet.publicKey,
-      newAccountPubkey: contentAccount.publicKey,
-    });
+    // var contentAccount = new Account()
+    // var createContentAccountIx = SystemProgram.createAccount({
+    //   programId: programId,
+    //   space: contentBuf.length, // TODO
+    //   lamports: await connection.getMinimumBalanceForRentExemption(contentBuf.length, 'singleGossip'),
+    //   fromPubkey: wallet.publicKey,
+    //   newAccountPubkey: contentAccount.publicKey,
+    // });
 
 
-    await sendTransaction(connection, wallet, [createContentAccountIx, createGameStateAccountIx], [contentAccount, gameStateAccount]).then(async () => {
-      await setAccountData(contentAccount.publicKey, contentBuf)
-      await setAccountData(gameStateAccount.publicKey, gameStateBuf)
-      console.log('CONSTRUCTED!')
-      console.log('Content account: ' + contentAccount.publicKey.toBase58())
-    })
+    // await sendTransaction(connection, wallet, [createContentAccountIx, createGameStateAccountIx], [contentAccount, gameStateAccount]).then(async () => {
+    //   await setAccountData(contentAccount.publicKey, contentBuf)
+    //   await setAccountData(gameStateAccount.publicKey, gameStateBuf)
+    //   console.log('CONSTRUCTED!')
+    //   console.log('Content account: ' + contentAccount.publicKey.toBase58())
+    //   console.log('JSON: ' + constructed.toJson())
+    // })
   }
 
   const createTemplate = async () => {

@@ -2,44 +2,59 @@ import React, { useState, useEffect } from "react";
 import { useConnection } from "../../contexts/connection";
 import { useProject } from "../../contexts/project"
 import { SystemProgram } from "@solana/web3.js";
-import { TemplateData, Storage} from "../../solcery/classes"
+import { Template } from "../../content/"
 import { Menu} from "antd"
 
 const { SubMenu } = Menu;
 
+const SolceryMenuTemplate = (
+  template: any
+) => {
+  const connection = useConnection();
+  const [ tpl, setTpl ] = useState<any>(undefined)
+
+  useEffect(() => {
+    (async () => {
+      let t = await template.template.await(connection) //TODO: template.template?
+      setTpl(t)
+    })()
+  }, [])
+
+  if (tpl !== undefined)
+    return (
+      <Menu.Item key={tpl.id}>
+        <a href={'/#/template/' + tpl.id}>{tpl.name}</a>
+      </Menu.Item>)
+  return (<></>)
+}
+
 export const SolceryMenu = () => {
   const { project } = useProject();
+  const [ templates, setTemplates ] = useState<any[]>([]);
   const connection = useConnection();
-  var [ templates, setTemplates ] = useState<TemplateData[]>([]);  
 
-  useEffect(() => { 
-    if (project)
-      (async () => {
-        const strg = await Storage.get(connection, project?.templateStorage)
-        setTemplates(await TemplateData.getAll(connection, strg.accounts))
-      })()
+  useEffect(() => {
+    if (project) {
+      setTemplates(project.templateStorage.getAll(Template))
+    }
   }, [ project ]);
 
-  const handleClick = (event: any) => {
-
-  }
-
   return (
-    <Menu onClick={handleClick} mode="horizontal">
+    <Menu mode="horizontal">
       <Menu.Item key="play">
         <a href="/#/play">PLAY</a>
       </Menu.Item>
       <Menu.Item key="home">
         <a key='home' href='/#/'>Home</a>
       </Menu.Item>
-      {templates.map((tpl) => 
-        <Menu.Item key={tpl.publicKey.toBase58()}>
-          <a href={'/#/template/' + tpl.publicKey.toBase58()}>{tpl.name}</a>
-        </Menu.Item>)
-      }
+      {templates.map((tpl: any) => 
+        <Menu.Item key={tpl.id}>
+          <a href={'/#/template/' + tpl.id}>{tpl.name}</a>
+        </Menu.Item>
+      )}
       {project && 
       <Menu.Item key="game">
-        <a href={ "/#/game/" + project.publicKey.toBase58() }>RELEASE</a>
+        <a href={ "/#/game/" + project.id }>RELEASE</a>
       </Menu.Item>}
     </Menu>);
 };

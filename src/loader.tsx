@@ -1,5 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
 import { BinaryReader, BinaryWriter } from 'borsh';
+import { Dweller } from './dweller'
 
 declare module "borsh" {
   interface BinaryReader {
@@ -34,3 +35,15 @@ declare module "borsh" {
   const writer = this;
   writer.writeU8(value ? 1 : 0);
 };
+
+
+export * from './dweller'
+export * from './content'
+export * from './subscribe'
+
+
+(window as any).root = Object.create(Dweller)
+window.root = Object.create(Dweller)
+window.root.root = window.root
+window.root.classname = 'Root'
+

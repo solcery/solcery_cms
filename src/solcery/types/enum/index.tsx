@@ -6,16 +6,16 @@ import { ValueRender, TypedataRender } from './components'
 export class SEnum extends SType {
   id = 8;
   static typename = 'Enum';
-  typename = "Brick";
   
   values: string[];
   valueRender = ValueRender;
   static typedataRender = TypedataRender;
 
+  getName = () => 'Enum: ' + this.values.toString()
+  
   constructor(src: { values: string[] }) {
     super()
     this.values = src.values;
-    this.nameRender = (<p>{this.typename}: {this.values.toString()}</p>); 
   }
 
   readValue = (reader: BinaryReader) => { 
@@ -24,6 +24,8 @@ export class SEnum extends SType {
   writeValue = (value: number, writer: BinaryWriter) => { 
     writer.writeU8(value)
   }
+  readConstructed = this.readValue;
+  writeConstructed = this.writeValue;
 
   static readType = (reader: BinaryReader) => {
     var valuesAmount = reader.readU32()

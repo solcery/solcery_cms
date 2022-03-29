@@ -5,8 +5,10 @@ import { SArray } from './index';
 
 
 export const ValueRender = (props: ValueRenderParams) => {
+
   var [value, setValue] = useState(props.defaultValue || [])
   var [valueSize, setValueSize] = useState(props.defaultValue?.length || 0);
+
   const onChange = (newValue: any, index: number) => {
     value[index] = newValue;
     setValue(value)
@@ -22,23 +24,16 @@ export const ValueRender = (props: ValueRenderParams) => {
 
   if (!props.onChange)
     return (<p>Array</p>)
-
   var array = props.type as SArray
   return (
-    <div>
-      {value.map((val: any, index: number) => <div key={index}>
-        {
-          React.createElement(array.subtype.valueRender, 
-            {
-              defaultValue: val,
-              type: array.subtype,
-              onChange: (newValue: any) => { onChange(newValue, index) }, 
-            }
-          )
-        }
-      </div>)}
+    <>
+      {value.map((val: any, index: number) => <div key={index}><array.subtype.valueRender 
+        defaultValue={val}
+        type={array.subtype}
+        onChange={ (newValue: any) => { onChange(newValue, index) }}
+      /></div>)}
       <Button onClick={addNewElement}>+</Button>
-    </div>
+    </>
   );
 }
 

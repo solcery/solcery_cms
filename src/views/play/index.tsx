@@ -6,10 +6,13 @@ import { construct, projectPublicKey, projectStoragePublicKey } from "../../solc
 import { useParams, useHistory } from "react-router-dom";
 import Unity, { UnityContext } from "react-unity-webgl";
 import { Button, Layout, InputNumber, Collapse, Divider, Space, Input } from "antd";
-import { applyBrick, brickToOldBrick, oldBrickToBrick } from "../../solcery/types/brick";
+import { applyBrick } from "../../solcery/types/brick";
 import { GameState } from "../../solcery/game"
 import { Project } from "../../solcery/classes"
 import { ConstructedContent } from "../../solcery/content"
+
+import testGameContent from "./game_content_test.json"
+import testGameState from "./game_state_test.json"
 
 import { PublicKey } from "@solana/web3.js";
 
@@ -38,11 +41,19 @@ export const GameObjectView = (props: {
     </div>)
 }
 
+// const unityPlayContext = new UnityContext({
+//   loaderUrl: "game/game_25.loader.js",
+//   dataUrl: "game/game_25.data",
+//   frameworkUrl: "game/game_25.framework.js",
+//   codeUrl: "game/game_25.wasm",
+// })
+
 const unityPlayContext = new UnityContext({
-  loaderUrl: "game/game_35.loader.js",
-  dataUrl: "game/game_35.data",
-  frameworkUrl: "game/game_35.framework.js",
-  codeUrl: "game/game_35.wasm",
+  loaderUrl: "new_game/WebGl.loader.js",
+  dataUrl: "new_game/WebGl.data",
+  frameworkUrl: "new_game/WebGl.framework.js",
+  codeUrl: "new_game/WebGl.wasm",
+  streamingAssetsUrl: "StreamingAssets",
 })
 
 export const PlayView = () => {
@@ -73,19 +84,8 @@ export const PlayView = () => {
     if (!project)
       return
     (async () => {
-      var constructedContent = await project.сonstructContent(connection)
-      let buf = constructedContent.toBuffer()
-      console.log(JSON.stringify(buf))
-      
-      let cc = ConstructedContent.read(new BinaryReader(buf))
-      // let contentInfo = await connection.getAccountInfo(new PublicKey("7cRU5jAtqRjaSFUb3Dj3e8Mhnnhe2G3J7XbDqSjhrPPc"))
-      // if (!contentInfo)
-      //   return
-      // let constructedContent = ConstructedContent.read(new BinaryReader(contentInfo.data))
-      let gameState = new GameState(cc)
-      // console.log(JSON.stringify(buf))
-      console.log(JSON.stringify(gameState.toBuffer()))
-
+      var constructedContent = await project.construct(connection)
+      let gameState = new GameState(constructedContent)
       let slots = gameState.content.getAll('slots')
       for (let slot of slots.values()) {
         let defaultCardTypeId = slot.default
@@ -113,24 +113,21 @@ export const PlayView = () => {
 
   const onCardAttrChange = (cardId: number, attrName: string, value: number) => {
     gameState.objects.get(cardId).attrs[attrName] = value;
-    unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
+    unityPlayContext.send("ReactToUnity", "UpdateGameState", gameState.toJson());
     setStep(step + 1)
   }
 
   unityPlayContext.on("OnUnityLoaded", async () => {
-    // console.log(JSON.stringify(gameState.extractContent()));
-    unityPlayContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
-    // console.log(JSON.stringify(gameState.extractDisplayData()));
-    unityPlayContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData()));
-    // console.log(JSON.stringify(gameState.extractGameState()));
-    unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
+    let content = gameState.content.toJson()
+    let state = gameState.toJson()
+    unityPlayContext.send("ReactToUnity", "UpdateGameContent", content);
+    unityPlayContext.send("ReactToUnity", "UpdateGameState", state);
   });
 
   unityPlayContext.on("CastCard", async (cardId: number) => {
-    gameState.useCard(cardId, 1);
-    // console.log(JSON.stringify(gameState.extractGameState()));
-    unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
-    setStep(step + 1);
+    gameState.useCard(cardId, 1)
+    unityPlayContext.send("ReactToUnity", "UpdateGameState", gameState.toJson());
+    setStep(step + 1)
   });
 
   unityPlayContext.on("LogAction", async (log: string) => {
@@ -138,10 +135,9 @@ export const PlayView = () => {
     for (let logEntry of logToApply.Steps) {
       if (logEntry.actionType == 0)
       {
-        gameState.useCard(logEntry.data, logEntry.playerId);
-        // console.log(JSON.stringify(gameState.extractGameState()));
-        unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
-        setStep(step + 1);
+        gameState.useCard(logEntry.data, logEntry.playerId)
+        unityPlayContext.send("ReactToUnity", "UpdateGameState", gameState.toJson());
+        setStep(step + 1)
       }
     }
   });
@@ -196,7 +192,9 @@ export const PlayView = () => {
         </Collapse>
       </Sider>
       <Content className="unityFrame">
-         <Unity tabIndex={3} style={{ width: '100%' }} unityContext={unityPlayContext} />
+        <div style={{ width: '100%' }}>
+          <Unity tabIndex={3} style={{ width: '100%' }} unityContext={unityPlayContext} />
+        </div>
       </Content>
     </Layout>
   );

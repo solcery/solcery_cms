@@ -47,9 +47,3 @@ export const TypeSelector = (props: { //TODO: -> Type render
 	  </div>
 	)
 }
-
-export const NameRender = (props: {
-	type: SType
-}) => {
-	return (<p>{props.type.typename}</p>)
-}

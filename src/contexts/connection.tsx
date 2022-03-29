@@ -9,10 +9,7 @@ import {
 } from "@solana/web3.js";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { notify } from "./../utils/notifications";
-import { ExplorerLink } from "../components/ExplorerLink";
-import { setProgramIds } from "../utils/ids";
 import { WalletAdapter } from "./wallet";
-import { cache, getMultipleAccounts, MintParser } from "./accounts";
 import { TokenListProvider, ENV as ChainID, TokenInfo } from "@solana/spl-token-registry";
 import Cookies from 'universal-cookie';
 
@@ -57,8 +54,6 @@ interface ConnectionConfig {
   setSlippage: (val: number) => void;
   env: ENV;
   setEndpoint: (val: string) => void;
-  tokens: TokenInfo[];
-  tokenMap: Map<string, TokenInfo>;
 }
 
 const ConnectionContext = React.createContext<ConnectionConfig>({
@@ -68,9 +63,7 @@ const ConnectionContext = React.createContext<ConnectionConfig>({
   setSlippage: (val: number) => {},
   connection: new Connection(DEFAULT, "recent"),
   sendConnection: new Connection(DEFAULT, "recent"),
-  env: ENDPOINTS[0].name,
-  tokens: [],
-  tokenMap: new Map<string, TokenInfo>(),
+  env: ENDPOINTS[0].name
 });
 
 export function ConnectionProvider({ children = undefined as any }) {
@@ -90,40 +83,6 @@ export function ConnectionProvider({ children = undefined as any }) {
   const chain =
     ENDPOINTS.find((end) => end.endpoint === endpoint) || ENDPOINTS[0];
   const env = chain.name;
-
-  const [tokens, setTokens] = useState<TokenInfo[]>([]);
-  const [tokenMap, setTokenMap] = useState<Map<string, TokenInfo>>(new Map());
-  useEffect(() => {
-    cache.clear();
-    // fetch token files
-    (async () => {
-      const res = await new TokenListProvider().resolve();
-      console.log(chain)
-      const list = res
-        .filterByChainId(chain.chainID)
-        .excludeByTag("nft")
-        .getList();
-      const knownMints = list.reduce((map, item) => {
-        map.set(item.address, item);
-        return map;
-      }, new Map<string, TokenInfo>());
-
-      const accounts = await getMultipleAccounts(connection, [...knownMints.keys()], 'single');
-      accounts.keys.forEach((key, index) => {
-        const account = accounts.array[index];
-        if(!account) {
-          return;
-        }
-        if (key != 'Crm2bpr3ai5QKMNfaq11NkBnHeMGULeP5YDLpkLeJjnw')
-          cache.add(new PublicKey(key), account, MintParser);
-      })
-
-      setTokenMap(knownMints);
-      setTokens(list);
-    })();
-  }, [connection, chain]);
-
-  setProgramIds(env);
 
   // The websocket library solana/web3.js uses closes its websocket connection when the subscription list
   // is empty after opening its first time, preventing subsequent subscriptions from receiving responses.
@@ -168,8 +127,8 @@ export function ConnectionProvider({ children = undefined as any }) {
         setSlippage: (val) => setSlippage(val.toString()),
         connection,
         sendConnection,
-        tokens,
-        tokenMap,
+        // tokens,
+        // tokenMap,
         env,
       }}
     >
@@ -191,9 +150,7 @@ export function useConnectionConfig() {
   return {
     endpoint: context.endpoint,
     setEndpoint: context.setEndpoint,
-    env: context.env,
-    tokens: context.tokens,
-    tokenMap: context.tokenMap,
+    env: context.env
   };
 }
 
@@ -265,7 +222,6 @@ export const sendTransaction = async (
     };
   
     const txid = await connection.sendRawTransaction(rawTransaction, options);
-  
     if (awaitConfirmation) {
       const status = (
         await connection.confirmTransaction(
@@ -283,7 +239,7 @@ export const sendTransaction = async (
               {errors.map((err) => (
                 <div>{err}</div>
               ))}
-              <ExplorerLink address={txid} type="transaction" />
+{/*              <ExplorerLink address={txid} type="transaction" />*/}
             </>
           ),
           type: "error",

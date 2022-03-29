@@ -5,7 +5,6 @@ import { LAMPORTS_PER_SOL, PublicKey, Account, TransactionInstruction } from "@s
 import { SystemProgram } from "@solana/web3.js";
 import { notify } from "../../utils/notifications";
 import { ConnectButton } from "./../../components/ConnectButton";
-import { LABELS } from "../../constants";
 import {
   deserializeUnchecked, BinaryReader, BinaryWriter, serialize
 } from 'borsh';
@@ -104,7 +103,7 @@ export const AccountView = () => {
     });
     await sendTransaction(connection, wallet, [createProjectAccountIx, createStorageAccountIx, createProjectIx], [projectAccount, storageAccount]).then(() => {
       cookies.set('projectKey', projectAccount.publicKey.toBase58())
-      history.push("/#/account/" + storageAccount.publicKey.toBase58());
+      history.push("/account/" + projectAccount.publicKey.toBase58());
     })
   }
 

@@ -6,6 +6,7 @@ import { SystemProgram } from "@solana/web3.js";
 import { useParams, useHistory } from "react-router-dom";
 import { Button, Table, Input } from "antd";
 import { TemplateData, TemplateField, SolcerySchema, Storage, TplObject } from "../../solcery/classes"
+import { Template } from '../../content/template';
 import { programId } from "../../solcery/engine"
 import { useProject } from "../../contexts/project";
 import Cookies from 'universal-cookie';
@@ -21,11 +22,14 @@ export const TemplateView = () => {
   const { Column } = Table;
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
+
   let history = useHistory();
   let { templateKey } = useParams<TemplateViewParams>();
-  var [ objects, setObjects ] = useState<TplObject[] | undefined>(undefined);
-  var [ template, setTemplate ] = useState<TemplateData | undefined>(undefined);
+  var [ template, setTemplate ] = useState<any>(undefined);
+  var [ objects, setObjects ] = useState<any>(undefined);
+  var [ storage, setStorage ] = useState<any>(undefined);
   var { project } = useProject();
+  var [ revision, setRevision ] = useState(0)
   let [ filter, setFilter ] = useState<any>(undefined)
 
 
@@ -71,26 +75,14 @@ export const TemplateView = () => {
     sendTransaction(connection, wallet, instructions, [objectAccount])
   }
 
-  const copyAll = () => {
-    if (!objects)
-      return;
-    for (let obj of objects) {
-      copyToAnotherProject(obj.publicKey)
-    }
-  }
-
-
   const createObject = async (src: PublicKey | undefined = undefined) => {
     if (!publicKey || !project || wallet === undefined || !template) {
       return;
     }
     var instructions = [];
 
-    if (!template.storages)
+    if (!template.storage)
       throw new Error("Template.createObject error - storage is empty")
-    var storagePublicKey = template.storages[0]// TODO
-
-    var storage = await Storage.get(connection, storagePublicKey)
     var objectAccount = new Account()
     instructions.push(SystemProgram.createAccount({
       programId: programId,
@@ -102,9 +94,9 @@ export const TemplateView = () => {
     instructions.push(new TransactionInstruction({
       keys: [
         { pubkey: publicKey, isSigner: true, isWritable: false },
-        { pubkey: project.publicKey, isSigner: false, isWritable: true },
-        { pubkey: storage.template, isSigner: false, isWritable: false },
-        { pubkey: storagePublicKey, isSigner: false, isWritable: true },
+        { pubkey: project.pubkey, isSigner: false, isWritable: true },
+        { pubkey: template.pubkey, isSigner: false, isWritable: false },
+        { pubkey: template.storage.pubkey, isSigner: false, isWritable: true },
         { pubkey: objectAccount.publicKey, isSigner: false, isWritable: true },
       ],
       programId: programId,
@@ -114,7 +106,7 @@ export const TemplateView = () => {
       instructions.push(new TransactionInstruction({
         keys: [
           { pubkey: publicKey, isSigner: true, isWritable: false },
-          { pubkey: project.publicKey, isSigner: false, isWritable: false },
+          { pubkey: project.pubkey, isSigner: false, isWritable: false },
           { pubkey: objectAccount.publicKey, isSigner: false, isWritable: true },
           { pubkey: src, isSigner: false, isWritable: false },
         ],
@@ -123,7 +115,7 @@ export const TemplateView = () => {
       }));
     }
     sendTransaction(connection, wallet, instructions, [objectAccount]).then(() => {
-      history.push('/object/' + objectAccount.publicKey.toBase58());
+      history.push('/template/' + template.pubkey.toBase58() + '/' + objectAccount.publicKey.toBase58());
     })
   }
 
@@ -133,14 +125,13 @@ export const TemplateView = () => {
       return;
     if (!project || !template)
       return
-    if (!template.storages)
+    if (!template.storage)
       throw new Error("Template.createObject error - storage is empty")
-    var storagePublicKey = template.storages[0]// TODO
     const popFromStorageIx = new TransactionInstruction({
       keys: [
         { pubkey: publicKey, isSigner: true, isWritable: false },
-        { pubkey: project.publicKey, isSigner: false, isWritable: false },
-        { pubkey: storagePublicKey, isSigner: false, isWritable: true },
+        { pubkey: project.pubkey, isSigner: false, isWritable: false },
+        { pubkey: template.storage.pubkey, isSigner: false, isWritable: true },
         { pubkey: objectPublicKey, isSigner: false, isWritable: false },
       ],
       programId: programId,
@@ -161,28 +152,40 @@ export const TemplateView = () => {
   }, [])
 
   useEffect(() => { 
-    if (project)
-      (async () => {
-        const tpl = await TemplateData.get(connection, new PublicKey(templateKey))
-        setTemplate(tpl)
-        var storage = await Storage.get(connection, tpl.storages[0])
-        setObjects(await tpl.getObjects(connection, storage.accounts))
-      })()
-  }, [ project ]);
+    if (project) {
+      let template = project.getTemplate(templateKey)
+      setStorage(template.storage)
+      setTemplate(template)
+    }
+  }, [ project, templateKey ]);
 
-  if (project && template && objects)
+  useEffect(() => { 
+    if (template) {
+      setObjects(template.getObjects())
+    }
+  }, [ template ]);
+
+
+  // useEffect(() => {
+  //   if (!storage)
+  //     return
+  //   let subscriptionId = storage.addEventSubscription('onLoaded', (storage: any) => {
+  //     setObjects(template.getObjects())
+  //   })
+  //   // return () => {
+  //   //   storage.removeEventSubscription('onLoad', subscriptionId)
+  //   // };
+  // }, [ storage ])
+
+  if (objects)
   {
-    var tableData: any[] = []
+    let tableData: any[] = []
     for (let objectInfo of objects) {
-      var res = Object.fromEntries(objectInfo.fields)
-      if (filter === undefined || (res[1] && res[1].includes(filter))) {
-        res.key = objectInfo.publicKey.toBase58()
-        res.id = objectInfo.id
-        tableData.push(res)
+      let name = objectInfo.fields.name
+      if (!filter || (name && name.toLowerCase().includes(filter.toLowerCase()))) {
+        tableData.push(objectInfo)
       }
     }
-
-
 
     const divStyle = {
       width: '100%',
@@ -194,10 +197,10 @@ export const TemplateView = () => {
           title="Object" 
           key="objectKey"
           render={(text, record: any) => (
-              <a href={"/#/object/"+record.key}>{record.id}</a>
+              <a href={"/#/template/"+ template.id + '/' + record.id}>{ record.id.substring(0,4) + ' . . . ' + record.id.substring(40)}</a>
           )}
         />
-        {template.fields.map((field: TemplateField) => { 
+        {Object.values(template.fields).map((field: any) => { 
           return <Column 
             title = { field.name + ((field.id === 1 && filter) ? ' : [' + filter + ']' : '') } 
             key = { field.id } 
@@ -205,17 +208,11 @@ export const TemplateView = () => {
             sorter = { field.fieldType.sorter && ((a: any, b: any) => { 
               return field.fieldType.sorter(a[field.id], b[field.id]) 
             }) }
-            render = {
-              (text, object: any) => {
-                return React.createElement(
-                  field.fieldType.valueRender,
-                  { 
-                    type: field.fieldType,
-                    defaultValue: object[field.id], 
-                    readonly: true
-                  }
-                )
-              }
+            render = {(text, object: any) => <field.fieldType.valueRender 
+                type={field.fieldType}
+                defaultValue={object.fields[field.code]}
+                readonly={true}
+              />
             }
           />
         })}
@@ -223,9 +220,9 @@ export const TemplateView = () => {
           title="Actions"
           key="actions"
           render={(text, object: any) =>
-          <div>
-            <Button onClick={() => { createObject(new PublicKey(object.key)) }}>Copy</Button>  
-            <Button onClick={() => { deleteObject(new PublicKey(object.key)) }}>Delete</Button>  
+          <div key={ 'actions.' + object.pubkey.toBase58() }>
+            <Button key={ 'copy.' + object.pubkey.toBase58() } onClick={() => { createObject(new PublicKey(object.pubkey)) }}>Copy</Button>  
+            <Button key={ 'delete.' + object.pubkey.toBase58() } onClick={() => { deleteObject(new PublicKey(object.pubkey)) }}>Delete</Button>  
           </div>} //TODO: delete: accountCleanup, confirmation
         />
       </Table>

@@ -2,7 +2,6 @@ import { PublicKey, Connection } from "@solana/web3.js";
 import ReactDOM from 'react-dom'
 import { BinaryReader, BinaryWriter } from 'borsh';
 import { solceryTypes } from "../solceryTypes"
-import { NameRender } from "./components"
 
 export * from "./components";
 
@@ -15,13 +14,16 @@ export interface ValueRenderParams {
 export class SType {
   id: number = 0;
   static typename = "Empty type";
-  typename = "Empty type";
-  nameRender = (<NameRender type={this}/>);
+  getName: () => string = () => 'EMPTY TYPE'
+  
+  nameRender = <p>{this.getName()}</p>
   sorter: any; //TODO
 
   // static typedataRender: any = (<p>Error</p>);
   valueRender: any = null;
   
+  cloneValue: (value: any) => any = (value) => JSON.parse(JSON.stringify(value))
+
   readValue: (reader: BinaryReader) => any = (reader: BinaryReader) => { 
   	throw new Error('Trying to read empty type value') 
   };
@@ -30,6 +32,13 @@ export class SType {
   };
 
   writeType: (writer: BinaryWriter) => void = () => {};
+
+  validate: (value: any, object: any) => boolean = () => true;
+
+  readConstructed = this.readValue;
+  writeConstructed = this.writeValue;
+  toObject = (value: any) => { return value }
+
   static readType = (reader: BinaryReader) => {
   	return new SType()
   }
@@ -40,7 +49,7 @@ export class SType {
   	return writer.buf.slice(0, writer.length)
   }
 
-  construct = async (value: any, connection: Connection) => { return value }
+  construct = (value: any, project: any) => { return value }
 }
 
 
