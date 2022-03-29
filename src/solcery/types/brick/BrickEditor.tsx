@@ -74,13 +74,10 @@ export const BrickEditor = (props: {
 
 	const setBrickTree = (brickTree: any) => {
 		brickTreeSet(brickTree)
-		console.log(brickTree)
 		onChange(brickTree)
 	}
 
 	const onChange = (brickTree: any) => {
-		console.log('onChange')
-		console.log(brickTree)
 		BRICK_TREE.tree = brickTree
 	}
 
@@ -283,7 +280,6 @@ export const BrickEditor = (props: {
 
 	const save = () => {
 		if (props.onChange && active && save) {
-			console.log(BRICK_TREE.tree)
 			props.onChange(reformat(BRICK_TREE.tree))
 		}
 		setActive(false)
