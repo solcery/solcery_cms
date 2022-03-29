@@ -54,8 +54,7 @@ export default function Brick(props: {
 					} catch {
 						notify({ message: "Invalid brickTree format in clipboard", description: clipboardContents, color: '#FFDDDD'})
 					}
-					if (!pastedBrickTree) return;
-					
+					if (!pastedBrickTree) return; // TODO: add validation
 					props.data.onPaste(pastedBrickTree, props.data.brickTree, props.data.parentBrick, props.data.paramID);
 				});
 			}

@@ -127,7 +127,7 @@ export const BrickEditor = (props: {
 			} else {
 				notify({ message: "Unable to paste brick tree: incompatible brick types.", color: '#FFDDDD'})
 			}
-		} else if (pastedBrickTree.type === 0) { //??
+		} else if (pastedBrickTree.type === props.brickType) { //??
 			sleepAndFit()
 			setBrickTree(pastedBrickTree)
 		}
