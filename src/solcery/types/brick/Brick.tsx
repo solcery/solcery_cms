@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Handle, Position } from 'react-flow-renderer';
 import { defaultBricksByType } from './index'
+import { notify } from "../../../utils/notifications";
 
 export default function Brick(props: {
 	id: string,
@@ -37,17 +38,22 @@ export default function Brick(props: {
 			isCtrlDown = !(e.keyCode === 17 || e.keyCode === 91); // Ctrl or Cmd keys
 			
 			if (isCtrlDown && e.keyCode === 67 /*'C' key*/ && isHovered) {
-				navigator.clipboard.writeText(JSON.stringify(props.data.brick));
+				let brickJson = JSON.stringify(props.data.brick)
+				notify({ message: "Brick copied", description: brickJson.substring(0, 30) + '...', color: '#DDFFDD'})
+				navigator.clipboard.writeText(brickJson);
 			}
 
 			if (isCtrlDown && e.keyCode === 86 /*'V' key*/ && isHovered) {
+
 				navigator.clipboard.readText().then((clipboardContents) => {
 					if (!clipboardContents) return;
 					
 					let pastedBrickTree: any = null;
 					try {
 						pastedBrickTree = JSON.parse(clipboardContents);
-					} catch {}
+					} catch {
+						notify({ message: "Invalid brickTree format in clipboard", description: clipboardContents, color: '#FFDDDD'})
+					}
 					if (!pastedBrickTree) return;
 					
 					props.data.onPaste(pastedBrickTree, props.data.brickTree, props.data.parentBrick, props.data.paramID);

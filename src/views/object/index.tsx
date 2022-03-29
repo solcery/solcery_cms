@@ -51,7 +51,7 @@ export const ObjectView = () => {
         await sendTransaction(connection, wallet, transactionData.instructions, transactionData.accounts, true)
       }
     })().then(() => {  // TODO: remove hardcode
-      notify({ message: "Object saved successfully", description: objectId })
+      notify({ message: "Object saved successfully", description: objectId})
       history.push('/template/' + templateKey)
     },
     () => {

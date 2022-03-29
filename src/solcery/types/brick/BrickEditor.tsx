@@ -5,6 +5,7 @@ import Brick from './Brick';
 import { Button } from 'antd';
 import LayoutHelper from './LayoutHelper';
 import makeLayoutedElements from './dagreLayout';
+import { notify } from "../../../utils/notifications";
 import './BrickEditor.scss';
 
 let brickUniqueID = 0;
@@ -122,8 +123,9 @@ export const BrickEditor = (props: {
 			if (param.type.brickType === pastedBrickTree.type) {
 				parentBrick.params[paramID] = pastedBrickTree;
 				setBrickTree(JSON.parse(JSON.stringify(bt)))
+				notify({ message: "Pasted successfully", color: '#DDFFDD'})
 			} else {
-				alert('Unable to paste brick tree: incompatible brick types.');
+				notify({ message: "Unable to paste brick tree: incompatible brick types.", color: '#FFDDDD'})
 			}
 		} else if (pastedBrickTree.type === 0) { //??
 			sleepAndFit()

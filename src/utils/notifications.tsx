@@ -8,6 +8,7 @@ export function notify({
   txid = "",
   type = "info",
   placement = "bottomLeft",
+  color = "white",
 }) {
   if (txid) {
     //   <Link
@@ -27,7 +28,7 @@ export function notify({
     ),
     placement,
     style: {
-      backgroundColor: "white",
+      backgroundColor: color,
     },
   });
 }
