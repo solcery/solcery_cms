@@ -114,7 +114,7 @@ export const TemplateView = () => {
         data: Buffer.from([1, 3]),
       }));
     }
-    sendTransaction(connection, wallet, instructions, [objectAccount]).then(() => {
+    sendTransaction(connection, wallet, instructions, [objectAccount], true).then(() => {
       history.push('/template/' + template.pubkey.toBase58() + '/' + objectAccount.publicKey.toBase58());
     })
   }
@@ -137,9 +137,7 @@ export const TemplateView = () => {
       programId: programId,
       data: Buffer.from([2, 1]),
     });
-    sendTransaction(connection, wallet, [popFromStorageIx], []).then(() => {
-      history.push('/template/' + templateKey);
-    })
+    sendTransaction(connection, wallet, [popFromStorageIx], [])
   }
 
   const applyFilter = (value: string) => {
@@ -165,17 +163,16 @@ export const TemplateView = () => {
     }
   }, [ template ]);
 
-
-  // useEffect(() => {
-  //   if (!storage)
-  //     return
-  //   let subscriptionId = storage.addEventSubscription('onLoaded', (storage: any) => {
-  //     setObjects(template.getObjects())
-  //   })
-  //   // return () => {
-  //   //   storage.removeEventSubscription('onLoad', subscriptionId)
-  //   // };
-  // }, [ storage ])
+  useEffect(() => {
+    if (!storage)
+      return
+    let subscriptionId = storage.addEventSubscription('onStorageFullyLoaded', (storage: any) => {
+      setObjects(template.getObjects())
+    })
+    return () => {
+      storage.removeEventSubscription('onStorageFullyLoaded', subscriptionId)
+    };
+  }, [ storage ])
 
   if (objects)
   {

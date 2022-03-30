@@ -21,6 +21,7 @@ Master.loadAll = async function(connection: Connection) { //TODO Promise
   if (!this.storedClass)
     return;
   let objects = this.getAll(this.storedClass) 
+
   let toLoad = objects.filter((obj: any) => !obj.isLoaded);
   let pubkeys = toLoad.map((obj: any) => new PublicKey(obj.id))
   let accInfos = await connection.getMultipleAccountsInfo(pubkeys)
@@ -32,10 +33,13 @@ Master.loadAll = async function(connection: Connection) { //TODO Promise
     }
   }
   await Promise.all(items)
+  this.execAllMixins('onStorageFullyLoaded')
 }
 
-Master.onSolanaAccountChanged = function (connection: Connection, data: any) {
-  this.load(connection, data)
+Master.onSolanaAccountChanged = async function (connection: Connection, data: any) {
+  this.objects[this.storedClass.classname] = {}
+  await this.load(connection, data)
+  this.loadAll(connection)
 }
 
 export { Master }
