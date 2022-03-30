@@ -35,10 +35,8 @@ Master.toBinary = function() {
   // this.fields.map((field: any) => new TemplateFieldData(field));
 }
 
-Master.onLoad = async function(connection: Connection) {
-  await this.storage.load(connection)
-  await this.storage.loadAll(connection)
-  if (this.customData.exportBrick) {
+Master.exportBricks = function() {
+  if (this.customData && this.customData.exportBrick) {
     let fieldId: number = this.customData.exportBrick
     let field = this.fields[fieldId].code
     for (let obj of this.getObjects()) {
@@ -48,6 +46,12 @@ Master.onLoad = async function(connection: Connection) {
       }
     }
   }
+}
+
+Master.onLoad = async function(connection: Connection) {
+  await this.storage.load(connection)
+  await this.storage.loadAll(connection)
+  this.exportBricks()
 }
 
 Master.onCreate = function() {

@@ -8,20 +8,8 @@ let Master: any = {}
 Master.updateBricks = function() {
   var result: BrickSignature[] = []
   for (var tpl of this.getTemplates()) {
-    if (tpl.customData !== '') {
-      if (tpl.customData.exportBrick) {
-        var objects = tpl.getObjects()
-        let brickField = tpl.fields[tpl.customData.exportBrick].code
-        for (let obj of objects) {
-          let brick = obj.fields[brickField]
-          if (brick) {
-            result.push(exportBrick(obj.fields[brickField], obj.intId, brick))
-          }
-        }
-      } 
-    }
+    tpl.exportBricks()
   }
-  updateCustomBricks(result)
 }
 
 
