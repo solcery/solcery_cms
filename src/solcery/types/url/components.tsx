@@ -12,7 +12,7 @@ export const ValueRender = (props: ValueRenderParams) => {
 
 	if (!props.onChange)
     return ( <Image
-      width={200}
+      width={100}
       src={props.defaultValue}
     />)
 
