@@ -147,7 +147,6 @@ export const HomeView = () => {
 
   return (
     <div>
-      <Button onClick = { createTemplate }>NEW TEMPLATE</Button>
       <Divider/>
       <h2>Content</h2>
       {constructedContent && 
@@ -164,6 +163,8 @@ export const HomeView = () => {
         </Button>}
       
       <Divider/>
+      <h2>Utils</h2>
+      <Button onClick = { createTemplate }>NEW TEMPLATE</Button>
       <Button onClick = { airdrop }>Airdrop</Button>
     </div>
   );
