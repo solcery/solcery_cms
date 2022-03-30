@@ -328,7 +328,8 @@ export const exportBrick = (name: string, id: number, brick: Brick) => {
   return {
     type: brick.type,
     subtype: subtype, //TODO: magic number
-    name: 'custom.' + subtype + ' [' + name + ']',
+    //name: 'custom.' + subtype + ' [' + name + ']',
+    name: '[' + (subtype - 10000) + '] ' + name,
     params: Array.from(paramsMap.values()),
     func: (params: any, ctx: any) => {
       let templateName = getBrickTypeName(brick.type) + 's'
