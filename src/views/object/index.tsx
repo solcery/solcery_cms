@@ -6,12 +6,14 @@ import { useWallet } from "../../contexts/wallet";
 import { PublicKey, Account, TransactionInstruction } from "@solana/web3.js";
 import { SystemProgram } from "@solana/web3.js";
 import { notify } from "../../utils/notifications";
+
+import { useInterval } from "../../utils/utils";
 import {
   deserializeUnchecked, BinaryReader, BinaryWriter, serialize
 } from 'borsh';
 import { SType } from "../../solcery/types"
 
-import { Form, Button, Input, Table } from "antd";
+import { Form, Button, Input, Table, Spin } from "antd";
 
 import { useParams, useHistory } from "react-router-dom";
 import { TplObject, TemplateField, TemplateData, SolcerySchema, Storage } from "../../solcery/classes"
@@ -213,23 +215,28 @@ export const ObjectView = () => {
         notify({ message: "Object saving error", description: objectId })
       })
     } else {
-      console.log('setAccountDataWithNonce')
       setAccountDataWithNonce(objectPublicKey, data)
       // setAccountData(objectPublicKey, data, 33 + 36)
     }
   }
 
   useEffect(() => { 
-    if (!project)
-      return;
+    if (!project) return;
     setTemplate(project.getTemplate(templateKey))
   }, [ project ]);
 
   useEffect(() => {
-    if (!template)
-      return;
+    if (!template) return;
+    if (object) return;
+    let obj = template.getObject(objectId)
+    if (obj) {
+      setObject(obj)
+      setRevision(0)
+    } else {
+      new Promise(resolve => setTimeout(resolve, 50)).then(() => { setRevision(revision - 1) })
+    }
     setObject(template.getObject(objectId))
-  }, [ template ]);
+  }, [ template, revision ]);
 
   const loadObjectFields = (obj: any) => {
     let fields: any = {}
@@ -254,7 +261,7 @@ export const ObjectView = () => {
     }
     loadObjectFields(object)
 
-  }, [ object ]);
+  }, [ object, project ]);
 
   useEffect(() => {  
     const onKeyDown = (e: KeyboardEvent) => {
@@ -314,9 +321,5 @@ export const ObjectView = () => {
     )
   }
 
-  return (
-    <div>
-      Loading ...
-    </div>
-  );
+  return (<div><Spin size='large'/></div>);
 };
