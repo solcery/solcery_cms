@@ -192,12 +192,20 @@ export const TemplateView = () => {
     };
     return (
     <div style = {divStyle}>
-      <Table dataSource={tableData} rowKey={(record: any) => record.pubkey.toBase58()} >
+      <Table 
+        dataSource={tableData} 
+        rowKey={(record: any) => record.pubkey.toBase58()}
+        onRow={(record: any) => {
+          return {
+            onDoubleClick: event => { history.push('/template/'+ templateKey +'/' + record.id) }, 
+          };
+        }}
+      >
         <Column 
           title="Object" 
           key="objectKey"
           render={(text, record: any) => (
-              <a href={"/#/template/"+ template.id + '/' + record.id}>{ record.id.substring(0,4) + ' . . . ' + record.id.substring(40)}</a>
+              <a href={"/#/template/"+ template.id + '/' + record.id}>{ '[' + record.intId + ']'}</a>
           )}
         />
         {Object.values(template.fields).map((field: any) => { 
