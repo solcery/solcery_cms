@@ -192,7 +192,7 @@ export const TemplateView = () => {
     };
     return (
     <div style = {divStyle}>
-      <Table dataSource={tableData} >
+      <Table dataSource={tableData} rowKey={(record: any) => record.pubkey.toBase58()} >
         <Column 
           title="Object" 
           key="objectKey"
