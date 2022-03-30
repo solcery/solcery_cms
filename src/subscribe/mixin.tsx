@@ -20,7 +20,7 @@ Master.addEventSubscription = function(event: string, callback: Callback ) {
 }
 
 Master.removeEventSubscription = function(event: string, subscriptionId: number) {
-	this.eventSubscriptions[event].filter((sub: Subscription) => sub.id != subscriptionId);
+	this.eventSubscriptions[event] = this.eventSubscriptions[event].filter((sub: Subscription) => sub.id != subscriptionId);
 }
 
 Master.onCreate = function (data: any) {
