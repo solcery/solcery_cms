@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useConnection, sendTransaction } from "../../contexts/connection";
 import { useProject } from "../../contexts/project";
 import { useWallet } from "../../contexts/wallet";
@@ -8,9 +8,10 @@ import { BinaryWriter, BinaryReader } from "borsh";
 import { programId } from "../../solcery/engine"
 import { Project, TemplateData, SolcerySchema, Storage} from "../../solcery/classes"
 import { useHistory } from "react-router-dom";
-import { Button } from "antd";
+import { Button, Divider } from "antd";
 import { ConstructedContent, ConstructedObject, ConstructedTemplate, ConstructedObjects } from "../../solcery/content"
 import { GameState } from "../../solcery/game"
+import { DownloadOutlined } from '@ant-design/icons';
 
 export const HomeView = () => {
 
@@ -19,50 +20,16 @@ export const HomeView = () => {
   const { wallet, publicKey } = useWallet();
   const history = useHistory();
   const { project } = useProject();
+  const [ constructedContent, setConstructedContent ] = useState<any>(undefined)
+  const [ constructedState, setConstructedState ] = useState<any>(undefined)
 
-  const setAccountData = async (accountPublicKey: PublicKey, data: Buffer, offset: number = 0) => {
-    const MAX_DATA_SIZE = 1000
-    if (wallet === undefined || !wallet.publicKey)
-      return
-
-    if (data.length <= MAX_DATA_SIZE) {
-      let writer = new BinaryWriter()
-      writer.writeU8(3)
-      writer.writeU8(0)
-      writer.writeU64(offset) 
-      const saveAccountIx = new TransactionInstruction({
-        keys: [
-          { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
-          { pubkey: accountPublicKey, isSigner: false, isWritable: true },
-        ],
-        programId: programId,
-        data: Buffer.concat([ 
-          writer.buf.slice(0, writer.length),
-          data,
-        ]),
-      });
-      sendTransaction(connection, wallet, [saveAccountIx], [])
-    }
-    else {
-      let writer = new BinaryWriter()
-      writer.writeU8(3)
-      writer.writeU8(0)
-      writer.writeU64(offset)
-      const saveAccountIx = new TransactionInstruction({
-        keys: [
-          { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
-          { pubkey: accountPublicKey, isSigner: false, isWritable: true },
-        ],
-        programId: programId,
-        data: Buffer.concat([ 
-          writer.buf.slice(0, writer.length),
-          data.slice(0, MAX_DATA_SIZE),
-        ]),
-      });
-      await sendTransaction(connection, wallet, [saveAccountIx], [], false).then(async () => {
-        await setAccountData(accountPublicKey, data.slice(MAX_DATA_SIZE), offset + MAX_DATA_SIZE)
-      })
-    }
+  const downloadJsonFile = (name: string, data: string) => {
+    const element = document.createElement("a");
+    const file = new Blob([data], {type: 'text/plain'});
+    element.href = URL.createObjectURL(file);
+    element.download = name;
+    document.body.appendChild(element); // Required for this to work in FireFox
+    element.click();
   }
 
   const airdrop = async () => {
@@ -70,21 +37,19 @@ export const HomeView = () => {
       return
     connection.requestAirdrop(publicKey, LAMPORTS_PER_SOL * 1)
   }
-  //7hjjgLMmKBbqHuphsmonhvffD3sCW1fBuUckWVeJoipv
+
+  useEffect(() => {
+    if (!project) return;
+    let constructed = project.construct(connection);
+    setConstructedContent(constructed.toJson());
+
+    let gameState = new GameState(constructed);
+    setConstructedState(gameState.toJson());
+  }, [ project ])
+
   const constructContent = async () => {
-    if (!project)
-      return
-    if (wallet === undefined || !wallet.publicKey)
-      return
-    let constructed = project.construct(connection)
-    console.log('GAME CONTENT JSON: ' + constructed.toJson())
-    let writer = new BinaryWriter()
-
-    let gameState = new GameState(constructed)
-
-    console.log('GAME STATE JSON:' + gameState.toJson())
-    let gameStateBuf = gameState.toBuffer()
-
+    // let writer = new BinaryWriter()
+    // let gameStateBuf = gameState.toBuffer()
 
     // var gameStateAccount = new Account()
     // var createGameStateAccountIx = SystemProgram.createAccount({
@@ -183,7 +148,22 @@ export const HomeView = () => {
   return (
     <div>
       <Button onClick = { createTemplate }>NEW TEMPLATE</Button>
-      <Button onClick = { constructContent }>CONSTRUCT</Button>
+      <Divider/>
+      <h2>Content</h2>
+      {constructedContent && 
+        <Button 
+          icon={<DownloadOutlined/>}
+          onClick={() => { downloadJsonFile('game_content.json', constructedContent) }}>
+          game_content.json
+        </Button>}
+      {constructedState && 
+        <Button 
+          icon={<DownloadOutlined/>}
+          onClick={() => { downloadJsonFile('game_state.json', constructedState) }}>
+          game_state.json
+        </Button>}
+      
+      <Divider/>
       <Button onClick = { airdrop }>Airdrop</Button>
     </div>
   );

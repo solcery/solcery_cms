@@ -243,7 +243,7 @@ export class ConstructedContent {
 				return undefined
 			}
 			return v
-		})
+		}, 2)
 	}
 }
 
