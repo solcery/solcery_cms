@@ -3,8 +3,9 @@ import EventEmitter from "eventemitter3";
 import React, {
   useContext,
   useState,
+  useEffect,
 } from "react";
-import { Button, Modal, Input } from "antd";
+import { Button, Modal, Input, Spin } from "antd";
 import { ConnectButton } from "../components/ConnectButton";
 
 import { SolceryMenu } from "../components/SolceryMenu";
@@ -30,14 +31,16 @@ export function ProjectProvider({ children = null as any }) {
 	const { connected } = useWallet();
 	const [ projectKey, setProjectKey ] = useState<string>(cookies.get('projectKey'));
 	const [ project, setProject ] = useState<any>(undefined)
-	// console.log(connected)
+	const [ isLoading, setIsLoading ] = useState(false)
 
 	const login = async () => {
 		if (!projectKey)
 			return
-		cookies.set('projectKey', projectKey)
+		setIsLoading(true)
 		let prj = window.root.create(Prj, { id: projectKey, pubkey: new PublicKey(projectKey) })
 		setProject(await prj.await(connection))
+		setIsLoading(false)
+		cookies.set('projectKey', projectKey)
 	}
 
 	if (project)
@@ -51,6 +54,7 @@ export function ProjectProvider({ children = null as any }) {
 			{children}
 			</ProjectContext.Provider>
 		);
+
 	return (
 		<div>
 		<Modal
@@ -58,12 +62,13 @@ export function ProjectProvider({ children = null as any }) {
 			okText="Login"
 			visible={!project}
 			cancelButtonProps={{ style: { display: "none" } }}
-			okButtonProps={!connected ? { style: { display: "none" }} : {}}
+			okButtonProps={(!connected || isLoading) ? { style: { display: "none" }} : {}}
 			closable={false}
 			width={400}
 			onOk={login}
 		>
-		<Input hidden={!connected} onChange ={(event) => { setProjectKey(event.target.value) }} defaultValue={projectKey}/>
+		<Input hidden={!connected || isLoading} onChange ={(event) => { setProjectKey(event.target.value) }} defaultValue={projectKey}/>
+		{isLoading && <Spin size='large'/>}
 		{!connected && <ConnectButton/>}
 		</Modal>
 		{children}
