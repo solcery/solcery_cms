@@ -231,12 +231,10 @@ export const ObjectView = () => {
     setObject(template.getObject(objectId))
   }, [ template ]);
 
-  useEffect(() => {
-    if (!object)
-      return;
+  const loadObjectFields = (obj: any) => {
     let fields: any = {}
     Object.values(template.fields).forEach((field: any) => {
-      let value = object.fields[field.code]
+      let value = obj.fields[field.code]
       fields[field.code] = {
         field: field,
         value: value ? field.fieldType.cloneValue(value) : undefined,
@@ -244,8 +242,38 @@ export const ObjectView = () => {
       }
     })
     setFields(fields)
+  }
+
+  useEffect(() => {
+    if (!object) return;
+    if (!object.isLoaded) {
+      object.await(connection).then((object: any) => {
+        loadObjectFields(object)
+      })
+      return;
+    }
+    loadObjectFields(object)
 
   }, [ object ]);
+
+  useEffect(() => {  
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.keyCode === 27) { //Escape
+        if (revision == 0) {
+          history.push('/template/' + templateKey)
+        } else {
+          if (window.confirm('You have unsaved changes. Sure to exit?')) {
+            history.push('/template/' + templateKey)
+          }
+        }
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  });
 
   const setFieldValue = (code: string, value: any) => {
     if (!object)
@@ -263,8 +291,8 @@ export const ObjectView = () => {
     var objectData = Object.values(fields).map((objField: any) => objField)
     return (
       <div style={ { width: '100%' } } >
-        <p>{'[ ' + object.intId + ' ] ' + object.id}</p>
-        <Table dataSource={objectData} pagination={false}>
+        <h3>{'[ ' + object.intId + ' ] ' + object.id}</h3>
+        <Table dataSource={objectData} pagination={false} rowKey={(record: any) => record.field.code}>
             <Column
               title="Field" key="field"
               render={(text, record: any) => <p style = {!record.valid ? { color: 'red' } : undefined}>{record.field.name}</p>}
