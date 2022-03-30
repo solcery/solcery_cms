@@ -3,7 +3,7 @@ import { PublicKey, Connection } from "@solana/web3.js";
 import { schema, StorageData } from './schema'
 
 let Master: any = {
-
+  reloadOnUpdate: true,
 }
 
 Master.fromBinary = function(data: any) {

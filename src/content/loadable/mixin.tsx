@@ -22,13 +22,12 @@ Master.load = async function(connection: Connection, data: any) {
   this.fromBinary(data)
   await this.awaitAllMixins('onLoad', connection)
   this.isLoaded = true
-  if (!this.loadableSubscription) {
-  	// console.log('subscribe to ' + this.pubkey.toBase58())
-  	// this.loadableSubscription = connection.onAccountChange(this.pubkey, 
-  	// 	(accInfo) => {
-  	// 		this.execAllMixins('onSolanaAccountChanged', connection, accInfo.data.slice(33))
-  	// 	}
-  	// );
+  if (!this.loadableSubscription && this.reloadOnUpdate) {
+  	this.loadableSubscription = connection.onAccountChange(this.pubkey, 
+  		(accInfo) => {
+  			this.execAllMixins('onSolanaAccountChanged', connection, accInfo.data.slice(33))
+  		}
+  	);
   }
   this.execAllMixins('onLoaded')
   return this
