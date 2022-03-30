@@ -111,7 +111,7 @@ export const TemplateView = () => {
           { pubkey: src, isSigner: false, isWritable: false },
         ],
         programId: programId,
-        data: Buffer.from([1, 2]),
+        data: Buffer.from([1, 3]),
       }));
     }
     sendTransaction(connection, wallet, instructions, [objectAccount]).then(() => {
