@@ -6,20 +6,20 @@ export function notify({
   message = "",
   description = undefined as any,
   txid = "",
+  url = "",
   type = "info",
   placement = "bottomLeft",
   color = "white",
 }) {
-  if (txid) {
-    //   <Link
-    //     external
-    //     to={'https://explorer.solana.com/tx/' + txid}
-    //     style={{ color: '#0000ff' }}
-    //   >
-    //     View transaction {txid.slice(0, 8)}...{txid.slice(txid.length - 8)}
-    //   </Link>
+  if (url) {
+    // <Link
+    //   to={url}
+    //   style={{ color: '#0000ff' }}
+    // >
+    //   {description}
+    // </Link>
 
-    description = <></>;
+    description = <a href={url}>{description}</a>;
   }
   (notification as any)[type]({
     message: <span style={{ color: "black" }}>{message}</span>,

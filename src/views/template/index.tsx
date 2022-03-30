@@ -10,6 +10,7 @@ import { Template } from '../../content/template';
 import { programId } from "../../solcery/engine"
 import { useProject } from "../../contexts/project";
 import Cookies from 'universal-cookie';
+import { notify } from "../../utils/notifications";
 
 
 type TemplateViewParams = {
@@ -115,7 +116,11 @@ export const TemplateView = () => {
       }));
     }
     sendTransaction(connection, wallet, instructions, [objectAccount], true).then(() => {
-      history.push('/template/' + template.pubkey.toBase58() + '/' + objectAccount.publicKey.toBase58());
+      notify({ 
+        message: "Object created", 
+        description: 'CLICK TO OPEN', 
+        url: '/#/template/' + template.pubkey.toBase58() + '/' + objectAccount.publicKey.toBase58()
+      })
     })
   }
 
@@ -137,7 +142,12 @@ export const TemplateView = () => {
       programId: programId,
       data: Buffer.from([2, 1]),
     });
-    sendTransaction(connection, wallet, [popFromStorageIx], [])
+    sendTransaction(connection, wallet, [popFromStorageIx], [], true).then(() => {
+      notify({ 
+        message: "Object deleted",
+        color: "#FFDDDD"
+      })
+    })
   }
 
   const applyFilter = (value: string) => {
@@ -227,7 +237,10 @@ export const TemplateView = () => {
           render={(text, object: any) =>
           <div key={ 'actions.' + object.pubkey.toBase58() }>
             <Button key={ 'copy.' + object.pubkey.toBase58() } onClick={() => { createObject(new PublicKey(object.pubkey)) }}>Copy</Button>  
-            <Button key={ 'delete.' + object.pubkey.toBase58() } onClick={() => { deleteObject(new PublicKey(object.pubkey)) }}>Delete</Button>  
+            <Button key={ 'delete.' + object.pubkey.toBase58() } onClick={() => { 
+              if (window.confirm('Deleting object [' + object.intId + '] ' + object.fields.name + '. Are you sure?'))
+                deleteObject(new PublicKey(object.pubkey)) 
+            }}>Delete</Button>  
           </div>} //TODO: delete: accountCleanup, confirmation
         />
       </Table>
