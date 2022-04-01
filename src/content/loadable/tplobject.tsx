@@ -1,6 +1,7 @@
 import { deserializeUnchecked, BinaryReader, BinaryWriter } from 'borsh';
 import { PublicKey, Connection } from "@solana/web3.js";
 import { schema, TemplateData } from './schema'
+import { addCustomBrick, exportBrick } from '../../solcery/types'
 
 let Master: any = {}
 
@@ -53,8 +54,23 @@ Master.toBinary = function() {
   ])
 }
 
-Master.onSolanaAccountChanged = function (connection: Connection, data: any) {
-  this.fromBinary(data)
+
+Master.exportBrick = function() {
+  let template = this.parent.parent
+  if (template.customData && template.customData.exportBrick) {
+    let fieldId: number = template.customData.exportBrick
+    let field = template.fields[fieldId].code
+    let brick = this.fields[field]
+    if (brick) {
+      addCustomBrick(exportBrick(this.fields.name, this.intId, brick))
+    }
+  }
 }
+
+Master.onLoad = function() {
+  this.exportBrick()
+  this.parent.execAllMixins('onObjectReload', this)
+}
+
 
 export { Master }

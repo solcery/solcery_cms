@@ -3,7 +3,6 @@ import { PublicKey, Connection } from "@solana/web3.js";
 import { schema, TemplateData, TemplateFieldData} from './schema';
 import { Storage } from '../storage';
 import { TplObject } from '../tplobject';
-import { addCustomBrick, exportBrick } from '../../solcery/types'
 
 let Master: any = {}
 
@@ -35,23 +34,9 @@ Master.toBinary = function() {
   // this.fields.map((field: any) => new TemplateFieldData(field));
 }
 
-Master.exportBricks = function() {
-  if (this.customData && this.customData.exportBrick) {
-    let fieldId: number = this.customData.exportBrick
-    let field = this.fields[fieldId].code
-    for (let obj of this.getObjects()) {
-      let brick = obj.fields[field]
-      if (brick) {
-        addCustomBrick(exportBrick(obj.fields.name, obj.intId, brick))
-      }
-    }
-  }
-}
-
 Master.onLoad = async function(connection: Connection) {
   await this.storage.load(connection)
   await this.storage.loadAll(connection)
-  this.exportBricks()
 }
 
 Master.onCreate = function() {

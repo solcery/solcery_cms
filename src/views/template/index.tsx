@@ -176,11 +176,15 @@ export const TemplateView = () => {
   useEffect(() => {
     if (!storage)
       return
-    let subscriptionId = storage.addEventSubscription('onStorageFullyLoaded', (storage: any) => {
+    let storageReloadSubscriptionId = storage.addEventSubscription('onStorageFullyLoaded', (storage: any) => {
+      setObjects(template.getObjects())
+    })
+    let objectReloadSubscriptionId = storage.addEventSubscription('onObjectReload', (storage: any, object: any) => {
       setObjects(template.getObjects())
     })
     return () => {
-      storage.removeEventSubscription('onStorageFullyLoaded', subscriptionId)
+      storage.removeEventSubscription('onStorageFullyLoaded', storageReloadSubscriptionId)
+      storage.removeEventSubscription('onObjectReload', objectReloadSubscriptionId)
     };
   }, [ storage ])
 

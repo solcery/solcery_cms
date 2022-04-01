@@ -45,20 +45,19 @@ export const ObjectView = () => {
   var objectPublicKey = new PublicKey(objectId)
 
 
-  const sendTransactionChain = async (transactionChain: any[]) => {
+  const sendTransactionChain = async (transactionChain: any[], index: number = 0, onSuccess: () => any = () => {}, onFailure: () => any = () => {}) => {
     if (!publicKey || wallet === undefined)
       return;
-    (async () => {
-      for (let transactionData of transactionChain) {
-        await sendTransaction(connection, wallet, transactionData.instructions, transactionData.accounts, true)
-      }
-    })().then(() => {  // TODO: remove hardcode
-      notify({ message: "Object saved successfully", description: objectId})
-      history.push('/template/' + templateKey)
-    },
-    () => {
-      notify({ message: "Object saving error", description: objectId })
-    });
+
+    var transactionData = transactionChain[index]
+    if (index < transactionChain.length - 1) {
+      sendTransaction(connection, wallet, transactionData.instructions, transactionData.accounts, true).then(() => {
+        sendTransactionChain(transactionChain, index + 1, onSuccess, onFailure)
+      })
+    } 
+    if (index == transactionChain.length - 1) {
+      sendTransaction(connection, wallet, transactionData.instructions, transactionData.accounts, true).then(onSuccess, onFailure)
+    }
   }
 
   const setAccountDataWithNonce = (accountPublicKey: PublicKey, data: Buffer) => {
@@ -125,7 +124,17 @@ export const ObjectView = () => {
       accounts: [ nonceAccount ]
     })
 
-    sendTransactionChain(transactions)
+    sendTransactionChain(
+      transactions, 
+      0, 
+      () => {  // TODO: remove hardcode
+        notify({ message: "Object saved successfully", description: objectId})
+        history.push('/template/' + templateKey)
+        if (object) object.load(connection);
+      },
+      () => {
+        notify({ message: "Object saving error", description: objectId })
+      });
   }
 
   const setAccountData = async (accountPublicKey: PublicKey, data: Buffer, offset: number = 0) => {
@@ -210,9 +219,11 @@ export const ObjectView = () => {
         history.push('/template/' + templateKey) 
       }).then(() => {
         notify({ message: "Object saved successfully", description: objectId })
+        if (object) object.load(connection);
       },
       () => {
         notify({ message: "Object saving error", description: objectId })
+
       })
     } else {
       setAccountDataWithNonce(objectPublicKey, data)
