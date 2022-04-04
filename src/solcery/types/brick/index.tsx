@@ -990,7 +990,7 @@ basicBricks.push({ // TODO: reuse code
   name: 'Sum Iterator',
   params: [
     { id: 1, code: 'iter_condition',name: 'Iteration Condition', type: new SBrick({ brickType: 1 }) },
-    { id: 2, code: 'value',name: 'Value', type: new SBrick({ brickType: 2 }) },
+    { id: 2, code: 'target_value',name: 'Target Value', type: new SBrick({ brickType: 2 }) },
     { id: 3, code: 'limit', name: 'Limit', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
@@ -1032,6 +1032,63 @@ basicBricks.push({
     return ctx.vars[varName]
   }
 })
+
+basicBricks.push({ // TODO: reuse code
+  type: 2,
+  subtype: 16,
+  name: 'Max Iterator',
+  params: [
+    { id: 1, code: 'iter_condition',name: 'Iteration Condition', type: new SBrick({ brickType: 1 }) },
+    { id: 2, code: 'value',name: 'Value', type: new SBrick({ brickType: 2 }) },
+    { id: 3, code: 'fallback', name: 'Fallback', type: new SBrick({ brickType: 2 }) }
+  ],
+  func: (params: any, ctx: any) => {
+    let old_object = ctx.object 
+    let amount = 0
+    let objects = [...ctx.game.objects.values()]
+    shuffleArray(objects)
+    let result = Number.NEGATIVE_INFINITY
+    for (let obj of objects) {
+      if (applyBrick(params.iter_condition, ctx)) {
+        result = Math.min(applyBrick(params.value, ctx), result)
+      }
+    }
+    ctx.object = old_object
+    if (result == Number.NEGATIVE_INFINITY) {
+      result = applyBrick(params.fallback, ctx)
+    }
+    return result
+  }
+})
+
+basicBricks.push({ // TODO: reuse code
+  type: 2,
+  subtype: 17,
+  name: 'Min Iterator',
+  params: [
+    { id: 1, code: 'iter_condition',name: 'Iteration Condition', type: new SBrick({ brickType: 1 }) },
+    { id: 2, code: 'value',name: 'Value', type: new SBrick({ brickType: 2 }) },
+    { id: 3, code: 'fallback', name: 'Fallback', type: new SBrick({ brickType: 2 }) }
+  ],
+  func: (params: any, ctx: any) => {
+    let old_object = ctx.object 
+    let amount = 0
+    let objects = [...ctx.game.objects.values()]
+    shuffleArray(objects)
+    let result = Number.POSITIVE_INFINITY
+    for (let obj of objects) {
+      if (applyBrick(params.iter_condition, ctx)) {
+        result = Math.max(applyBrick(params.value, ctx), result)
+      }
+    }
+    ctx.object = old_object
+    if (result == Number.POSITIVE_INFINITY) {
+      result = applyBrick(params.fallback, ctx)
+    }
+    return result
+  }
+})
+
 
 
 
