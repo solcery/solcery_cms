@@ -117,7 +117,7 @@ export const PlayView = () => {
         {
           id: 0,
           state_type: 0,
-          value: gameState,
+          value: gameState.toObject(),
         }
       ]
     }
@@ -126,19 +126,19 @@ export const PlayView = () => {
 
   const onCardAttrChange = (cardId: number, attrName: string, value: number) => {
     gameState.objects.get(cardId).attrs[attrName] = value;
-    setGameState(gameState)
+    sendGameState(gameState)
     setStep(step + 1)
   }
 
   unityPlayContext.on("OnUnityLoaded", async () => {
     let content = gameState.content.toJson()
     unityPlayContext.send("ReactToUnity", "UpdateGameContent", content);
-    setGameState(gameState)
+    sendGameState(gameState)
   });
 
   unityPlayContext.on("CastCard", async (cardId: number) => {
     gameState.useCard(cardId, 1)
-    setGameState(gameState)
+    sendGameState(gameState)
     setStep(step + 1)
   });
 
@@ -148,7 +148,7 @@ export const PlayView = () => {
       if (logEntry.actionType == 0)
       {
         gameState.useCard(logEntry.data, logEntry.playerId)
-        setGameState(gameState)
+        sendGameState(gameState)
         setStep(step + 1)
       }
     }

@@ -1,5032 +1,2670 @@
 {
-  "attrs": [
-    {
-      "key": "finished",
-      "value": 0
-    }
-  ],
-  "objects": [
-    {
-      "id": 1,
-      "tplId": 161,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 2,
-      "tplId": 813,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 8
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 1
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 3,
-      "tplId": 206,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 1
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 4,
-      "tplId": 207,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 1
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 5,
-      "tplId": 226,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 1
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 6,
-      "tplId": 235,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 1
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 7,
-      "tplId": 236,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 1
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 8,
-      "tplId": 259,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 9,
-      "tplId": 259,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 10,
-      "tplId": 259,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 11,
-      "tplId": 259,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 12,
-      "tplId": 259,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 13,
-      "tplId": 265,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 14,
-      "tplId": 265,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 15,
-      "tplId": 265,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 16,
-      "tplId": 265,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 17,
-      "tplId": 265,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 18,
-      "tplId": 865,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 19,
-      "tplId": 865,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 20,
-      "tplId": 865,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 21,
-      "tplId": 301,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 22,
-      "tplId": 301,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 23,
-      "tplId": 301,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 24,
-      "tplId": 810,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 25,
-      "tplId": 810,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 26,
-      "tplId": 810,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 27,
-      "tplId": 311,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 1
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 28,
-      "tplId": 312,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 1
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 29,
-      "tplId": 312,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 1
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 30,
-      "tplId": 312,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 1
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 31,
-      "tplId": 319,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 1
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 32,
-      "tplId": 319,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 1
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 33,
-      "tplId": 346,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 34,
-      "tplId": 308,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 35,
-      "tplId": 300,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 36,
-      "tplId": 861,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 37,
-      "tplId": 332,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 38,
-      "tplId": 882,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 39,
-      "tplId": 880,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 1
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 1
-        },
-        {
-          "key": "consumable",
-          "value": 1
-        }
-      ]
-    },
-    {
-      "id": 40,
-      "tplId": 880,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 1
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 1
-        },
-        {
-          "key": "consumable",
-          "value": 1
-        }
-      ]
-    },
-    {
-      "id": 41,
-      "tplId": 880,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 1
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 1
-        },
-        {
-          "key": "consumable",
-          "value": 1
-        }
-      ]
-    },
-    {
-      "id": 42,
-      "tplId": 880,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 1
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 1
-        },
-        {
-          "key": "consumable",
-          "value": 1
-        }
-      ]
-    },
-    {
-      "id": 43,
-      "tplId": 880,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 1
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 1
-        },
-        {
-          "key": "consumable",
-          "value": 1
-        }
-      ]
-    },
-    {
-      "id": 44,
-      "tplId": 875,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 1
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 1
-        },
-        {
-          "key": "consumable",
-          "value": 1
-        }
-      ]
-    },
-    {
-      "id": 45,
-      "tplId": 875,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 1
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 1
-        },
-        {
-          "key": "consumable",
-          "value": 1
-        }
-      ]
-    },
-    {
-      "id": 46,
-      "tplId": 875,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 1
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 1
-        },
-        {
-          "key": "consumable",
-          "value": 1
-        }
-      ]
-    },
-    {
-      "id": 47,
-      "tplId": 875,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 1
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 1
-        },
-        {
-          "key": "consumable",
-          "value": 1
-        }
-      ]
-    },
-    {
-      "id": 48,
-      "tplId": 875,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 1
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 1
-        },
-        {
-          "key": "consumable",
-          "value": 1
-        }
-      ]
-    },
-    {
-      "id": 49,
-      "tplId": 790,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 50,
-      "tplId": 848,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 51,
-      "tplId": 848,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 52,
-      "tplId": 848,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 53,
-      "tplId": 848,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 54,
-      "tplId": 848,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 55,
-      "tplId": 894,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 56,
-      "tplId": 898,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 57,
-      "tplId": 878,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 58,
-      "tplId": 156,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 59,
-      "tplId": 156,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 60,
-      "tplId": 156,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 61,
-      "tplId": 156,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 62,
-      "tplId": 156,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 63,
-      "tplId": 156,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 64,
-      "tplId": 156,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 65,
-      "tplId": 156,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 66,
-      "tplId": 156,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 67,
-      "tplId": 156,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 68,
-      "tplId": 896,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 69,
-      "tplId": 897,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 70,
-      "tplId": 906,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 71,
-      "tplId": 310,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 72,
-      "tplId": 908,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 73,
-      "tplId": 911,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 74,
-      "tplId": 911,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 75,
-      "tplId": 911,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 76,
-      "tplId": 911,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 77,
-      "tplId": 911,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 78,
-      "tplId": 913,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 79,
-      "tplId": 913,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 80,
-      "tplId": 915,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 81,
-      "tplId": 915,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 82,
-      "tplId": 908,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 83,
-      "tplId": 908,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 84,
-      "tplId": 908,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 85,
-      "tplId": 922,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 86,
-      "tplId": 922,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 87,
-      "tplId": 922,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 88,
-      "tplId": 921,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 89,
-      "tplId": 921,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 90,
-      "tplId": 921,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 0
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 91,
-      "tplId": 157,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 1
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 92,
-      "tplId": 315,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 2
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
-    },
-    {
-      "id": 93,
-      "tplId": 314,
-      "attrs": [
-        {
-          "key": "place",
-          "value": 1
-        },
-        {
-          "key": "hp",
-          "value": 0
-        },
-        {
-          "key": "deckPlace",
-          "value": 0
-        },
-        {
-          "key": "sidekick",
-          "value": 3
-        },
-        {
-          "key": "enemy",
-          "value": 0
-        },
-        {
-          "key": "number",
-          "value": 0
-        },
-        {
-          "key": "loot",
-          "value": 0
-        },
-        {
-          "key": "highlighted",
-          "value": 0
-        },
-        {
-          "key": "block",
-          "value": 0
-        },
-        {
-          "key": "widgetOwner",
-          "value": 0
-        },
-        {
-          "key": "useCount",
-          "value": 0
-        },
-        {
-          "key": "consumable",
-          "value": 0
-        }
-      ]
+  "states": 
+  [
+    {
+      "id": 0,
+      "state_type": 0,
+      "value":
+      {
+        "attrs": [
+          {
+            "key": "finished",
+            "value": 0
+          },
+          {
+            "key": "input_lock",
+            "value": 0
+          }
+        ],
+        "objects": [
+          {
+            "id": 1,
+            "tplId": 295,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 1
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 3
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "tplId": 295,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 1
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 3
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "tplId": 295,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 1
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 3
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "tplId": 295,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 1
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 3
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "tplId": 295,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 1
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 3
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "tplId": 295,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 1
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 3
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "tplId": 295,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 1
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 3
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "tplId": 295,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 1
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 3
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 9,
+            "tplId": 295,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 1
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 3
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 10,
+            "tplId": 295,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 1
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 3
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 11,
+            "tplId": 295,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 1
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 3
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 12,
+            "tplId": 295,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 1
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 3
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 13,
+            "tplId": 295,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 1
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 3
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 14,
+            "tplId": 295,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 1
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 3
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 15,
+            "tplId": 295,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 1
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 3
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 16,
+            "tplId": 295,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 1
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 3
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 17,
+            "tplId": 119,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 1
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 5
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 15
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 18,
+            "tplId": 347,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 0
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 0
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 19,
+            "tplId": 303,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 11
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 0
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 0
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 20,
+            "tplId": 236,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 8
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 0
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 0
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 21,
+            "tplId": 116,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 5
+              },
+              {
+                "key": "type",
+                "value": 4
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 2
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 22,
+            "tplId": 116,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 5
+              },
+              {
+                "key": "type",
+                "value": 4
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 2
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 23,
+            "tplId": 116,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 5
+              },
+              {
+                "key": "type",
+                "value": 4
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 2
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 24,
+            "tplId": 116,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 5
+              },
+              {
+                "key": "type",
+                "value": 4
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 2
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 25,
+            "tplId": 116,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 5
+              },
+              {
+                "key": "type",
+                "value": 4
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 2
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 26,
+            "tplId": 115,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 3
+              },
+              {
+                "key": "type",
+                "value": 1
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 27,
+            "tplId": 115,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 3
+              },
+              {
+                "key": "type",
+                "value": 1
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 28,
+            "tplId": 115,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 3
+              },
+              {
+                "key": "type",
+                "value": 1
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 29,
+            "tplId": 115,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 3
+              },
+              {
+                "key": "type",
+                "value": 1
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 30,
+            "tplId": 286,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 3
+              },
+              {
+                "key": "type",
+                "value": 1
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 31,
+            "tplId": 286,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 3
+              },
+              {
+                "key": "type",
+                "value": 1
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 32,
+            "tplId": 286,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 3
+              },
+              {
+                "key": "type",
+                "value": 1
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 33,
+            "tplId": 286,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 3
+              },
+              {
+                "key": "type",
+                "value": 1
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 34,
+            "tplId": 287,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 3
+              },
+              {
+                "key": "type",
+                "value": 1
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 35,
+            "tplId": 287,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 3
+              },
+              {
+                "key": "type",
+                "value": 1
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 36,
+            "tplId": 287,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 3
+              },
+              {
+                "key": "type",
+                "value": 1
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 37,
+            "tplId": 287,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 3
+              },
+              {
+                "key": "type",
+                "value": 1
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 38,
+            "tplId": 462,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 12
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 0
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 0
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 39,
+            "tplId": 477,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 14
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 0
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 0
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 40,
+            "tplId": 443,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 0
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 0
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 41,
+            "tplId": 444,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 0
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 0
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 42,
+            "tplId": 263,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 22
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 3
+              },
+              {
+                "key": "type",
+                "value": 1
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 43,
+            "tplId": 478,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 13
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 0
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 0
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 44,
+            "tplId": 266,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 21
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 3
+              },
+              {
+                "key": "type",
+                "value": 1
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 3
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 45,
+            "tplId": 481,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 0
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 0
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 46,
+            "tplId": 482,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 0
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 0
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 47,
+            "tplId": 241,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 0
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 0
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 48,
+            "tplId": 243,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 0
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 0
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "id": 49,
+            "tplId": 243,
+            "attrs": [
+              {
+                "key": "place",
+                "value": 1
+              },
+              {
+                "key": "number",
+                "value": 0
+              },
+              {
+                "key": "show_duration",
+                "value": 0
+              },
+              {
+                "key": "token_slots",
+                "value": 0
+              },
+              {
+                "key": "type",
+                "value": 0
+              },
+              {
+                "key": "creature_number",
+                "value": 0
+              },
+              {
+                "key": "token_count",
+                "value": 0
+              },
+              {
+                "key": "token_type",
+                "value": 0
+              },
+              {
+                "key": "token_origin",
+                "value": 0
+              },
+              {
+                "key": "duration",
+                "value": 0
+              },
+              {
+                "key": "creature",
+                "value": 0
+              },
+              {
+                "key": "highlighted",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }
