@@ -44,7 +44,7 @@ export const HomeView = () => {
     setConstructedContent(constructed.toJson());
 
     let gameState = new GameState(constructed);
-    setConstructedState(gameState.toJson());
+    setConstructedState(gameState.toJSON());
   }, [ project ])
 
   const constructContent = async () => {

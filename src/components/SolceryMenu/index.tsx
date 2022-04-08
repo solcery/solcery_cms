@@ -3,7 +3,7 @@ import { useConnection } from "../../contexts/connection";
 import { useProject } from "../../contexts/project"
 import { SystemProgram } from "@solana/web3.js";
 import { Template } from "../../content/"
-import { Menu} from "antd"
+import { Menu } from "antd"
 
 const { SubMenu } = Menu;
 

@@ -111,22 +111,34 @@ export const PlayView = () => {
     setCardTypeNamesById(Object.fromEntries(result))
   }, [ gameState])
 
+  const sendGameState = (gameState: any) => {
+    let client_package = {
+      states: [
+        {
+          id: 0,
+          state_type: 0,
+          value: gameState,
+        }
+      ]
+    }
+    unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(client_package));
+  }
+
   const onCardAttrChange = (cardId: number, attrName: string, value: number) => {
     gameState.objects.get(cardId).attrs[attrName] = value;
-    unityPlayContext.send("ReactToUnity", "UpdateGameState", gameState.toJson());
+    setGameState(gameState)
     setStep(step + 1)
   }
 
   unityPlayContext.on("OnUnityLoaded", async () => {
     let content = gameState.content.toJson()
-    let state = gameState.toJson()
     unityPlayContext.send("ReactToUnity", "UpdateGameContent", content);
-    unityPlayContext.send("ReactToUnity", "UpdateGameState", state);
+    setGameState(gameState)
   });
 
   unityPlayContext.on("CastCard", async (cardId: number) => {
     gameState.useCard(cardId, 1)
-    unityPlayContext.send("ReactToUnity", "UpdateGameState", gameState.toJson());
+    setGameState(gameState)
     setStep(step + 1)
   });
 
@@ -136,7 +148,7 @@ export const PlayView = () => {
       if (logEntry.actionType == 0)
       {
         gameState.useCard(logEntry.data, logEntry.playerId)
-        unityPlayContext.send("ReactToUnity", "UpdateGameState", gameState.toJson());
+        setGameState(gameState)
         setStep(step + 1)
       }
     }

@@ -300,7 +300,7 @@ export class GameState {
     }
   }
 
-  toJson() {
+  toJSON() {
     return JSON.stringify(this.toObject(), null, 2)
   }
 
