@@ -78,6 +78,7 @@ export class GameState {
 	objects: Map<number, GameObject> = new Map();
   attrs: any = {};
 	content: any = undefined;
+  diff: any = {};
 
   copy = () => {
     let newState = new GameState()
@@ -230,45 +231,11 @@ export class GameState {
       gameAttrs: new Map(),
       objectAttrs: new Map()
     }
+    ctx.log = []
 		let cardType = this.content.get('cardTypes', object.tplId)
 		applyBrick(cardType.action, ctx)
     return ctx.diff
 	}
-
-	extractGameState = () => {
-		return {
-      Cards: this.objectsToCards()
-    }
-	}
-
-  extractContent = () => {
-    return {
-      CardTypes: constructCardTypes(this.content),
-    }
-  }
-
-  extractDisplayData = () => {
-    return {
-      PlaceDisplayDatas: constructPlaces(this.content)
-    }
-  }
-
-	objectsToCards = () => {
-		var result: Card[] = []
-		for (let [ gameObjectId, gameObject ] of this.objects) { 
-      let cardAttrs: CardAttr[] = []
-      for (let attr of Object.keys(gameObject.attrs)) {
-        cardAttrs.push({ Name: attr, Value: gameObject.attrs[attr] })
-      }
-			result.push({
-				CardId: gameObjectId,
-				CardType: gameObject.tplId,
-				CardPlace: gameObject.attrs.place,
-        Attrs: cardAttrs,
-			})
-		}
-		return result
-	}	
 
   toObject() {
     let globalAttrs: any[] = []
@@ -301,9 +268,24 @@ export class GameState {
   }
 
   toJSON() {
-    return JSON.stringify(this.toObject(), null, 2)
+    return this.toObject()
   }
 
+  createEntity(tplId: any) {
+    let objectId = this.objects.size + 1;
+    var attributes = this.content.get('attributes');
+    var attrs: any = {};
+    for (let contentAttr of attributes) {
+      attrs[contentAttr.code] = 0
+    }
+    let obj = {
+      id: objectId,
+      tplId: tplId,
+      attrs: attrs
+    }
+    this.objects.set(objectId, obj)
+    return obj
+  }
 }
 
 class Context {
@@ -311,64 +293,15 @@ class Context {
 	game: GameState;
 	object: any;
   diff: any;
+  log: any[];
   args: any[] = [];
 	constructor(src: { game: GameState, object: any, extra?: any}) {
 		this.object = src.object;
 		this.game = src.game;
 		this.vars = src.extra?.vars;
+    this.log = []
 	}
 }
-
-const constructPlaces = (content: any) => {
-  var result = []
-  var placesContent = content.get('places')
-  if (!placesContent)
-    return
-  for (let place of placesContent) { 
-    result.push({
-      PlaceName: place.name,
-      PlaceId: place.placeId,
-      PlacePlayer: place.playerMode,
-      IsInteractable: place.interactableForActiveLocalPlayer,
-      IsVisible: place.visible,
-      HorizontalAnchors: {
-        Min: (place.x1 ? place.x1 : 0) / 10000,
-        Max: (place.x2 ? place.x2 : 0) / 10000,
-      },
-      VerticalAnchors: {
-        Min: (place.y1 ? place.y1 : 0) / 10000,
-        Max: (place.y2 ? place.y2 : 0) / 10000,
-      },
-      ZOrder: place.zOrder,
-      CardFaceOption: place.face ? place.face : 0,
-      CardLayoutOption: place.layout ? place.layout : 0,
-    })
-  }
-  return result
-}
-
-
-const constructBoardData = (content: any) => {
-  var result = {
-    LastUpdate: Date.now(),
-    Players: constructPlayers(),
-    Cards: [],
-    Message: {
-      Nonce: 1,
-      Message: "No message",
-      Duration: 5,
-    },
-    Random: {
-      x: 1,
-      y: 2,
-      z: 3,
-      w: 4,
-    },
-    EndTurnCardId: 5,
-  }
-  return result
-}
-
 
 type FightLog = {
   Steps: LogEntry[],
@@ -378,101 +311,5 @@ type LogEntry = {
   playerId: number,
   actionType: number,
   data: number,
-}
-
-type Card = { // TODO: from content
-  CardId: number,
-  CardType: number,
-  CardPlace: number,
-  Attrs: CardAttr[],
-}
-
-type CardAttr = {
-  Name: string,
-  Value: number,
-}
-
-type OldPlayer = {
-  Address: string,
-  IsActive: boolean,
-  HP: number,
-  Coins: number,
-  IsMe: boolean,
-  Attrs: number[]
-}
-
-type CardType = { //TODO: from content
-  Id: number,
-  Metadata: {
-    Picture: number,
-    PictureUrl: string,
-    Icon: number,
-    Coins: number,
-    Name: string,
-    Description: string,
-  },
-  BrickTree: any, // TODO: brick
-}
-
-type BoardData = {
-  LastUpdate: number,
-  Players: OldPlayer[],
-  Cards: Card[],
-  Message: {
-    Nonce: number,
-    Message: string,
-    Duration: number
-  }
-  Random: {
-    x: number,
-    y: number,
-    z: number,
-    w: number,
-  }
-  EndTurnCardId: number
-}
-
-
-const constructCardTypes = (content: any) => {
-  var result: CardType[] = []
-  var cardTypesContent = content.get('cardTypes')
-  if (!cardTypesContent)
-    return result
-  for (let cardType of cardTypesContent) { 
-    result.push({
-      Id: cardType.id,
-      BrickTree: {},
-      Metadata: {
-        Picture: cardType.pictureNumber,
-        PictureUrl: cardType.picture,
-        Icon: cardType.icon,
-        Coins: cardType.coins,
-        Name: cardType.name,
-        Description: cardType.description,
-      }
-    })
-  }
-  return result
-} 
-
-const constructPlayers = () => {
- return [
-  {
-    Address: "None",
-    IsActive: true,
-    HP: 25,
-    Coins: 0,
-    IsMe: true,
-    Attrs: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  },
-  {
-    Address: "None",
-    IsActive: false,
-    HP: 25,
-    Coins: 0,
-    IsMe: false,
-    Attrs: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  }
- ]
 }
 
