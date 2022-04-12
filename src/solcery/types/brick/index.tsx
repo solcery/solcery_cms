@@ -18,7 +18,6 @@ const checkValidity: (brickTree: any) => boolean = (brickTree: any) => {
   return result
 }
 
-
 export class SBrick extends SType {
   id = 6;
   static typename = "Brick";
@@ -520,13 +519,17 @@ basicBricks.push({
     if (ctx.object.attrs[attrName] === undefined)
       throw new Error("trying to set unknown attr " + attrName)
     ctx.object.attrs[attrName] = value
-    // if (ctx.diff) {
-    //   let objectId = ctx.object.id
-    //   let objectDiff = ctx.diff.objectAttrs.get(objectId)
-    //   if (!objectDiff)
-    //     ctx.diff.objectAttrs.set(objectId, new Map())
-    //   ctx.diff.objectAttrs.get(objectId).set(attrName, value)
-    // }
+    if (ctx.diff) {
+      let objectId = ctx.object.id
+      if (!ctx.diff.objects[objectId]) {
+        ctx.diff.objects[objectId] = {
+          id: objectId,
+          tplId: ctx.object.tplId,
+          attrs: {}
+        }
+      }
+      ctx.diff.objects[objectId].attrs[attrName] = value
+    }
   }
 })
 
@@ -559,9 +562,9 @@ basicBricks.push({
     if (ctx.game.attrs[attrName] === undefined)
       throw new Error("Trying to set unknown game attr " + attrName)
     ctx.game.attrs[attrName] = value
-    // if (ctx.diff) {
-    //   ctx.diff.gameAttrs.set(attrName, value)
-    // }
+    if (ctx.diff) {
+      ctx.diff.attrs[attrName] = value
+    }
   }
 })
 
@@ -574,12 +577,7 @@ basicBricks.push({
   ],
   func: (params: any, ctx: any) => {
     let duration = applyBrick(params.duration, ctx);
-    let gameState = {
-      id: ctx.log.length,
-      type: 0,
-      value: ctx.game.toObject()
-    };
-    ctx.log.push(gameState)
+    ctx.game.exportDiff(ctx)
     let pauseState = {
       id: ctx.log.length,
       type: 1,

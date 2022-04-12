@@ -134,6 +134,7 @@ export const PlayView = () => {
     let clientPackage = {
       states: gameState.playerCommand(command)
     }
+    console.log(clientPackage)
     unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(clientPackage));
     setStep(step + 1)
   });

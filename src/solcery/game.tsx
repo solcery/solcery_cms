@@ -78,7 +78,6 @@ export class GameState {
 	objects: Map<number, GameObject> = new Map();
   attrs: any = {};
 	content: any = undefined;
-  diff: any = {};
 
   copy = () => {
     let newState = new GameState()
@@ -218,6 +217,47 @@ export class GameState {
     updateCustomBricks(bricksToAdd)
   }
 
+  createContext = (extra: any) => {
+
+  }
+
+  exportDiff = (ctx: any) => {
+    console.log('exportDiff')
+    console.log(ctx.log.length)
+    console.log(JSON.stringify(ctx.diff))
+    let logEntry: any = {
+      attrs: Object.entries(ctx.diff.attrs).map(([key, value]) => {
+        return {
+          key: key,
+          value: value
+        }
+      }),
+      objects: Object.values(ctx.diff.objects).map((objDiff: any) => {
+        return {
+          id: objDiff.id,
+          tplId: objDiff.tplId,
+          attrs: Object.entries(objDiff.attrs).map(([key, value]) => {
+            return {
+              key: key,
+              value: value
+            }
+          }),
+        }
+      })
+    }
+    console.log(logEntry)
+    let gameState = {
+      id: ctx.log.length,
+      type: 0,
+      value: logEntry
+    };
+    ctx.log.push(gameState)
+    ctx.diff = {
+      attrs: {},
+      objects: {}
+    }
+  }
+
 	useCard = (cardId: number) => {
 		let object = this.objects.get(cardId)
 		if (!object)
@@ -227,18 +267,10 @@ export class GameState {
 			object: object,
 			extra: { vars: {} },
 		})
-    ctx.diff = {
-      gameAttrs: new Map(),
-      objectAttrs: new Map()
-    }
-    ctx.log = []
 		let cardType = this.content.get('cardTypes', object.tplId)
 		applyBrick(cardType.action, ctx)
-    ctx.log.push({
-      id: ctx.log.length,
-      type: 0,
-      value: ctx.game.toObject()
-    })
+    console.log('EXPORT')
+    this.exportDiff(ctx)
     return ctx.log
 	}
 
@@ -252,18 +284,9 @@ export class GameState {
       object: object,
       extra: { vars: { 'target_place': targetPlace } },
     })
-    ctx.diff = {
-      gameAttrs: new Map(),
-      objectAttrs: new Map()
-    }
-    ctx.log = []
     let dragndrop = this.content.get('drag_n_drops', dndId)
     applyBrick(dragndrop.action_on_drop, ctx)
-    ctx.log.push({
-      id: ctx.log.length,
-      type: 0,
-      value: ctx.game.toObject()
-    })
+    this.exportDiff(ctx)
     return ctx.log
   }
 
@@ -339,6 +362,10 @@ class Context {
 		this.object = src.object;
 		this.game = src.game;
 		this.vars = src.extra?.vars;
+    this.diff = {
+      attrs: {},
+      objects: {}
+    }
     this.log = []
 	}
 }
