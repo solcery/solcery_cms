@@ -575,13 +575,13 @@ basicBricks.push({
   func: (params: any, ctx: any) => {
     let duration = applyBrick(params.duration, ctx);
     let gameState = {
-      id: ctx.log.length(),
+      id: ctx.log.length,
       type: 0,
       value: ctx.game.toObject()
     };
     ctx.log.push(gameState)
     let pauseState = {
-      id: ctx.log.length(),
+      id: ctx.log.length,
       type: 1,
       value: {
         delay: duration,
@@ -618,7 +618,7 @@ basicBricks.push({
     { id: 3, code: 'action', name: 'Action', type: new SBrick({ brickType: 0 }) }, 
   ],
   func: (params: any, ctx: any) => {
-    let card_type  = applyBrick(params.cardType, ctx)
+    let card_type  = applyBrick(params.card_type, ctx)
     let place = applyBrick(params.place, ctx)
     let newObj = ctx.game.createEntity(card_type)
     let oldObj = ctx.object
@@ -966,7 +966,7 @@ basicBricks.push({
   func: (params: any, ctx: any) => {
     let v1 = applyBrick(params.value1, ctx)
     let v2 = applyBrick(params.value2, ctx)
-    return v1 - Math.floor(v1 / v2) 
+    return v1 - (Math.floor(v1 / v2) * v2)
   }
 })
 
@@ -1044,7 +1044,7 @@ basicBricks.push({ // TODO: reuse code
     let result = 0
     for (let obj of objs) {
       ctx.object = obj
-      result = result + applyBrick(params.value, ctx)
+      result = result + applyBrick(params.target_value, ctx)
     }
     ctx.object = oldObj
     return result

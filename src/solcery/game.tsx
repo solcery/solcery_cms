@@ -218,14 +218,14 @@ export class GameState {
     updateCustomBricks(bricksToAdd)
   }
 
-	useCard = (cardId: number, playerId: number) => {
+	useCard = (cardId: number) => {
 		let object = this.objects.get(cardId)
 		if (!object)
 			throw new Error("Attempt to cast unexistent card!")
 		let ctx = new Context({
 			game: this,
 			object: object,
-			extra: { vars: new Map([[ 'playerId', playerId ]]) },
+			extra: { vars: {} },
 		})
     ctx.diff = {
       gameAttrs: new Map(),
@@ -234,8 +234,48 @@ export class GameState {
     ctx.log = []
 		let cardType = this.content.get('cardTypes', object.tplId)
 		applyBrick(cardType.action, ctx)
-    return ctx.diff
+    ctx.log.push({
+      id: ctx.log.length,
+      type: 0,
+      value: ctx.game.toObject()
+    })
+    return ctx.log
 	}
+
+  dropCard = (cardId: number, dndId: number, targetPlace: number) => {
+    console.log(`cardId: ${cardId}, dndId: ${dndId}, targetPlace: ${targetPlace}`);
+    let object = this.objects.get(cardId)
+    if (!object)
+      throw new Error("Attempt to drag and drop unexistent card!")
+    let ctx = new Context({
+      game: this,
+      object: object,
+      extra: { vars: { 'target_place': targetPlace } },
+    })
+    ctx.diff = {
+      gameAttrs: new Map(),
+      objectAttrs: new Map()
+    }
+    ctx.log = []
+    let dragndrop = this.content.get('drag_n_drops', dndId)
+    applyBrick(dragndrop.action_on_drop, ctx)
+    ctx.log.push({
+      id: ctx.log.length,
+      type: 0,
+      value: ctx.game.toObject()
+    })
+    return ctx.log
+  }
+
+  playerCommand = (command: any) => {
+    console.log(command)
+    if (command.command_data_type == 0) {
+      return this.useCard(command.object_id)
+    }
+    if (command.command_data_type == 2) {
+      return this.dropCard(command.object_id, command.drag_drop_id, command.target_place_id)
+    }
+  }
 
   toObject() {
     let globalAttrs: any[] = []
@@ -289,7 +329,7 @@ export class GameState {
 }
 
 class Context {
-	vars: Map<string, number> = new Map();
+	vars: any;
 	game: GameState;
 	object: any;
   diff: any;

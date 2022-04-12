@@ -41,13 +41,6 @@ export const GameObjectView = (props: {
     </div>)
 }
 
-// const unityPlayContext = new UnityContext({
-//   loaderUrl: "game/game_25.loader.js",
-//   dataUrl: "game/game_25.data",
-//   frameworkUrl: "game/game_25.framework.js",
-//   codeUrl: "game/game_25.wasm",
-// })
-
 const unityPlayContext = new UnityContext({
   loaderUrl: "new_game/WebGl.loader.js",
   dataUrl: "new_game/WebGl.data",
@@ -136,9 +129,12 @@ export const PlayView = () => {
     sendGameState(gameState)
   });
 
-  unityPlayContext.on("CastCard", async (cardId: number) => {
-    gameState.useCard(cardId, 1)
-    sendGameState(gameState)
+  unityPlayContext.on("SendCommand", async (jsonData: string) => {
+    let command = JSON.parse(jsonData)
+    let clientPackage = {
+      states: gameState.playerCommand(command)
+    }
+    unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(clientPackage));
     setStep(step + 1)
   });
 
@@ -171,20 +167,21 @@ export const PlayView = () => {
   })
   return (
     <Layout>
-      <Sider width='300'>
-        <Input onChange={(e:any) => { onHeaderFilterChange(e.target.value) }}/>
-        {gameState.content.get('attributes').map((attr: any) => (
-          <div>
-            { attr.name  } 
-            <InputNumber 
-              precision={0}
-              value={ filter.attrs[attr.code] }
-              onChange={(value) => { onAttrFilterChange(attr.code, value) }} 
-            />
-          </div>)
-        )}
-        
+      <Sider width='300'>        
         <Collapse>
+          <Panel header='Filter' key='filter'>
+            <Input onChange={(e:any) => { }}/>
+            {gameState.content.get('attributes').map((attr: any) => (
+              <div>
+                { attr.name  } 
+                <InputNumber 
+                  precision={0}
+                  value={ filter.attrs[attr.code] }
+                  onChange={(value) => { onAttrFilterChange(attr.code, value) }} 
+                />
+              </div>)
+            )}
+          </Panel>
           {data.map((elem: any) => 
             <Panel header={elem.header} key={elem.object.id}>
               <Space direction="vertical">

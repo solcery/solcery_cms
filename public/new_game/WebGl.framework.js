@@ -1174,26 +1174,26 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 5156276: function() {
+ 5156260: function() {
   Module["emscripten_get_now_backup"] = performance.now;
  },
- 5156331: function($0) {
+ 5156315: function($0) {
   performance.now = function() {
    return $0;
   };
  },
- 5156379: function($0) {
+ 5156363: function($0) {
   performance.now = function() {
    return $0;
   };
  },
- 5156427: function() {
+ 5156411: function() {
   performance.now = Module["emscripten_get_now_backup"];
  },
- 5156482: function() {
+ 5156466: function() {
   return Module.webglContextAttributes.premultipliedAlpha;
  },
- 5156543: function() {
+ 5156527: function() {
   return Module.webglContextAttributes.preserveDrawingBuffer;
  }
 };
@@ -1295,10 +1295,6 @@ function stackTrace() {
  var js = jsStackTrace();
  if (Module["extraStackTrace"]) js += "\n" + Module["extraStackTrace"]();
  return demangleAll(js);
-}
-
-function _CastCard(cardId) {
- ReactUnityWebGL.CastCard(cardId);
 }
 
 var JS_Accelerometer = null;
@@ -2635,6 +2631,10 @@ function _OnUnityLoaded(message) {
 
 function _OpenLinkInNewTab(link) {
  ReactUnityWebGL.OpenLinkInNewTab(Pointer_stringify(link));
+}
+
+function _SendCommand(command) {
+ ReactUnityWebGL.SendCommand(Pointer_stringify(command));
 }
 
 var instances = [];
@@ -13650,7 +13650,6 @@ function intArrayFromString(stringy, dontAddNull, length) {
 }
 
 var asmLibraryArg = {
- "CastCard": _CastCard,
  "JS_Accelerometer_IsRunning": _JS_Accelerometer_IsRunning,
  "JS_Accelerometer_Start": _JS_Accelerometer_Start,
  "JS_Accelerometer_Stop": _JS_Accelerometer_Stop,
@@ -13726,6 +13725,7 @@ var asmLibraryArg = {
  "OnGameOverPopupButtonClicked": _OnGameOverPopupButtonClicked,
  "OnUnityLoaded": _OnUnityLoaded,
  "OpenLinkInNewTab": _OpenLinkInNewTab,
+ "SendCommand": _SendCommand,
  "WebGLInputCreate": _WebGLInputCreate,
  "WebGLInputDelete": _WebGLInputDelete,
  "WebGLInputEnterSubmit": _WebGLInputEnterSubmit,

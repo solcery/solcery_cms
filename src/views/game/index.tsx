@@ -682,7 +682,7 @@ export const GameView = (props: {
       return;
     }
     let tmpState = gameState.copy()
-    let diff = tmpState.useCard(cardId, 1)
+    let diff = tmpState.useCard(cardId)
 
     let buf = diffToBuf(tmpState.content, diff)
     let updateStateIx = new TransactionInstruction({
