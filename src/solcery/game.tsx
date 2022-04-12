@@ -222,9 +222,6 @@ export class GameState {
   }
 
   exportDiff = (ctx: any) => {
-    console.log('exportDiff')
-    console.log(ctx.log.length)
-    console.log(JSON.stringify(ctx.diff))
     let logEntry: any = {
       attrs: Object.entries(ctx.diff.attrs).map(([key, value]) => {
         return {
@@ -245,7 +242,6 @@ export class GameState {
         }
       })
     }
-    console.log(logEntry)
     let gameState = {
       id: ctx.log.length,
       type: 0,
@@ -269,13 +265,11 @@ export class GameState {
 		})
 		let cardType = this.content.get('cardTypes', object.tplId)
 		applyBrick(cardType.action, ctx)
-    console.log('EXPORT')
     this.exportDiff(ctx)
     return ctx.log
 	}
 
   dropCard = (cardId: number, dndId: number, targetPlace: number) => {
-    console.log(`cardId: ${cardId}, dndId: ${dndId}, targetPlace: ${targetPlace}`);
     let object = this.objects.get(cardId)
     if (!object)
       throw new Error("Attempt to drag and drop unexistent card!")
@@ -291,7 +285,6 @@ export class GameState {
   }
 
   playerCommand = (command: any) => {
-    console.log(command)
     if (command.command_data_type == 0) {
       return this.useCard(command.object_id)
     }
