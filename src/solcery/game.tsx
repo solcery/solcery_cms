@@ -366,6 +366,13 @@ class Context {
       attrs: {},
       objects: {}
     }
+    for (let [objId, obj] of this.game.objects.entries()) {
+      this.diff.objects[objId] = {
+        id: obj.id,
+        tplId: obj.tplId,
+        attrs: {}
+      }
+    }
     this.log = []
 	}
 }
