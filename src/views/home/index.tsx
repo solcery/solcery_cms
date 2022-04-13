@@ -44,7 +44,16 @@ export const HomeView = () => {
     setConstructedContent(constructed.toJson());
 
     let gameState = new GameState(constructed);
-    setConstructedState(JSON.stringify(gameState, null, 2));
+    let constructedState = {
+      states: [
+        {
+          id: 0,
+          state_type: 0,
+          value: gameState.toObject(),
+        }
+      ]
+    }
+    setConstructedState(JSON.stringify(constructedState, null, 2));
   }, [ project ])
 
   const constructContent = async () => {
