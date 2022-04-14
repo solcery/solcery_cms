@@ -580,7 +580,7 @@ basicBricks.push({
     ctx.game.exportDiff(ctx)
     let pauseState = {
       id: ctx.log.length,
-      type: 1,
+      state_type: 1,
       value: {
         delay: duration,
       }
