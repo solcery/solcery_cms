@@ -221,31 +221,51 @@ export class GameState {
 
   }
 
+  exportState = (ctx: any) => {
+    let objects:any [] = [];
+    ctx.game.objects.forEach((obj: any) => {
+      objects.push({
+        id: obj.id,
+        tplId: obj.tplId,
+        attrs: Object.entries(obj.attrs).map(([key, value]) => {
+          return { key, value }
+        })
+      })
+    })
+    let gameState = {
+      id: ctx.log.length,
+      state_type: 0,
+      value: {
+        attrs: Object.entries(ctx.game.attrs).map(([key, value]) => {
+          return { key, value }
+        }),
+        objects: objects,
+        deleted_objects: [],
+      }
+    };
+    ctx.log.push(gameState)
+  }
+
   exportDiff = (ctx: any) => {
     let logEntry: any = {
       attrs: Object.entries(ctx.diff.attrs).map(([key, value]) => {
-        return {
-          key: key,
-          value: value
-        }
+        return { key, value }
       }),
       objects: Object.values(ctx.diff.objects).map((objDiff: any) => {
         return {
           id: objDiff.id,
           tplId: objDiff.tplId,
           attrs: Object.entries(objDiff.attrs).map(([key, value]) => {
-            return {
-              key: key,
-              value: value
-            }
+            return { key, value }
           }),
         }
       })
     }
     let gameState = {
       id: ctx.log.length,
-      type: 0,
-      value: logEntry
+      state_type: 0,
+      value: logEntry,
+      deleted_objects: []
     };
     ctx.log.push(gameState)
     ctx.diff = {
@@ -263,6 +283,7 @@ export class GameState {
 			object: object,
 			extra: { vars: {} },
 		})
+    // this.exportDiff(ctx)
 		let cardType = this.content.get('cardTypes', object.tplId)
 		applyBrick(cardType.action, ctx)
     this.exportDiff(ctx)
@@ -278,6 +299,7 @@ export class GameState {
       object: object,
       extra: { vars: { 'target_place': targetPlace } },
     })
+    // this.exportState(ctx)
     let dragndrop = this.content.get('drag_n_drops', dndId)
     applyBrick(dragndrop.action_on_drop, ctx)
     this.exportDiff(ctx)
@@ -342,6 +364,21 @@ export class GameState {
     this.objects.set(objectId, obj)
     return obj
   }
+
+  setAttr = (ctx: any, attrName: string, value: number) => {
+    ctx.object.attrs[attrName] = value;
+    if (ctx.diff) {
+      let objectId = ctx.object.id
+      if (!ctx.diff.objects[objectId]) {
+        ctx.diff.objects[objectId] = {
+          id: objectId,
+          tplId: ctx.object.tplId,
+          attrs: {}
+        }
+      }
+      ctx.diff.objects[objectId].attrs[attrName] = value
+    }
+  }
 }
 
 class Context {
@@ -356,14 +393,14 @@ class Context {
 		this.game = src.game;
 		this.vars = src.extra?.vars;
     this.diff = {
-      attrs: {},
+      attrs: Object.assign({}, this.game.attrs),
       objects: {}
     }
     for (let [objId, obj] of this.game.objects.entries()) {
       this.diff.objects[objId] = {
         id: obj.id,
         tplId: obj.tplId,
-        attrs: {}
+        attrs: Object.assign({}, obj.attrs)
       }
     }
     this.log = []

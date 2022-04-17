@@ -6,6 +6,8 @@ import { BinaryReader, BinaryWriter } from 'borsh';
 import { solceryTypes } from '../solceryTypes'
 import { ValueRender, TypedataRender } from './components'
 
+const debug = { log: false }
+
 const checkValidity: (brickTree: any) => boolean = (brickTree: any) => {
   if (brickTree === undefined || brickTree === null)
     return false
@@ -500,8 +502,8 @@ basicBricks.push({
   ],
   func: (params: any, ctx: any) => {
     let varName = params.var_name
-    let value = params.value
-    ctx.vars[varName] = applyBrick(value, ctx)
+    let value = applyBrick(params.value, ctx)
+    ctx.vars[varName] = value
   }
 })
 
@@ -518,18 +520,7 @@ basicBricks.push({
     let value = applyBrick(params.value, ctx)
     if (ctx.object.attrs[attrName] === undefined)
       throw new Error("trying to set unknown attr " + attrName)
-    ctx.object.attrs[attrName] = value
-    if (ctx.diff) {
-      let objectId = ctx.object.id
-      if (!ctx.diff.objects[objectId]) {
-        ctx.diff.objects[objectId] = {
-          id: objectId,
-          tplId: ctx.object.tplId,
-          attrs: {}
-        }
-      }
-      ctx.diff.objects[objectId].attrs[attrName] = value
-    }
+    ctx.game.setAttr(ctx, attrName, value)
   }
 })
 
@@ -621,6 +612,7 @@ basicBricks.push({
     let newObj = ctx.game.createEntity(card_type)
     let oldObj = ctx.object
     ctx.object = newObj
+    ctx.game.setAttr(ctx, 'place', place)
     applyBrick(params.action, ctx)
     ctx.object = oldObj
   }
@@ -632,7 +624,8 @@ basicBricks.push({
   name: 'DeleteEntity',
   params: [],
   func: (params: any, ctx: any) => {
-    ctx.obj.deleted = true;
+    ctx.game.objects[ctx.object.id] = undefined
+    ctx.object.deleted = true;
   }
 })
 
@@ -1080,11 +1073,14 @@ basicBricks.push({ // TODO: reuse code
     let objects = [...ctx.game.objects.values()]
     shuffleArray(objects)
     let result = Number.NEGATIVE_INFINITY
+    debug.log = true;
     for (let obj of objects) {
+      ctx.object = obj
       if (applyBrick(params.iter_condition, ctx)) {
-        result = Math.min(applyBrick(params.value, ctx), result)
+        result = Math.max(applyBrick(params.value, ctx), result)
       }
     }
+    debug.log = false;
     ctx.object = old_object
     if (result == Number.NEGATIVE_INFINITY) {
       result = applyBrick(params.fallback, ctx)
@@ -1109,8 +1105,9 @@ basicBricks.push({ // TODO: reuse code
     shuffleArray(objects)
     let result = Number.POSITIVE_INFINITY
     for (let obj of objects) {
+      ctx.object = obj
       if (applyBrick(params.iter_condition, ctx)) {
-        result = Math.max(applyBrick(params.value, ctx), result)
+        result = Math.min(applyBrick(params.value, ctx), result)
       }
     }
     ctx.object = old_object

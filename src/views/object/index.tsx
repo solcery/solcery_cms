@@ -46,8 +46,7 @@ export const ObjectView = () => {
 
 
   const sendTransactionChain = async (transactionChain: any[]) => {
-    if (!publicKey || wallet === undefined)
-      return;
+    if (!publicKey || wallet === undefined) return;
     (async () => {
       for (let transactionData of transactionChain) {
         await sendTransaction(connection, wallet, transactionData.instructions, transactionData.accounts, true)
@@ -61,7 +60,7 @@ export const ObjectView = () => {
     });
   }
 
-  const setAccountDataWithNonce = (accountPublicKey: PublicKey, data: Buffer) => {
+  const setAccountDataWithNonce = async (accountPublicKey: PublicKey, data: Buffer) => {
     if (!publicKey || wallet === undefined)
       return;
 
@@ -72,7 +71,7 @@ export const ObjectView = () => {
     instructions.push(SystemProgram.createAccount({
       programId: programId,
       space: 3200 - 69, // TODO
-      lamports: 10000, // TODO:
+      lamports: await connection.getMinimumBalanceForRentExemption(3200-69, 'singleGossip'),
       fromPubkey: publicKey,
       newAccountPubkey: nonceAccount.publicKey,
     }));
