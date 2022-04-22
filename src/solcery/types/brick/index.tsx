@@ -625,7 +625,7 @@ basicBricks.push({
   params: [],
   func: (params: any, ctx: any) => {
     ctx.game.objects[ctx.object.id] = undefined
-    ctx.object.deleted = true;
+    ctx.diff.deleted_objects[ctx.object.id] = true;
   }
 })
 

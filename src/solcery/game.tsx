@@ -259,18 +259,19 @@ export class GameState {
             return { key, value }
           }),
         }
-      })
+      }),
+      deleted_objects: Object.keys(ctx.diff.deleted_objects)
     }
     let gameState = {
       id: ctx.log.length,
       state_type: 0,
       value: logEntry,
-      deleted_objects: []
     };
     ctx.log.push(gameState)
     ctx.diff = {
       attrs: {},
-      objects: {}
+      objects: {},
+      deleted_objects: {}
     }
   }
 
@@ -394,7 +395,8 @@ class Context {
 		this.vars = src.extra?.vars;
     this.diff = {
       attrs: Object.assign({}, this.game.attrs),
-      objects: {}
+      objects: {},
+      deleted_objects: {}
     }
     for (let [objId, obj] of this.game.objects.entries()) {
       this.diff.objects[objId] = {
