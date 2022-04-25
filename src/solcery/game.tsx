@@ -392,7 +392,7 @@ class Context {
 	constructor(src: { game: GameState, object: any, extra?: any}) {
 		this.object = src.object;
 		this.game = src.game;
-		this.vars = src.extra?.vars;
+		this.vars = src.extra?.vars || {};
     this.diff = {
       attrs: Object.assign({}, this.game.attrs),
       objects: {},
