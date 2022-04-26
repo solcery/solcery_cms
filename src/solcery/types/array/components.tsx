@@ -22,16 +22,26 @@ export const ValueRender = (props: ValueRenderParams) => {
     setValue(value)
   }
 
+  const removeElement = (index: number) => {
+    setValueSize(valueSize - 1)
+    value.splice(index, 1)
+  }
+
   if (!props.onChange)
     return (<p>Array</p>)
   var array = props.type as SArray
   return (
     <>
-      {value.map((val: any, index: number) => <div key={index}><array.subtype.valueRender 
-        defaultValue={val}
-        type={array.subtype}
-        onChange={ (newValue: any) => { onChange(newValue, index) }}
-      /></div>)}
+      {value.map((val: any, index: number) => 
+        <div key={index}>
+          <Button onClick={() => { removeElement(index) }}>-</Button>
+          <array.subtype.valueRender 
+            key = { `${index}.${JSON.stringify(val)}`} // dirty hack
+            defaultValue={val}
+            type={array.subtype}
+            onChange={ (newValue: any) => { onChange(newValue, index) }}
+          />
+        </div>)}
       <Button onClick={addNewElement}>+</Button>
     </>
   );

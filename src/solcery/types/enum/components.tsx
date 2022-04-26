@@ -14,7 +14,7 @@ export const ValueRender = (props: ValueRenderParams) => {
     return (<p>{enumType.values[defaultValue]}</p>)
   }
   return (
-    <div>
+    <>
       <Select defaultValue={ props.defaultValue ? props.defaultValue : 0 } onChange={(value) => { 
         props?.onChange && props.onChange(value)
       }}>
@@ -22,7 +22,7 @@ export const ValueRender = (props: ValueRenderParams) => {
           return (<Option key={index} value={index}>{value}</Option>)
         })} 
       </Select>
-    </div>
+    </>
   );
 }
 
