@@ -19,7 +19,7 @@ export const HomeView = () => {
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
   const history = useHistory();
-  const { project } = useProject();
+  const { project, userPrefs } = useProject();
   const [ constructedContent, setConstructedContent ] = useState<any>(undefined)
   const [ constructedState, setConstructedState ] = useState<any>(undefined)
 
@@ -40,10 +40,10 @@ export const HomeView = () => {
 
   useEffect(() => {
     if (!project) return;
-    let constructed = project.construct(connection);
+    let constructed = project.construct();
     setConstructedContent(constructed.toJson());
 
-    let gameState = new GameState(constructed);
+    let gameState = new GameState(constructed, userPrefs.layoutPreset);
     let constructedState = {
       states: [
         {
@@ -54,7 +54,7 @@ export const HomeView = () => {
       ]
     }
     setConstructedState(JSON.stringify(constructedState, null, 2));
-  }, [ project ])
+  }, [ project, userPrefs ])
 
   const constructContent = async () => {
     // let writer = new BinaryWriter()
@@ -140,10 +140,10 @@ export const HomeView = () => {
     const createTemplateIx = new TransactionInstruction({
       keys: [
         { pubkey: publicKey, isSigner: true, isWritable: false },
-        { pubkey: project.publicKey, isSigner: false, isWritable: true },
+        { pubkey: project.pubkey, isSigner: false, isWritable: true },
         { pubkey: templateAccount.publicKey, isSigner: false, isWritable: true },
         { pubkey: storageAccount.publicKey, isSigner: false, isWritable: true },
-        { pubkey: project.templateStorage, isSigner: false, isWritable: true },
+        { pubkey: project.templateStorage.pubkey, isSigner: false, isWritable: true },
       ],
       programId: programId,
       data: Buffer.from([0, 0]),
@@ -157,7 +157,7 @@ export const HomeView = () => {
   return (
     <div>
       <Divider/>
-      <h2>Content</h2>
+      <h2>{ userPrefs && userPrefs.layoutPreset ? `Content [${userPrefs.layoutPreset}]` : 'Content' }</h2>
       {constructedContent && 
         <Button 
           icon={<DownloadOutlined/>}

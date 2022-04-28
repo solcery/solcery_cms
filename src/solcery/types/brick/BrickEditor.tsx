@@ -271,7 +271,7 @@ export const BrickEditor = (props: {
 	};
 
 	const sleepAndFit = () => {
-		new Promise(resolve => setTimeout(resolve, 1000)).then(() => { fitView() })
+		new Promise(resolve => setTimeout(resolve, 50)).then(() => { fitView() })
 	}
 
 	const enable = () => {

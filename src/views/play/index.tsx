@@ -51,7 +51,7 @@ const unityPlayContext = new UnityContext({
 
 export const PlayView = () => {
 
-  const { project } = useProject()
+  const { project, userPrefs } = useProject()
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
   const history = useHistory();
@@ -78,7 +78,7 @@ export const PlayView = () => {
       return
     (async () => {
       var constructedContent = await project.construct(connection)
-      let gameState = new GameState(constructedContent)
+      let gameState = new GameState(constructedContent, userPrefs.layoutPreset)
       let slots = gameState.content.getAll('slots')
       for (let slot of slots.values()) {
         let defaultCardTypeId = slot.default

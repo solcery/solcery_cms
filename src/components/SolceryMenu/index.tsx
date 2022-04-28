@@ -29,7 +29,7 @@ const SolceryMenuTemplate = (
 }
 
 export const SolceryMenu = () => {
-  const { project } = useProject();
+  const { project, userPrefs } = useProject();
   const [ templates, setTemplates ] = useState<any[]>([]);
   const connection = useConnection();
 
@@ -39,10 +39,11 @@ export const SolceryMenu = () => {
     }
   }, [ project ]);
 
+  if (!project) return <></>
   return (
     <Menu mode="horizontal">
       <Menu.Item key="play">
-        <a href="/#/play">PLAY</a>
+        <a href="/#/play">{ userPrefs && userPrefs.layoutPreset ? `PLAY [ ${userPrefs.layoutPreset} ]` : 'PLAY' }</a>
       </Menu.Item>
       <Menu.Item key="home">
         <a key='home' href='/#/'>Home</a>

@@ -18,20 +18,23 @@ import Cookies from 'universal-cookie';
 
 interface ProjectContextInterface {
   project: any | undefined;
+  userPrefs: any | undefined;
 }
 
 const ProjectContext = React.createContext<ProjectContextInterface>({ 
-	project: undefined
+	project: undefined,
+	userPrefs: undefined,
 });
 
 export function ProjectProvider({ children = null as any }) {
 	
 	var cookies = new Cookies()
 	const connection = useConnection()
-	const { connected } = useWallet();
+	const { connected, publicKey } = useWallet();
 	const [ projectKey, setProjectKey ] = useState<string>(cookies.get('projectKey'));
 	const [ project, setProject ] = useState<any>(undefined)
 	const [ isLoading, setIsLoading ] = useState(false)
+	const [ userPrefs, setUserPrefs ] = useState<any>({})
 
 	const login = async () => {
 		if (!projectKey)
@@ -43,12 +46,22 @@ export function ProjectProvider({ children = null as any }) {
 		cookies.set('projectKey', projectKey)
 	}
 
+	useEffect(() => {
+		if (!project) return;
+		if (!publicKey) return;
+		let user = project.getTemplates()
+			.find((tpl: any) => tpl.code === 'users')
+			.getObjects()
+			.find((obj: any) => obj.fields.pubkey === publicKey.toBase58());
+		if (user) {
+			setUserPrefs(user.fields)
+		}
+	}, [ project ])
+
 	if (project)
 		return (
 			<ProjectContext.Provider
-			value={{
-				project: project
-			}}
+				value={{ project, userPrefs }}
 			>
 			<SolceryMenu/>
 			{children}
@@ -77,6 +90,6 @@ export function ProjectProvider({ children = null as any }) {
 }
 
 export function useProject() {
- 	const { project } = useContext(ProjectContext);
-	return { project }
+ 	const { project, userPrefs } = useContext(ProjectContext);
+	return { project, userPrefs }
 }

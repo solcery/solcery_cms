@@ -156,7 +156,6 @@ export const TemplateView = () => {
     filter[field.code] = value;
     let code: string = field.code;
     cookies.set(`${templateKey}.filter.${code}`, value);
-    console.log(JSON.stringify(filter))
     setFilter(JSON.parse(JSON.stringify(filter)));
   }
 

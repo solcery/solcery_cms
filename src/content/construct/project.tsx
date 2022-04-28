@@ -13,7 +13,7 @@ Master.updateBricks = function() {
 }
 
 
-Master.construct = function() {
+Master.construct = function(data: any = {}) {
   this.updateBricks()
   let templates = this.templateStorage.getAll(Template)
   let constructMetadata: any = {
@@ -29,7 +29,6 @@ Master.construct = function() {
       customBricks = new Map([...customBricks, ...tpl.objects.raw])
     }
     else {
-
       constructedTemplates.set(template.code, tpl)
     }
   }

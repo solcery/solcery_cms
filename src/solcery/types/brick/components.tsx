@@ -16,9 +16,12 @@ interface BrickEditorParams extends ValueRenderParams {
 
 export const ValueRender = (props: BrickEditorParams) => {
 
+	let { userPrefs } = useProject();
   let brickType = (props.type as SBrick).brickType
   if (!props.onChange && !props.defaultValue)
     return <p>Empty</p>
+  if (!props.onChange && !userPrefs.readonlyBricks)
+  	return <p>Brick</p>;
 	return (
     <>
       <ReactFlowProvider>
