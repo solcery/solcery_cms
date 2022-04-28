@@ -236,7 +236,7 @@ export const TemplateView = () => {
               <Input defaultValue={filter[field.code]} onChange={(event: any) => { applyFilter(event.target.value, field) }}/>
             }
             sorter = { field.fieldType.sorter && ((a: any, b: any) => { 
-              return field.fieldType.sorter(a[field.id], b[field.id]) 
+              return field.fieldType.sorter(a.fields[field.code], b.fields[field.code]) 
             }) }
             render = {(text, object: any) => <field.fieldType.valueRender 
                 type={field.fieldType}
