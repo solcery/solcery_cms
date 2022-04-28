@@ -41,6 +41,7 @@ export const ObjectView = () => {
   const [ fields, setFields ] = useState<any>(undefined)
   const [ revision, setRevision ] = useState(0)
   var [ template, setTemplate ] = useState<any>(undefined);
+  var [ brickTreeActive, setBrickTreeActive ] = useState(false);
   let history = useHistory();
   var objectPublicKey = new PublicKey(objectId)
 
@@ -262,7 +263,8 @@ export const ObjectView = () => {
 
   }, [ object, project ]);
 
-  useEffect(() => {  
+  useEffect(() => {
+    if (brickTreeActive) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.keyCode === 27) { //Escape
         if (revision == 0) {
@@ -279,7 +281,11 @@ export const ObjectView = () => {
     return () => {
       window.removeEventListener('keydown', onKeyDown);
     };
-  });
+  }, [ brickTreeActive ]);
+
+  const onActivate = (newValue: any) => {
+    setBrickTreeActive(newValue);
+  }
 
   const setFieldValue = (code: string, value: any) => {
     if (!object)
@@ -311,6 +317,7 @@ export const ObjectView = () => {
                 onChange= {(newValue: any) => {
                   setFieldValue(record.field.code, newValue) 
                 }}
+                onActivate={ (record.field.fieldType instanceof SType) && onActivate }
               />     
               }
             />

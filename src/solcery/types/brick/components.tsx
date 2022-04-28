@@ -10,7 +10,11 @@ import { getBricks } from "./index"
 import { Select, Button, Modal } from 'antd';
 import { SInt, SString, ValueRenderParams, SBrick } from '../index'
 
-export const ValueRender = (props: ValueRenderParams) => {
+interface BrickEditorParams extends ValueRenderParams {
+	onActivate: boolean;
+}
+
+export const ValueRender = (props: BrickEditorParams) => {
 
   let brickType = (props.type as SBrick).brickType
   if (!props.onChange && !props.defaultValue)
@@ -26,6 +30,7 @@ export const ValueRender = (props: ValueRenderParams) => {
           brickTree={props.defaultValue}
           brickType={brickType}
           onChange={props.onChange}
+          onActivate={props.onActivate}
         />
       </ReactFlowProvider>
     </>

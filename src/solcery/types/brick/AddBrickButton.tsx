@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Handle, Position } from 'react-flow-renderer';
 import Select from 'react-select';
+import { notify } from "../../../utils/notifications";
 
 export default function AddBrickButton(props: {
 	id: string,
@@ -41,36 +42,33 @@ export default function AddBrickButton(props: {
 
 	let isHovered = false;
 
+	const paste = () => {
+		navigator.clipboard.readText().then((clipboardContents) => {
+			if (!clipboardContents) return;
+			
+			let pastedBrickTree: any = null;
+			try {
+				pastedBrickTree = JSON.parse(clipboardContents);
+			} catch {}
+			if (!pastedBrickTree) return;
+			
+			props.data.onPaste(pastedBrickTree, props.data.brickTree, props.data.parentBrick, props.data.paramID);
+		});
+	}
+
 	useEffect(() => {
 		let isCtrlDown = false;
 		
 		const onKeyDown = (e: KeyboardEvent) => {
-			isCtrlDown = e.keyCode === 17 || e.keyCode === 91;
+			if (!isHovered) return;
+			if (!e.ctrlKey) return;
+			let charCode = String.fromCharCode(e.which).toLowerCase();
+			if(charCode === 'v') paste();
 		};
-		const onKeyUp = (e: KeyboardEvent) => {
-			isCtrlDown = !(e.keyCode === 17 || e.keyCode === 91); // Ctrl or Cmd keys
-			
-			if (isCtrlDown && e.keyCode === 86 /*'V' key*/ && isHovered) {
-				navigator.clipboard.readText().then((clipboardContents) => {
-					if (!clipboardContents) return;
-					
-					let pastedBrickTree: any = null;
-					try {
-						pastedBrickTree = JSON.parse(clipboardContents);
-					} catch {}
-					if (!pastedBrickTree) return;
-					
-					props.data.onPaste(pastedBrickTree, props.data.brickTree, props.data.parentBrick, props.data.paramID);
-				});
-			}
-		};
-		
+
 		window.addEventListener('keydown', onKeyDown);
-		window.addEventListener('keyup', onKeyUp);
-		
 		return () => {
 			window.removeEventListener('keydown', onKeyDown);
-			window.removeEventListener('keyup', onKeyUp);
 		};
 	});
 

@@ -22,7 +22,8 @@ export const BrickEditor = (props: {
 	brickClass: any,
 	brickType: number,
 	brickTree?: any,
-	onChange?: (brickTree: any) => void
+	onChange?: (brickTree: any) => void,
+	onActivate: any
 }) => {
 	const [ active, setActive ] = useState(false)
 	let width = active ? window.innerWidth : props.width;
@@ -270,10 +271,11 @@ export const BrickEditor = (props: {
 	};
 
 	const sleepAndFit = () => {
-		new Promise(resolve => setTimeout(resolve, 50)).then(() => { fitView() })
+		new Promise(resolve => setTimeout(resolve, 1000)).then(() => { fitView() })
 	}
 
 	const enable = () => {
+		props.onActivate && props.onActivate(true);
 		setActive(true)
 	}
 
@@ -282,13 +284,30 @@ export const BrickEditor = (props: {
 		if (props.onChange && active && save) {
 			props.onChange(reformat(BRICK_TREE.tree))
 		}
+		props.onActivate && props.onActivate(false);
 		setActive(false)
 	}
 
+
 	const cancel = () => {
 		reset()
+		props.onActivate && props.onActivate(false);
 		setActive(false)
 	}
+
+	useEffect(() => {
+		if (!active) return;
+		const onKeyDown = (e: KeyboardEvent) => {
+			if (e.keyCode === 27) { //Escape
+				cancel()
+			}
+		};
+		window.addEventListener('keydown', onKeyDown);
+		
+		return () => {
+		  window.removeEventListener('keydown', onKeyDown);
+		};
+	}, [ active ]);
 
 	let style = {
 		backgroundColor: active ? 'black' : 'transparent',
