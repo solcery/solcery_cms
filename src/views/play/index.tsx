@@ -78,7 +78,7 @@ export const PlayView = () => {
       return
     (async () => {
       var constructedContent = await project.construct(connection)
-      let gameState = new GameState(constructedContent, userPrefs.layoutPreset)
+      let gameState = new GameState(constructedContent, userPrefs.layoutPresets)
       let slots = gameState.content.getAll('slots')
       for (let slot of slots.values()) {
         let defaultCardTypeId = slot.default

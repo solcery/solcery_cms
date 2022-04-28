@@ -43,7 +43,7 @@ export const SolceryMenu = () => {
   return (
     <Menu mode="horizontal">
       <Menu.Item key="play">
-        <a href="/#/play">{ userPrefs && userPrefs.layoutPreset ? `PLAY [ ${userPrefs.layoutPreset} ]` : 'PLAY' }</a>
+        <a href="/#/play">{ userPrefs && userPrefs.layoutPresets ? 'PLAY (CUSTOM PRESET)' : 'PLAY' }</a>
       </Menu.Item>
       <Menu.Item key="home">
         <a key='home' href='/#/'>Home</a>

@@ -43,7 +43,7 @@ export const HomeView = () => {
     let constructed = project.construct();
     setConstructedContent(constructed.toJson());
 
-    let gameState = new GameState(constructed, userPrefs.layoutPreset);
+    let gameState = new GameState(constructed, userPrefs.layoutPresets);
     let constructedState = {
       states: [
         {
@@ -154,10 +154,14 @@ export const HomeView = () => {
     })
   }
 
+  let contentName = 'Content';
+  if (userPrefs && userPrefs.layoutPresets) {
+    contentName = `Content [ ${ userPrefs.layoutPresets.join(', ') } ]`;
+  }
   return (
     <div>
       <Divider/>
-      <h2>{ userPrefs && userPrefs.layoutPreset ? `Content [${userPrefs.layoutPreset}]` : 'Content' }</h2>
+      <h2>{ contentName }</h2>
       {constructedContent && 
         <Button 
           icon={<DownloadOutlined/>}

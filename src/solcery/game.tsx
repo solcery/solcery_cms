@@ -89,7 +89,7 @@ export class GameState {
     return newState
   }
 
-  init = (layoutPreset: string | undefined = undefined) => {
+  init = (layoutPresets: string[] | undefined = undefined) => {
     let content = this.content
     if (!content)
       return
@@ -100,7 +100,7 @@ export class GameState {
     var attributes = content.get('attributes')
 	  var cardId = 1
 	  for (let cardPack of content.get('cards')) {
-      if (layoutPreset && cardPack.preset != layoutPreset) continue;
+      if (layoutPresets && !layoutPresets.find((presetName: string) => cardPack.preset === presetName)) continue;
 	    for (let i = 0; i < cardPack.amount; i++) {
 	      var cardType = content.get('cardTypes', cardPack.cardType)
         var attrs: any = {}
@@ -147,10 +147,10 @@ export class GameState {
     }
   }
 
-  constructor(content: any = undefined, layoutPreset: string | undefined = undefined) {
+  constructor(content: any = undefined, layoutPresets: string[] | undefined = undefined) {
     if (content) {
       this.content = content
-      this.init(layoutPreset)
+      this.init(layoutPresets)
     }
   }
 
