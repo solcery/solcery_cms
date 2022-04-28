@@ -11,7 +11,7 @@ export const ValueRender = (props: ValueRenderParams) => {
 
   const onChange = (newValue: any, index: number) => {
     value[index] = newValue;
-    setValue(value)
+    // // setValue(value)
     var res = value.filter((value: any) => value != undefined)
     props.onChange && props.onChange(res)
   }
@@ -27,8 +27,7 @@ export const ValueRender = (props: ValueRenderParams) => {
     value.splice(index, 1)
   }
 
-  if (!props.onChange)
-    return (<p>Array</p>)
+  if (!props.onChange) return (<p>Array</p>)
   var array = props.type as SArray
   return (
     <>
@@ -36,7 +35,7 @@ export const ValueRender = (props: ValueRenderParams) => {
         <div key={index}>
           <Button onClick={() => { removeElement(index) }}>-</Button>
           <array.subtype.valueRender 
-            key = { `${index}.${JSON.stringify(val)}`} // dirty hack
+            key = { `${index}/${valueSize}`} // dirty hack
             defaultValue={val}
             type={array.subtype}
             onChange={ (newValue: any) => { onChange(newValue, index) }}
