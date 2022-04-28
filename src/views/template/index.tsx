@@ -200,6 +200,7 @@ export const TemplateView = () => {
         tableData = tableData.filter((objectInfo: any) => {
           let val = objectInfo.fields[code]
           let filterValue: string = filter[code] as string;
+          if (filterValue === '') return true;
           if (!val) return false;
           return val && val.toLowerCase().includes(filterValue.toLowerCase())
         })
