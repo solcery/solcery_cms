@@ -168,18 +168,40 @@ export const TemplateView = () => {
   }, [ project, templateKey ]);
 
   useEffect(() => { 
-    if (template) {
-      setObjects(template.getObjects())
-      let flt: any = {}
-      for (let fld of Object.values(template.fields)) {
-        let field: any = fld as any;
-        let code: string = field.code
-        let fltValue = cookies.get(`${templateKey}.filter.${code}`)
-        if (fltValue) flt[code] = fltValue;
-      }
-      setFilter(flt);
+    if (!template) return;
+    let objects = template.getObjects()
+    setObjects(objects)
+    let flt: any = {}
+    for (let fld of Object.values(template.fields)) {
+      let field: any = fld as any;
+      let code: string = field.code
+      let fltValue = cookies.get(`${templateKey}.filter.${code}`)
+      if (fltValue) flt[code] = fltValue;
     }
+    setFilter(flt);
+    
+
+    let subscriptions: any[] = []
+    for (let object of template.getObjects()) {
+      subscriptions.push({
+        object,
+        id: object.addEventSubscription('onLoad', (storage: any) => {
+          setRevision(revision + 1)
+        })
+      })
+    }
+    return () => {
+      subscriptions.forEach((subscription: any) => {
+        subscription.object.removeEventSubscription('onLoad', subscription.id)
+      })
+    };
+
   }, [ template ]);
+
+
+  useEffect(() => {
+
+  })
 
   useEffect(() => {
     if (!storage)

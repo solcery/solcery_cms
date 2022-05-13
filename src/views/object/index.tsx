@@ -45,23 +45,25 @@ export const ObjectView = () => {
   let history = useHistory();
   var objectPublicKey = new PublicKey(objectId)
 
-
-  const sendTransactionChain = async (transactionChain: any[]) => {
+  const sendTransactionChain = async (
+    transactionChain: any[], 
+    onAllSigned?: () => void,
+  ) => {
     if (!publicKey || wallet === undefined) return;
-    (async () => {
+    return (async () => {
+      let transactionNumber = 0;
       for (let transactionData of transactionChain) {
-        await sendTransaction(connection, wallet, transactionData.instructions, transactionData.accounts, true)
+        transactionNumber ++;
+        if (transactionNumber < transactionChain.length) {
+          await sendTransaction(connection, wallet, transactionData.instructions, transactionData.accounts, true)
+        } else {
+          return sendTransaction(connection, wallet, transactionData.instructions, transactionData.accounts, true, onAllSigned)
+        }
       }
-    })().then(() => {  // TODO: remove hardcode
-      notify({ message: "Object saved successfully", description: objectId})
-      history.push('/template/' + templateKey)
-    },
-    () => {
-      notify({ message: "Object saving error", description: objectId })
-    });
+    })();
   }
 
-  const setAccountDataWithNonce = async (accountPublicKey: PublicKey, data: Buffer) => {
+  const setAccountDataWithNonce = async (accountPublicKey: PublicKey, data: Buffer, onAllSigned?: () => void) => {
     if (!publicKey || wallet === undefined)
       return;
 
@@ -106,10 +108,6 @@ export const ObjectView = () => {
       pos = pos2
     }
 
-
-
-
-
     let copyIx = new TransactionInstruction({
       keys: [
         { pubkey: publicKey, isSigner: true, isWritable: false },
@@ -125,57 +123,7 @@ export const ObjectView = () => {
       accounts: [ nonceAccount ]
     })
 
-    sendTransactionChain(transactions)
-  }
-
-  const setAccountData = async (accountPublicKey: PublicKey, data: Buffer, offset: number = 0) => {
-
-    if (wallet === undefined || !wallet.publicKey)
-      return
-    if (data.length <= MAX_DATA_SIZE) {
-      let writer = new BinaryWriter()
-      writer.writeU8(3)
-      writer.writeU8(0)
-      writer.writeU64(offset) 
-      const saveAccountIx = new TransactionInstruction({
-        keys: [
-          { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
-          { pubkey: accountPublicKey, isSigner: false, isWritable: true },
-        ],
-        programId: programId,
-        data: Buffer.concat([ 
-          writer.buf.slice(0, writer.length),
-          data,
-        ]),
-      });
-      await sendTransaction(connection, wallet, [saveAccountIx], [], true, () => { history.push('/template/' + templateKey) }).then(() => {  // TODO: remove hardcode
-        notify({ message: "Object saved successfully", description: objectId })
-      },
-      () => {
-        notify({ message: "Object saving error", description: objectId })
-      })
-      return true
-    }
-    else {
-      let writer = new BinaryWriter()
-      writer.writeU8(3)
-      writer.writeU8(0)
-      writer.writeU64(offset)
-      const saveAccountIx = new TransactionInstruction({
-        keys: [
-          { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
-          { pubkey: accountPublicKey, isSigner: false, isWritable: true },
-        ],
-        programId: programId,
-        data: Buffer.concat([ 
-          writer.buf.slice(0, writer.length),
-          data.slice(0, MAX_DATA_SIZE),
-        ]),
-      });
-      return await sendTransaction(connection, wallet, [saveAccountIx], [], false).then(async () => {
-        await setAccountData(accountPublicKey, data.slice(MAX_DATA_SIZE), offset + MAX_DATA_SIZE)
-      })
-    }
+    return sendTransactionChain(transactions, onAllSigned)
   }
 
   const saveObject = async () => {
@@ -208,15 +156,22 @@ export const ObjectView = () => {
       });
       await sendTransaction(connection, wallet, [saveObjectIx], [], true, () => { 
         history.push('/template/' + templateKey) 
-      }).then(() => {
+      }).then(async () => {
+        await object.load(connection)
         notify({ message: "Object saved successfully", description: objectId })
       },
       () => {
         notify({ message: "Object saving error", description: objectId })
       })
     } else {
-      setAccountDataWithNonce(objectPublicKey, data)
-      // setAccountData(objectPublicKey, data, 33 + 36)
+      setAccountDataWithNonce(objectPublicKey, data, () => {
+        history.push('/template/' + templateKey) 
+      }).then(async () => {
+        await object.load(connection)
+        notify({ message: "Object saved successfully", description: objectId })
+      }, () => {
+        notify({ message: "Object saving error", description: objectId })
+      })
     }
   }
 
