@@ -1,15 +1,17 @@
 import { useEffect } from 'react';
 import { Handle, Position } from 'react-flow-renderer';
-import { defaultBricksByType } from './index'
+import { defaultBricksByType, getBrickTypeName } from './index';
 import { notify } from "../../../utils/notifications";
+import { useProject } from '../../../contexts/project';
 
 export default function Brick(props: {
 	id: string,
 	data: any
 }) {
-
+	const { userPrefs } = useProject();
 	const brick = props.data.brick;
 	const brickClass = props.data.brickClass;
+	const brickTypeName = getBrickTypeName(brick.type);
 	let brickSignature = props.data.brickSignatures.find((bs: any) => bs.type === brick.type && bs.subtype === brick.subtype);
 	if (!brickSignature) {
 		brickSignature = defaultBricksByType.get(brick.type)
@@ -68,8 +70,12 @@ export default function Brick(props: {
 
 
 	return (
-		<div className={ props.data.readonly ? "brick" : "brick brick-active" } onPointerEnter={() => isHovered = true} onPointerLeave={() => isHovered = false}>
-			<div className={ props.data.readonly ? "remove-button" : "remove-button remove-button-active" } onClick={onRemoveButtonClicked}>x</div>
+		<div className={ `brick ${brickTypeName} ${props.data.small ? 'small' : ''} ${props.data.readonly ? 'readonly' : ''}` } 
+		onPointerEnter={() => isHovered = true }
+		onPointerLeave={() => isHovered = false }
+		style={{ width: `${Math.max(15, 4 + nestedParams.length * 5)}rem`}}
+		>
+			{!props.data.readonly && !props.data.small && <div className={"remove-button" } onClick={onRemoveButtonClicked}>x</div>}
 			<div className="brick-name">{brickSignature.name}</div>
 			{inlineParams.map((param: any) =>
 				<div className="field-container" key={param.id}>

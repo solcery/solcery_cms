@@ -72,13 +72,13 @@ export default function AddBrickButton(props: {
 		};
 	});
 
-	const selectorOptions = brickSignaturesOfType.map((bs: any) => {
+	const selectorOptions = brickSignaturesOfType.filter((bs: any) => !bs.hidden).map((bs: any) => {
 		return { value: bs.subtype, label: bs.name, className: 'test' };
 	});
 
 	return (
 		<>
-			<div className={ props.data.readonly ? "add-brick-button" : "add-brick-button add-brick-button-active" }
+			<div className={ `add-brick-button ${!props.data.readonly ? 'active' : ''}` }
 			     onPointerUp={onAddButtonPointerUp}
 			     onPointerEnter={() => isHovered = true}
 			     onPointerLeave={() => isHovered = false}>+</div>
