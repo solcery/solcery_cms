@@ -35,14 +35,14 @@ Master.toBinary = function() {
   // this.fields.map((field: any) => new TemplateFieldData(field));
 }
 
-Master.exportBricks = function() {
+Master.exportBricks = function(includeHidden: boolean = false) {
   if (this.customData && this.customData.exportBrick) {
     let fieldId: number = this.customData.exportBrick
     let field = this.fields[fieldId].code
     for (let obj of this.getObjects()) {
       let brick = obj.fields[field]
       if (brick) {
-        addCustomBrick(exportBrick(obj.fields.name, obj.intId, brick))
+        addCustomBrick(exportBrick(obj.fields.name, obj.intId, brick, obj.fields.hidden))
       }
     }
   }
