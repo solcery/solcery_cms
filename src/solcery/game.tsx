@@ -277,6 +277,7 @@ export class GameState {
   }
 
 	useCard = (cardId: number) => {
+    console.log('USE CARD')
 		let object = this.objects.get(cardId)
 		if (!object)
 			throw new Error("Attempt to cast unexistent card!")
@@ -287,6 +288,7 @@ export class GameState {
 		})
     // this.exportDiff(ctx)
 		let cardType = this.content.get('cardTypes', object.tplId)
+    console.log(cardType)
 		applyBrick(cardType.action, ctx)
     this.exportDiff(ctx)
     return ctx.log

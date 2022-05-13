@@ -27,9 +27,10 @@ export const PlayView = () => {
 
   useEffect(() => {
     let buffer = Buffer.from(testGameContent.data)
-    console.log(buffer)
     var constructedContent = ConstructedContent.fromBuffer(buffer)
-    let gameState = new GameState(constructedContent, [])
+    console.log('TEST')
+    console.log(constructedContent)
+    let gameState = new GameState(constructedContent, [ 'core', 'tech demo', 'test buttons '])
     setGameState(gameState)
     return () => { 
       unityPlayContext.quitUnityInstance() 
@@ -69,18 +70,6 @@ export const PlayView = () => {
     console.log(clientPackage)
     unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(clientPackage));
     setStep(step + 1)
-  });
-
-  unityPlayContext.on("LogAction", async (log: string) => {
-    var logToApply = JSON.parse(log)
-    for (let logEntry of logToApply.Steps) {
-      if (logEntry.actionType == 0)
-      {
-        gameState.useCard(logEntry.data, logEntry.playerId)
-        sendGameState(gameState)
-        setStep(step + 1)
-      }
-    }
   });
 
   console.log(gameState)
