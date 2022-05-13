@@ -36,6 +36,8 @@ export function ProjectProvider({ children = null as any }) {
 	const [ isLoading, setIsLoading ] = useState(false)
 	const [ userPrefs, setUserPrefs ] = useState<any>({})
 
+	const SESSION_LENGTH = 86400 * 30 * 1000;
+
 	const login = async () => {
 		if (!projectKey)
 			return
@@ -43,7 +45,9 @@ export function ProjectProvider({ children = null as any }) {
 		let prj = window.root.create(Prj, { id: projectKey, pubkey: new PublicKey(projectKey) })
 		setProject(await prj.await(connection))
 		setIsLoading(false)
-		cookies.set('projectKey', projectKey)
+		cookies.set('projectKey', projectKey, {
+				expires: new Date((new Date()).getTime() + SESSION_LENGTH)
+		})
 	}
 
 	useEffect(() => {
@@ -58,6 +62,18 @@ export function ProjectProvider({ children = null as any }) {
 		}
 	}, [ project ])
 
+	useEffect(() => {
+		if (!userPrefs) return;
+		if (userPrefs.css) {
+			var style = document.createElement('style');
+			style.type = 'text/css';
+			style.innerHTML = userPrefs.css;
+			if (document) {
+				document.getElementsByTagName('head')[0].appendChild(style);
+			}
+		}
+	}, [ userPrefs ])
+
 	if (project)
 		return (
 			<ProjectContext.Provider
@@ -68,6 +84,7 @@ export function ProjectProvider({ children = null as any }) {
 			</ProjectContext.Provider>
 		);
 
+	console.log(projectKey)
 	return (
 		<div>
 		<Modal
@@ -80,9 +97,9 @@ export function ProjectProvider({ children = null as any }) {
 			width={400}
 			onOk={login}
 		>
-		<Input hidden={!connected || isLoading} onChange ={(event) => { setProjectKey(event.target.value) }} defaultValue={projectKey}/>
-		{isLoading && <Spin size='large'/>}
-		{!connected && <ConnectButton/>}
+			<Input hidden={!connected || isLoading} onChange ={(event) => { setProjectKey(event.target.value) }} defaultValue={projectKey}/>
+			{isLoading && <Spin size='large'/>}
+			{!connected && <ConnectButton/>}
 		</Modal>
 		{children}
 		</div>
