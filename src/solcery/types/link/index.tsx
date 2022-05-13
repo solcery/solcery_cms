@@ -46,9 +46,10 @@ export class SLink extends SType {
   cloneValue = (value: PublicKey) => new PublicKey(value)
 
   construct = (value: any, project: any) => {
+    console.log(project)
+    console.log(value)
     let obj = project.childrenById[value.toBase58()]
-    if (!obj)
-      throw new Error('Error constructing SLink type!')
+    if (!obj) throw new Error('Error constructing SLink type!')
     let customData = obj.parent.parent.customData
     if (customData.linkKey) {
       return obj.fields[customData.linkKey]

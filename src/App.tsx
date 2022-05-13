@@ -6,7 +6,7 @@ import { RouterGame } from "./RouterGame"
 import { RouterUtils } from "./RouterUtils"
 
 function App() {
-  return <RouterCMS/>; // TODO: insert branch-specific app here
+  return <RouterGame/>; // TODO: insert branch-specific app here
 }
 
 export default App;
