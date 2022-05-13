@@ -172,7 +172,7 @@ export class SBrick extends SType {
     }
     let params: any[] = []
     for (let param of value.params) {
-      let paramSignature = getParamSignatureById(brickSignature, param.id)
+      let paramSignature = getParamSignatureByName(brickSignature, param.name)
       if (paramSignature) {
         params.push({
           name: param.name,
@@ -197,6 +197,11 @@ export const customBricks: BrickSignature[] = [];
 export const solceryBricks: BrickSignature[] = [];
 export const customBricksMap: any = {};
 
+export const getParamSignatureByName = (brickSignature: BrickSignature, paramCode: string) => {
+  for (var param of brickSignature.params) {
+    if (param.code == paramCode) return param;
+  }
+}
 
 export const getParamSignatureById = (brickSignature: BrickSignature, paramId: number) => {
   for (var param of brickSignature.params) {
