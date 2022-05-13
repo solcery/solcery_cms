@@ -21,6 +21,7 @@ export const HomeView = () => {
   const history = useHistory();
   const { project, userPrefs } = useProject();
   const [ constructedContent, setConstructedContent ] = useState<any>(undefined)
+  const [ constructedContentBinary, setConstructedContentBinary ] = useState<any>(undefined)
   const [ constructedState, setConstructedState ] = useState<any>(undefined)
 
   const downloadJsonFile = (name: string, data: string) => {
@@ -42,6 +43,7 @@ export const HomeView = () => {
     if (!project) return;
     let constructed = project.construct();
     setConstructedContent(constructed.toJson());
+    setConstructedContentBinary(constructed.toBuffer())
 
     let gameState = new GameState(constructed, userPrefs.layoutPresets);
     let constructedState = {
@@ -173,6 +175,12 @@ export const HomeView = () => {
           icon={<DownloadOutlined/>}
           onClick={() => { downloadJsonFile('game_state.json', constructedState) }}>
           game_state.json
+        </Button>}
+      {constructedContentBinary && 
+        <Button 
+          icon={<DownloadOutlined/>}
+          onClick={() => { downloadJsonFile('game_content_binary.json', constructedContentBinary) }}>
+          game_content_binary.json
         </Button>}
       
       <Divider/>
