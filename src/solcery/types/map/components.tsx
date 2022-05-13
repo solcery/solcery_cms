@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { SType, TypeSelector, ValueRenderParams } from "../index";
 import { Select, Button } from 'antd';
 import { SMap } from './index';
+import { SInt } from '../index';
 
 export const ValueRender = (props: ValueRenderParams) => {
 
@@ -48,8 +49,8 @@ export const TypedataRender = (props: {
   defaultValue?: any, 
   onChange?: (newValue: any) => void,
 }) => {
-  const [ keyType, setKeyType ] = useState<any>(props.defaultValue.keyType)
-  const [ valueType, setValueType ] = useState<any>(props.defaultValue.keyType)
+  const [ keyType, setKeyType ] = useState<any>(props.defaultValue ? props.defaultValue.keyType : new SInt())
+  const [ valueType, setValueType ] = useState<any>(props.defaultValue ? props.defaultValue.valueType : new SInt())
 
 
   useEffect(() => {
