@@ -6,7 +6,7 @@ import { BinaryReader, BinaryWriter } from 'borsh';
 import { solceryTypes } from '../solceryTypes'
 import { ValueRender, TypedataRender } from './components'
 
-const debug = { log: false }
+const debug = { log: false, iter: 0, enabled: false }
 
 const checkValidity: (brickTree: any) => boolean = (brickTree: any) => {
   if (brickTree === undefined || brickTree === null)
@@ -223,7 +223,7 @@ export const defaultBricksByType = new Map()
 
 
 
-const getBrickTypeName = (brickType: number) => {
+export const getBrickTypeName = (brickType: number) => {
   if (brickType == 0)
     return 'action'
   if (brickType == 1)
@@ -289,12 +289,20 @@ export type BrickSignature = {
   type: number,
   subtype: number,
   name: string,
+  hidden?: boolean,
   description?: string,
   params: any,
   func: any,
 }
 
 export const applyBrick: (brick: any, ctx: any) => any = (brick: any, ctx: any) => {
+  // if (debug.enabled) {
+  //   console.log(brick)
+  //   debug.iter = debug.iter + 1
+  //   if (debug.iter > 10000) {
+  //     throw new Error('END')
+  //   }
+  // }
   let params: any = {}
   for (let param of brick.params) {
     params[param.name] = param.value
@@ -322,13 +330,14 @@ export const applyBrick: (brick: any, ctx: any) => any = (brick: any, ctx: any) 
 //       .join('_');
 // };
 
-export const exportBrick = (name: string, id: number, brick: Brick) => {
+export const exportBrick = (name: string, id: number, brick: Brick, hidden: boolean = false) => {
   let paramsMap = new Map<string, BrickParamSignature>()
   exportArgsAsParams(brick, paramsMap)
   let subtype = 10000 + id //TODO: magic number
   return {
     type: brick.type,
     subtype: subtype,
+    hidden: hidden,
     //name: 'custom.' + subtype + ' [' + name + ']',
     name: '[' + (subtype - 10000) + '] ' + name,
     params: Array.from(paramsMap.values()),
@@ -624,7 +633,7 @@ basicBricks.push({
   name: 'DeleteEntity',
   params: [],
   func: (params: any, ctx: any) => {
-    ctx.game.objects[ctx.object.id] = undefined
+    ctx.game.objects.delete(ctx.object.id);
     ctx.diff.deleted_objects[ctx.object.id] = true;
   }
 })
