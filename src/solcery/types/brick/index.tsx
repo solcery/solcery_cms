@@ -136,6 +136,7 @@ export class SBrick extends SType {
     let constructedParams: any[] = []
     let brickSignature = getBrickSignature(value.type, value.subtype)
     if (!brickSignature) {
+      throw new Error('Error')
       return {
         name: "unknown brick",
         type: value.type,
@@ -166,20 +167,13 @@ export class SBrick extends SType {
   }
 
   toObject = (value: ConstructedBrick) => {
-    let brickSignature = getBrickSignature(value.type, value.subtype)
-    if (!brickSignature) {
-      return defaultBricksByType.get(value.type)
-    }
     let params: any[] = []
     for (let param of value.params) {
-      let paramSignature = getParamSignatureByName(brickSignature, param.name)
-      if (paramSignature) {
-        params.push({
-          name: param.name,
-          type: paramSignature.type,
-          value: paramSignature.type.toObject(param.value),
-        })
-      }
+      params.push({
+        name: param.name,
+        type: param.type,
+        value: param.type.toObject(param.value),
+      })
     }
     return {
       name: value.name,
