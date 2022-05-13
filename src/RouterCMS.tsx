@@ -21,6 +21,8 @@ export function RouterCMS() {
                   <Route exact path="/template/:templateKey/schema" component={() => <TemplateSchemaView/>} />
                   <Route exact path="/template/:templateKey/:objectId" component={() => <ObjectView/>} />
                   <Route exact path="/" component={() => <HomeView />} />
+                  <Route path="/account/:accountKey" component={() => <AccountView/>} />
+                  <Route exact path="/account" component={() => <AccountView/>} />
                 </Switch>
               </ProjectProvider>
             </AppLayout>
