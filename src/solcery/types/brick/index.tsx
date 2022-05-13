@@ -29,16 +29,16 @@ export class SBrick extends SType {
 
   static typedataRender = TypedataRender;
    constructor(src: { brickType: number }) {
-  	super()
-  	this.brickType = src.brickType
+    super()
+    this.brickType = src.brickType
     this.nameRender = (<p>Brick: { this.brickType }</p>); //TOD: name
     this.valueRender = ValueRender
   }
   static readType = (reader: BinaryReader) => {
-  	return new SBrick({ brickType: reader.readU32() })
+    return new SBrick({ brickType: reader.readU32() })
   }
   writeType = (writer: BinaryWriter) => {
-  	writer.writeU32(this.brickType)
+    writer.writeU32(this.brickType)
   }
 
   readValue = (reader: BinaryReader) => { // reading ignoring brick signatures and this.brickType
@@ -172,7 +172,7 @@ export class SBrick extends SType {
     }
     let params: any[] = []
     for (let param of value.params) {
-      let paramSignature = getParamSignatureById(brickSignature, param.id)
+      let paramSignature = getParamSignatureByName(brickSignature, param.name)
       if (paramSignature) {
         params.push({
           name: param.name,
@@ -197,6 +197,11 @@ export const customBricks: BrickSignature[] = [];
 export const solceryBricks: BrickSignature[] = [];
 export const customBricksMap: any = {};
 
+export const getParamSignatureByName = (brickSignature: BrickSignature, paramCode: string) => {
+  for (var param of brickSignature.params) {
+    if (param.code == paramCode) return param;
+  }
+}
 
 export const getParamSignatureById = (brickSignature: BrickSignature, paramId: number) => {
   for (var param of brickSignature.params) {
