@@ -8,6 +8,8 @@
     <type fullname="Solcery.Widgets_new.Eclipse.Cards.Tokens.EclipseCardTokenLayout" preserve="all" />
     <type fullname="Solcery.Widgets_new.Eclipse.Cards.Tokens.EclipseCardTokensLayout" preserve="all" />
     <type fullname="Solcery.Widgets_new.Eclipse.CardsContainer.PlaceWidgetEclipseLayout" preserve="all" />
+    <type fullname="Solcery.Widgets_new.Eclipse.Effects.EclipseCardEffectLayout" preserve="all" />
+    <type fullname="Solcery.Widgets_new.Eclipse.Tokens.ListTokensInContainerWidgetLayout" preserve="all" />
     <type fullname="Solcery.Widgets_new.Eclipse.Tokens.TokenInContainerWidgetLayout" preserve="all" />
     <type fullname="Solcery.Widgets_new.Eclipse.TokensStockpile.PlaceWidgetEclipseTokensLayout" preserve="all" />
     <type fullname="Solcery.Widgets_new.Simple.Buttons.PlaceWidgetButtonLayout" preserve="all" />
@@ -66,6 +68,7 @@
     <type fullname="UnityEngine.UI.HorizontalLayoutGroup" preserve="all" />
     <type fullname="UnityEngine.UI.Image" preserve="all" />
     <type fullname="UnityEngine.UI.Mask" preserve="all" />
+    <type fullname="UnityEngine.UI.RawImage" preserve="all" />
     <type fullname="UnityEngine.UI.ScrollRect" preserve="all" />
     <type fullname="UnityEngine.UI.VerticalLayoutGroup" preserve="all" />
     <type fullname="UnityEngine.UI.AnimationTriggers" preserve="nothing" serialized="true" />
