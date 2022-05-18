@@ -125,6 +125,7 @@ export const PlayView = () => {
 
   unityPlayContext.on("OnUnityLoaded", async () => {
     let content = gameState.content.toJson()
+    console.log(content)
     unityPlayContext.send("ReactToUnity", "UpdateGameContent", content);
     sendGameState(gameState)
   });
