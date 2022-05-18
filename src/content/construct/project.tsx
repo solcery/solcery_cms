@@ -28,7 +28,7 @@ Master.construct = function(data: any = {}) {
       customBricksSchema = tpl.schema;
       customBricks = new Map([...customBricks, ...tpl.objects.raw])
     }
-    else {
+    else if (!template.customData.skipConstruct) {
       constructedTemplates.set(template.code, tpl)
     }
   }
