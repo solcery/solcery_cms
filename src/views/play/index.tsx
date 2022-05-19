@@ -28,15 +28,13 @@ export const PlayView = () => {
   useEffect(() => {
     let buffer = Buffer.from(testGameContent.data)
     var constructedContent = ConstructedContent.fromBuffer(buffer)
-    console.log('TEST')
-    console.log(constructedContent)
     let gameState = new GameState(constructedContent, [ 'core', 'tech demo', 'test buttons '])
     setGameState(gameState)
     return () => { 
       unityPlayContext.quitUnityInstance() 
     }
   }, [])
-
+ 
   const sendGameState = (gameState: any) => {
     let client_package = {
       states: [
@@ -47,18 +45,39 @@ export const PlayView = () => {
         }
       ]
     }
-    unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(client_package));
+    clientCommand('UpdateGameState', JSON.stringify(client_package));
   }
 
-  const onCardAttrChange = (cardId: number, attrName: string, value: number) => {
-    gameState.objects.get(cardId).attrs[attrName] = value;
-    sendGameState(gameState)
-    setStep(step + 1)
+  function * stringChunk(s: string, maxBytes: number) {
+    const SPACE_CODE = 32;
+    let buf = Buffer.from(s);
+    while (buf.length) {
+      let i = buf.lastIndexOf(SPACE_CODE, maxBytes + 1);
+      if (i < 0) i = buf.indexOf(SPACE_CODE, maxBytes);
+      if (i < 0) i = buf.length;
+      yield buf.slice(0, i).toString();
+      buf = buf.slice(i + 1); 
+    }
+  }
+
+  const clientCommand = (funcName: string, param: string) => {
+    const USHORT_SIZE = 65536;
+    const chunks = [...stringChunk(param, USHORT_SIZE)];
+
+    for (let i = 0; i < chunks.length; i++) {
+      let chunk_package = {
+        count: chunks.length,
+        index: i,
+        value: chunks[i],
+      }
+      // console.log(`Web - sending package to Unity client [${funcName}]: ${JSON.stringify(chunk_package)}`);
+      unityPlayContext.send('ReactToUnity', funcName, JSON.stringify(chunk_package))
+    }
   }
 
   unityPlayContext.on("OnUnityLoaded", async () => {
     let content = gameState.content.toJson()
-    unityPlayContext.send("ReactToUnity", "UpdateGameContent", content);
+    clientCommand("UpdateGameContent", content)
     sendGameState(gameState)
   });
 
@@ -67,12 +86,22 @@ export const PlayView = () => {
     let clientPackage = {
       states: gameState.playerCommand(command)
     }
-    console.log(clientPackage)
-    unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(clientPackage));
+    clientCommand('UpdateGameState', JSON.stringify(clientPackage));
     setStep(step + 1)
   });
 
-  console.log(gameState)
+  unityPlayContext.on("LogAction", async (log: string) => {
+    var logToApply = JSON.parse(log)
+    for (let logEntry of logToApply.Steps) {
+      if (logEntry.actionType == 0)
+      {
+        gameState.useCard(logEntry.data, logEntry.playerId)
+        sendGameState(gameState)
+        setStep(step + 1)
+      }
+    }
+  });
+
   if (!gameState || !gameState.objects) return (<div></div>)
 
   return (
