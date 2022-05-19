@@ -6,7 +6,7 @@ import { applyBrick } from "../../solcery/types/brick";
 import { GameState } from "../../solcery/game"
 import { ConstructedContent } from "../../solcery/content"
 
-import testGameContent from "./game_content_test.json"
+import gameContent from "./game_content_binary.json"
 
 import { BinaryWriter, BinaryReader } from "borsh";
 
@@ -26,7 +26,7 @@ export const PlayView = () => {
   const [ step, setStep ] = useState(0)
 
   useEffect(() => {
-    let buffer = Buffer.from(testGameContent.data)
+    let buffer = Buffer.from(gameContent.data)
     var constructedContent = ConstructedContent.fromBuffer(buffer)
     let gameState = new GameState(constructedContent, [ 'core', 'tech demo', 'test buttons '])
     setGameState(gameState)
