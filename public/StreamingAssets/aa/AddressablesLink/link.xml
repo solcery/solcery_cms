@@ -16,6 +16,7 @@
     <type fullname="Solcery.Widgets_new.Simple.Pictures.PlaceWidgetPictureLayout" preserve="all" />
     <type fullname="Solcery.Widgets_new.Simple.Titles.PlaceWidgetTitleLayout" preserve="all" />
     <type fullname="Solcery.Widgets_new.Simple.Widgets.PlaceWidgetWidgetLayout" preserve="all" />
+    <type fullname="Solcery.Widgets_new.Tooltip.TMPTooltipBehaviour" preserve="all" />
     <type fullname="Solcery.Widgets_new.Tooltip.TooltipLayout" preserve="all" />
   </assembly>
   <assembly fullname="Unity.Addressables, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" preserve="all">

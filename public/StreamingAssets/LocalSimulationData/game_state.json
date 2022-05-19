@@ -20,6 +20,10 @@
           {
             "key": "loogris_branch",
             "value": 0
+          },
+          {
+            "key": "non_creatures_drawn",
+            "value": 0
           }
         ],
         "objects": [
@@ -595,7 +599,7 @@
           },
           {
             "id": 6,
-            "tplId": 695,
+            "tplId": 303,
             "attrs": [
               {
                 "key": "place",
