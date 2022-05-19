@@ -49,9 +49,6 @@ export const TypedataRender = (props: {
 
   if (!project) return <></>
   let templates = project.getTemplates()
-console.log(templates)
-console.log(props.defaultValue)
-console.log(templates[0])
   return (
     <Select defaultValue={ props.defaultValue ? props.defaultValue.templatePublicKey.toBase58() : templates[0].pubkey.toBase58() } onChange={(templateKey) => { 
       props?.onChange && props.onChange(new SLink({ templatePublicKey: new PublicKey(templateKey) })) 

@@ -19,8 +19,9 @@ export const HomeView = () => {
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
   const history = useHistory();
-  const { project } = useProject();
+  const { project, userPrefs } = useProject();
   const [ constructedContent, setConstructedContent ] = useState<any>(undefined)
+  const [ constructedContentBinary, setConstructedContentBinary ] = useState<any>(undefined)
   const [ constructedState, setConstructedState ] = useState<any>(undefined)
 
   const downloadJsonFile = (name: string, data: string) => {
@@ -40,12 +41,22 @@ export const HomeView = () => {
 
   useEffect(() => {
     if (!project) return;
-    let constructed = project.construct(connection);
+    let constructed = project.construct();
     setConstructedContent(constructed.toJson());
+    setConstructedContentBinary(constructed.toBuffer())
 
-    let gameState = new GameState(constructed);
-    setConstructedState(gameState.toJson());
-  }, [ project ])
+    let gameState = new GameState(constructed, userPrefs.layoutPresets);
+    let constructedState = {
+      states: [
+        {
+          id: 0,
+          state_type: 0,
+          value: gameState.toObject(),
+        }
+      ]
+    }
+    setConstructedState(JSON.stringify(constructedState, null, 2));
+  }, [ project, userPrefs ])
 
   const constructContent = async () => {
     // let writer = new BinaryWriter()
@@ -131,10 +142,10 @@ export const HomeView = () => {
     const createTemplateIx = new TransactionInstruction({
       keys: [
         { pubkey: publicKey, isSigner: true, isWritable: false },
-        { pubkey: project.publicKey, isSigner: false, isWritable: true },
+        { pubkey: project.pubkey, isSigner: false, isWritable: true },
         { pubkey: templateAccount.publicKey, isSigner: false, isWritable: true },
         { pubkey: storageAccount.publicKey, isSigner: false, isWritable: true },
-        { pubkey: project.templateStorage, isSigner: false, isWritable: true },
+        { pubkey: project.templateStorage.pubkey, isSigner: false, isWritable: true },
       ],
       programId: programId,
       data: Buffer.from([0, 0]),
@@ -145,10 +156,14 @@ export const HomeView = () => {
     })
   }
 
+  let contentName = 'Content';
+  if (userPrefs && userPrefs.layoutPresets) {
+    contentName = `Content [ ${ userPrefs.layoutPresets.join(', ') } ]`;
+  }
   return (
     <div>
       <Divider/>
-      <h2>Content</h2>
+      <h2>{ contentName }</h2>
       {constructedContent && 
         <Button 
           icon={<DownloadOutlined/>}
@@ -160,6 +175,12 @@ export const HomeView = () => {
           icon={<DownloadOutlined/>}
           onClick={() => { downloadJsonFile('game_state.json', constructedState) }}>
           game_state.json
+        </Button>}
+      {constructedContentBinary && 
+        <Button 
+          icon={<DownloadOutlined/>}
+          onClick={() => { downloadJsonFile('game_content_binary.json', constructedContentBinary) }}>
+          game_content_binary.json
         </Button>}
       
       <Divider/>

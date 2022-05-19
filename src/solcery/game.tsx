@@ -89,7 +89,7 @@ export class GameState {
     return newState
   }
 
-  init = () => {
+  init = (layoutPresets: string[] | undefined = undefined) => {
     let content = this.content
     if (!content)
       return
@@ -99,7 +99,8 @@ export class GameState {
     }
     var attributes = content.get('attributes')
 	  var cardId = 1
-	  for (let cardPack of content.get('cards')) { 
+	  for (let cardPack of content.get('cards')) {
+      if (layoutPresets && !layoutPresets.find((presetName: string) => cardPack.preset === presetName)) continue;
 	    for (let i = 0; i < cardPack.amount; i++) {
 	      var cardType = content.get('cardTypes', cardPack.cardType)
         var attrs: any = {}
@@ -146,10 +147,10 @@ export class GameState {
     }
   }
 
-  constructor(content: any = undefined) {
+  constructor(content: any = undefined, layoutPresets: string[] | undefined = undefined) {
     if (content) {
       this.content = content
-      this.init()
+      this.init(layoutPresets)
     }
   }
 
@@ -217,58 +218,104 @@ export class GameState {
     updateCustomBricks(bricksToAdd)
   }
 
-	useCard = (cardId: number, playerId: number) => {
+  createContext = (extra: any) => {
+
+  }
+
+  exportState = (ctx: any) => {
+    let objects:any [] = [];
+    ctx.game.objects.forEach((obj: any) => {
+      objects.push({
+        id: obj.id,
+        tplId: obj.tplId,
+        attrs: Object.entries(obj.attrs).map(([key, value]) => {
+          return { key, value }
+        })
+      })
+    })
+    let gameState = {
+      id: ctx.log.length,
+      state_type: 0,
+      value: {
+        attrs: Object.entries(ctx.game.attrs).map(([key, value]) => {
+          return { key, value }
+        }),
+        objects: objects,
+        deleted_objects: [],
+      }
+    };
+    ctx.log.push(gameState)
+  }
+
+  exportDiff = (ctx: any) => {
+    let logEntry: any = {
+      attrs: Object.entries(ctx.diff.attrs).map(([key, value]) => {
+        return { key, value }
+      }),
+      objects: Object.values(ctx.diff.objects).map((objDiff: any) => {
+        return {
+          id: objDiff.id,
+          tplId: objDiff.tplId,
+          attrs: Object.entries(objDiff.attrs).map(([key, value]) => {
+            return { key, value }
+          }),
+        }
+      }),
+      deleted_objects: Object.keys(ctx.diff.deleted_objects)
+    }
+    let gameState = {
+      id: ctx.log.length,
+      state_type: 0,
+      value: logEntry,
+    };
+    ctx.log.push(gameState)
+    ctx.diff = {
+      attrs: {},
+      objects: {},
+      deleted_objects: {}
+    }
+  }
+
+	useCard = (cardId: number) => {
 		let object = this.objects.get(cardId)
 		if (!object)
 			throw new Error("Attempt to cast unexistent card!")
 		let ctx = new Context({
 			game: this,
 			object: object,
-			extra: { vars: new Map([[ 'playerId', playerId ]]) },
+			extra: { vars: {} },
 		})
-    ctx.diff = {
-      gameAttrs: new Map(),
-      objectAttrs: new Map()
-    }
+    // this.exportDiff(ctx)
 		let cardType = this.content.get('cardTypes', object.tplId)
 		applyBrick(cardType.action, ctx)
-    return ctx.diff
+    this.exportDiff(ctx)
+    return ctx.log
 	}
 
-	extractGameState = () => {
-		return {
-      Cards: this.objectsToCards()
-    }
-	}
-
-  extractContent = () => {
-    return {
-      CardTypes: constructCardTypes(this.content),
-    }
+  dropCard = (cardId: number, dndId: number, targetPlace: number) => {
+    let object = this.objects.get(cardId)
+    if (!object)
+      throw new Error("Attempt to drag and drop unexistent card!")
+    let ctx = new Context({
+      game: this,
+      object: object,
+      extra: { vars: { 'target_place': targetPlace } },
+    })
+    // this.exportState(ctx)
+    let dragndrop = this.content.get('drag_n_drops', dndId)
+    applyBrick(dragndrop.action_on_drop, ctx)
+    this.exportDiff(ctx)
+    return ctx.log
   }
 
-  extractDisplayData = () => {
-    return {
-      PlaceDisplayDatas: constructPlaces(this.content)
+  playerCommand = (command: any) => {
+    if (command.command_data_type == 0) {
+      return this.useCard(command.object_id)
+    }
+    if (command.command_data_type == 2) {
+      return this.dropCard(command.object_id, command.drag_drop_id, command.target_place_id)
     }
   }
-
-	objectsToCards = () => {
-		var result: Card[] = []
-		for (let [ gameObjectId, gameObject ] of this.objects) { 
-      let cardAttrs: CardAttr[] = []
-      for (let attr of Object.keys(gameObject.attrs)) {
-        cardAttrs.push({ Name: attr, Value: gameObject.attrs[attr] })
-      }
-			result.push({
-				CardId: gameObjectId,
-				CardType: gameObject.tplId,
-				CardPlace: gameObject.attrs.place,
-        Attrs: cardAttrs,
-			})
-		}
-		return result
-	}	
 
   toObject() {
     let globalAttrs: any[] = []
@@ -300,75 +347,68 @@ export class GameState {
     }
   }
 
-  toJson() {
-    return JSON.stringify(this.toObject(), null, 2)
+  toJSON() {
+    return this.toObject()
   }
 
+  createEntity(tplId: any) {
+    let objectId = this.objects.size + 1;
+    var attributes = this.content.get('attributes');
+    var attrs: any = {};
+    for (let contentAttr of attributes) {
+      attrs[contentAttr.code] = 0
+    }
+    let obj = {
+      id: objectId,
+      tplId: tplId,
+      attrs: attrs
+    }
+    this.objects.set(objectId, obj)
+    return obj
+  }
+
+  setAttr = (ctx: any, attrName: string, value: number) => {
+    ctx.object.attrs[attrName] = value;
+    if (ctx.diff) {
+      let objectId = ctx.object.id
+      if (!ctx.diff.objects[objectId]) {
+        ctx.diff.objects[objectId] = {
+          id: objectId,
+          tplId: ctx.object.tplId,
+          attrs: {}
+        }
+      }
+      ctx.diff.objects[objectId].attrs[attrName] = value
+    }
+  }
 }
 
 class Context {
-	vars: Map<string, number> = new Map();
+	vars: any;
 	game: GameState;
 	object: any;
   diff: any;
+  log: any[];
   args: any[] = [];
 	constructor(src: { game: GameState, object: any, extra?: any}) {
 		this.object = src.object;
 		this.game = src.game;
-		this.vars = src.extra?.vars;
+		this.vars = src.extra?.vars || {};
+    this.diff = {
+      attrs: Object.assign({}, this.game.attrs),
+      objects: {},
+      deleted_objects: {}
+    }
+    for (let [objId, obj] of this.game.objects.entries()) {
+      this.diff.objects[objId] = {
+        id: obj.id,
+        tplId: obj.tplId,
+        attrs: Object.assign({}, obj.attrs)
+      }
+    }
+    this.log = []
 	}
 }
-
-const constructPlaces = (content: any) => {
-  var result = []
-  var placesContent = content.get('places')
-  if (!placesContent)
-    return
-  for (let place of placesContent) { 
-    result.push({
-      PlaceName: place.name,
-      PlaceId: place.placeId,
-      PlacePlayer: place.playerMode,
-      IsInteractable: place.interactableForActiveLocalPlayer,
-      IsVisible: place.visible,
-      HorizontalAnchors: {
-        Min: (place.x1 ? place.x1 : 0) / 10000,
-        Max: (place.x2 ? place.x2 : 0) / 10000,
-      },
-      VerticalAnchors: {
-        Min: (place.y1 ? place.y1 : 0) / 10000,
-        Max: (place.y2 ? place.y2 : 0) / 10000,
-      },
-      ZOrder: place.zOrder,
-      CardFaceOption: place.face ? place.face : 0,
-      CardLayoutOption: place.layout ? place.layout : 0,
-    })
-  }
-  return result
-}
-
-
-const constructBoardData = (content: any) => {
-  var result = {
-    LastUpdate: Date.now(),
-    Players: constructPlayers(),
-    Cards: [],
-    Message: {
-      Nonce: 1,
-      Message: "No message",
-      Duration: 5,
-    },
-    Random: {
-      x: 1,
-      y: 2,
-      z: 3,
-      w: 4,
-    },
-    EndTurnCardId: 5,
-  }
-  return result
-}
-
 
 type FightLog = {
   Steps: LogEntry[],
@@ -378,101 +418,5 @@ type LogEntry = {
   playerId: number,
   actionType: number,
   data: number,
-}
-
-type Card = { // TODO: from content
-  CardId: number,
-  CardType: number,
-  CardPlace: number,
-  Attrs: CardAttr[],
-}
-
-type CardAttr = {
-  Name: string,
-  Value: number,
-}
-
-type OldPlayer = {
-  Address: string,
-  IsActive: boolean,
-  HP: number,
-  Coins: number,
-  IsMe: boolean,
-  Attrs: number[]
-}
-
-type CardType = { //TODO: from content
-  Id: number,
-  Metadata: {
-    Picture: number,
-    PictureUrl: string,
-    Icon: number,
-    Coins: number,
-    Name: string,
-    Description: string,
-  },
-  BrickTree: any, // TODO: brick
-}
-
-type BoardData = {
-  LastUpdate: number,
-  Players: OldPlayer[],
-  Cards: Card[],
-  Message: {
-    Nonce: number,
-    Message: string,
-    Duration: number
-  }
-  Random: {
-    x: number,
-    y: number,
-    z: number,
-    w: number,
-  }
-  EndTurnCardId: number
-}
-
-
-const constructCardTypes = (content: any) => {
-  var result: CardType[] = []
-  var cardTypesContent = content.get('cardTypes')
-  if (!cardTypesContent)
-    return result
-  for (let cardType of cardTypesContent) { 
-    result.push({
-      Id: cardType.id,
-      BrickTree: {},
-      Metadata: {
-        Picture: cardType.pictureNumber,
-        PictureUrl: cardType.picture,
-        Icon: cardType.icon,
-        Coins: cardType.coins,
-        Name: cardType.name,
-        Description: cardType.description,
-      }
-    })
-  }
-  return result
-} 
-
-const constructPlayers = () => {
- return [
-  {
-    Address: "None",
-    IsActive: true,
-    HP: 25,
-    Coins: 0,
-    IsMe: true,
-    Attrs: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  },
-  {
-    Address: "None",
-    IsActive: false,
-    HP: 25,
-    Coins: 0,
-    IsMe: false,
-    Attrs: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  }
- ]
 }
 

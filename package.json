@@ -10,7 +10,7 @@
     "@solana/spl-token": "^0.1.4",
     "@solana/spl-token-registry": "^0.2.105",
     "@solana/spl-token-swap": "^0.1.0",
-    "@solana/web3.js": "^1.37.0",
+    "@solana/web3.js": "^1.39.1",
     "@testing-library/jest-dom": "^5.12.0",
     "@testing-library/react": "^11.2.7",
     "@types/dagre": "^0.7.47",

@@ -575,25 +575,25 @@ export const GameView = (props: {
   unityGameContext.on("OnUnityLoaded", async () => {
     if (!gameState)
       return;
-    unityGameContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
-    unityGameContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData())); 
-    sendGameState()
+    // unityGameContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
+    // unityGameContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData())); 
+    // sendGameState()
   });
 
   const sendGameState = () => {
     if (!gameState)
       return
     setCastPending(false)
-    unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
+    // unityGameContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(gameState.extractGameState()));
   }
 
   useEffect(() => {
     if (!gameState)
       return
     if (!unityContentLoaded) {
-      unityGameContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
-      unityGameContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData())); 
-      setUnityContentLoaded(true)     
+      // unityGameContext.send("ReactToUnity", "UpdateGameContent", JSON.stringify(gameState.extractContent()));
+      // unityGameContext.send("ReactToUnity", "UpdateGameDisplay", JSON.stringify(gameState.extractDisplayData())); 
+      // setUnityContentLoaded(true)     
     }
     sendGameState();
   }, [ gameState ])
@@ -682,7 +682,7 @@ export const GameView = (props: {
       return;
     }
     let tmpState = gameState.copy()
-    let diff = tmpState.useCard(cardId, 1)
+    let diff = tmpState.useCard(cardId)
 
     let buf = diffToBuf(tmpState.content, diff)
     let updateStateIx = new TransactionInstruction({

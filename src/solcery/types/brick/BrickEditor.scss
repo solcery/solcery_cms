@@ -37,6 +37,10 @@
 		background-color: #604E3F;
 	}
 
+	.add-brick-button.active {
+		cursor: pointer;
+	}
+
 	.brick-subtype-selector {
 		position: absolute;
 		margin-top: -2rem;
@@ -97,11 +101,10 @@
 	}
 	
 	.brick {
-		width: 15rem;
+		
 		padding: 1.5rem;
 		border: solid 1px #40342C;
 		border-radius: 0.5rem;
-		background-color: #261F1C;
 		text-align: center;
 	
 		.brick-name {
@@ -121,7 +124,7 @@
 			background-color: #604E3F;
 		}
 
-		.remove-button-active {
+		.remove-button {
 			cursor: pointer;
 		}
 	
@@ -150,11 +153,51 @@
 		}
 	}
 
-	.brick-active:hover {
+	.brick {
+		background-color: #261F1C;
+	}
+
+	.brick:hover {
 		background-color: #302621;
 	}
 
-	.add-brick-button-active:hover {
+	.add-brick-button.active:hover {
 		background-color: #71563F;
 	}
+
+	.brick.readonly {
+		background-color: #202020;
+	}
+
+	.brick.readonly:hover {
+		background-color: #303030;
+	}
+
+	.brick.small {
+		pointer-events: none;
+	}
+
+	.brick.small > * {
+		pointer-events: none;
+	}
 }
+
+.brickeditor-bg-small {
+	background-color: transparent;
+	pointer-events: none;
+	z-index: 10;
+	display: block;
+}
+
+.brickeditor-bg {
+	background-color: #000000;
+	pointer-events: auto;
+	position: fixed;
+	z-index: 100;
+	display: inline;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	right: 0;
+}
+

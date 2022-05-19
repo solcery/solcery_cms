@@ -41,26 +41,29 @@ export const ObjectView = () => {
   const [ fields, setFields ] = useState<any>(undefined)
   const [ revision, setRevision ] = useState(0)
   var [ template, setTemplate ] = useState<any>(undefined);
+  var [ brickTreeActive, setBrickTreeActive ] = useState(false);
   let history = useHistory();
   var objectPublicKey = new PublicKey(objectId)
 
-
-  const sendTransactionChain = async (transactionChain: any[], index: number = 0, onSuccess: () => any = () => {}, onFailure: () => any = () => {}) => {
-    if (!publicKey || wallet === undefined)
-      return;
-
-    var transactionData = transactionChain[index]
-    if (index < transactionChain.length - 1) {
-      sendTransaction(connection, wallet, transactionData.instructions, transactionData.accounts, true).then(() => {
-        sendTransactionChain(transactionChain, index + 1, onSuccess, onFailure)
-      })
-    } 
-    if (index == transactionChain.length - 1) {
-      sendTransaction(connection, wallet, transactionData.instructions, transactionData.accounts, true).then(onSuccess, onFailure)
-    }
+  const sendTransactionChain = async (
+    transactionChain: any[], 
+    onAllSigned?: () => void,
+  ) => {
+    if (!publicKey || wallet === undefined) return;
+    return (async () => {
+      let transactionNumber = 0;
+      for (let transactionData of transactionChain) {
+        transactionNumber ++;
+        if (transactionNumber < transactionChain.length) {
+          await sendTransaction(connection, wallet, transactionData.instructions, transactionData.accounts, true)
+        } else {
+          return sendTransaction(connection, wallet, transactionData.instructions, transactionData.accounts, true, onAllSigned)
+        }
+      }
+    })();
   }
 
-  const setAccountDataWithNonce = (accountPublicKey: PublicKey, data: Buffer) => {
+  const setAccountDataWithNonce = async (accountPublicKey: PublicKey, data: Buffer, onAllSigned?: () => void) => {
     if (!publicKey || wallet === undefined)
       return;
 
@@ -71,7 +74,7 @@ export const ObjectView = () => {
     instructions.push(SystemProgram.createAccount({
       programId: programId,
       space: 3200 - 69, // TODO
-      lamports: 10000, // TODO:
+      lamports: await connection.getMinimumBalanceForRentExemption(3200-69, 'singleGossip'),
       fromPubkey: publicKey,
       newAccountPubkey: nonceAccount.publicKey,
     }));
@@ -105,10 +108,6 @@ export const ObjectView = () => {
       pos = pos2
     }
 
-
-
-
-
     let copyIx = new TransactionInstruction({
       keys: [
         { pubkey: publicKey, isSigner: true, isWritable: false },
@@ -124,67 +123,7 @@ export const ObjectView = () => {
       accounts: [ nonceAccount ]
     })
 
-    sendTransactionChain(
-      transactions, 
-      0, 
-      () => {  // TODO: remove hardcode
-        notify({ message: "Object saved successfully", description: objectId})
-        history.push('/template/' + templateKey)
-        if (object) object.load(connection);
-      },
-      () => {
-        notify({ message: "Object saving error", description: objectId })
-      });
-  }
-
-  const setAccountData = async (accountPublicKey: PublicKey, data: Buffer, offset: number = 0) => {
-
-    if (wallet === undefined || !wallet.publicKey)
-      return
-    if (data.length <= MAX_DATA_SIZE) {
-      let writer = new BinaryWriter()
-      writer.writeU8(3)
-      writer.writeU8(0)
-      writer.writeU64(offset) 
-      const saveAccountIx = new TransactionInstruction({
-        keys: [
-          { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
-          { pubkey: accountPublicKey, isSigner: false, isWritable: true },
-        ],
-        programId: programId,
-        data: Buffer.concat([ 
-          writer.buf.slice(0, writer.length),
-          data,
-        ]),
-      });
-      await sendTransaction(connection, wallet, [saveAccountIx], [], true, () => { history.push('/template/' + templateKey) }).then(() => {  // TODO: remove hardcode
-        notify({ message: "Object saved successfully", description: objectId })
-      },
-      () => {
-        notify({ message: "Object saving error", description: objectId })
-      })
-      return true
-    }
-    else {
-      let writer = new BinaryWriter()
-      writer.writeU8(3)
-      writer.writeU8(0)
-      writer.writeU64(offset)
-      const saveAccountIx = new TransactionInstruction({
-        keys: [
-          { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
-          { pubkey: accountPublicKey, isSigner: false, isWritable: true },
-        ],
-        programId: programId,
-        data: Buffer.concat([ 
-          writer.buf.slice(0, writer.length),
-          data.slice(0, MAX_DATA_SIZE),
-        ]),
-      });
-      return await sendTransaction(connection, wallet, [saveAccountIx], [], false).then(async () => {
-        await setAccountData(accountPublicKey, data.slice(MAX_DATA_SIZE), offset + MAX_DATA_SIZE)
-      })
-    }
+    return sendTransactionChain(transactions, onAllSigned)
   }
 
   const saveObject = async () => {
@@ -217,17 +156,22 @@ export const ObjectView = () => {
       });
       await sendTransaction(connection, wallet, [saveObjectIx], [], true, () => { 
         history.push('/template/' + templateKey) 
-      }).then(() => {
+      }).then(async () => {
+        await object.load(connection)
         notify({ message: "Object saved successfully", description: objectId })
-        if (object) object.load(connection);
       },
       () => {
         notify({ message: "Object saving error", description: objectId })
-
       })
     } else {
-      setAccountDataWithNonce(objectPublicKey, data)
-      // setAccountData(objectPublicKey, data, 33 + 36)
+      setAccountDataWithNonce(objectPublicKey, data, () => {
+        history.push('/template/' + templateKey) 
+      }).then(async () => {
+        await object.load(connection)
+        notify({ message: "Object saved successfully", description: objectId })
+      }, () => {
+        notify({ message: "Object saving error", description: objectId })
+      })
     }
   }
 
@@ -274,7 +218,8 @@ export const ObjectView = () => {
 
   }, [ object, project ]);
 
-  useEffect(() => {  
+  useEffect(() => {
+    if (brickTreeActive) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.keyCode === 27) { //Escape
         if (revision == 0) {
@@ -291,7 +236,11 @@ export const ObjectView = () => {
     return () => {
       window.removeEventListener('keydown', onKeyDown);
     };
-  });
+  }, [ brickTreeActive ]);
+
+  const onActivate = (newValue: any) => {
+    setBrickTreeActive(newValue);
+  }
 
   const setFieldValue = (code: string, value: any) => {
     if (!object)
@@ -323,6 +272,7 @@ export const ObjectView = () => {
                 onChange= {(newValue: any) => {
                   setFieldValue(record.field.code, newValue) 
                 }}
+                onActivate={ (record.field.fieldType instanceof SType) && onActivate }
               />     
               }
             />

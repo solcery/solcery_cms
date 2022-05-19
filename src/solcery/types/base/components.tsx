@@ -4,7 +4,7 @@ import { SType } from './index'
 import { solceryTypes } from '../solceryTypes'
 import { SInt } from '../index'
 
-export const TypeSelector = (props: { //TODO: -> Type render
+export const TypeSelector = (props: { 
 	onChange?: (newValue: SType) => void,
 	defaultValue?: SType,
 }) => {
@@ -21,8 +21,7 @@ export const TypeSelector = (props: { //TODO: -> Type render
 	})
 
 	const onChangeSolceryType = (newValue: any) => {
-		if (props.onChange)
-			props.onChange(newValue)
+		if (props.onChange) props.onChange(newValue);
 	}
 	return (
 		<div>
@@ -30,8 +29,7 @@ export const TypeSelector = (props: { //TODO: -> Type render
 	    <Select id="fieldType" defaultValue={ props.defaultValue ? props.defaultValue.id : DEFAULT_STYPE.id } onChange={(solceryTypeId) => { 
 	    	let solceryType = solceryTypes.get(solceryTypeId)
 	    	setTypeId(solceryTypeId)
-	    	if (!solceryType.typedataRender)
-	    		onChangeSolceryType(new solceryType())
+	    	if (!solceryType.typedataRender) onChangeSolceryType(new solceryType());
 	    }} >
 	    {Array.from(solceryTypes.keys()).map((solceryTypeId) => 
 	      <Option key={solceryTypeId} value={solceryTypeId}>{solceryTypes.get(solceryTypeId).typename}</Option>
@@ -41,7 +39,7 @@ export const TypeSelector = (props: { //TODO: -> Type render
 	    	solceryTypes.get(typeId)?.typedataRender,
 				{ 
 					onChange: onChangeSolceryType,
-					defaultValue: props.defaultValue,
+					defaultValue: (props.defaultValue && typeId === props.defaultValue.id) ? props.defaultValue : undefined,
 				}
 			)}
 	  </div>

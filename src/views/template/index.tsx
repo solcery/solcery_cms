@@ -11,6 +11,7 @@ import { programId } from "../../solcery/engine"
 import { useProject } from "../../contexts/project";
 import Cookies from 'universal-cookie';
 import { notify } from "../../utils/notifications";
+import { SString } from "../../solcery/types";
 
 
 type TemplateViewParams = {
@@ -31,7 +32,7 @@ export const TemplateView = () => {
   var [ storage, setStorage ] = useState<any>(undefined);
   var { project } = useProject();
   var [ revision, setRevision ] = useState(0)
-  let [ filter, setFilter ] = useState<any>(undefined)
+  let [ filter, setFilter ] = useState<any>()
 
 
   const copyToAnotherProject = async (src: PublicKey ) => {
@@ -150,14 +151,13 @@ export const TemplateView = () => {
     })
   }
 
-  const applyFilter = (value: string) => {
-    setFilter(value)
-    cookies.set(templateKey + '.filter.name', value)
+  const applyFilter = (value: string, field: any) => {
+    if (!filter) filter = {};
+    filter[field.code] = value;
+    let code: string = field.code;
+    cookies.set(`${templateKey}.filter.${code}`, value);
+    setFilter(JSON.parse(JSON.stringify(filter)));
   }
-
-  useEffect(() => {
-    setFilter(cookies.get(templateKey + '.filter.name'))
-  }, [])
 
   useEffect(() => { 
     if (project) {
@@ -168,10 +168,40 @@ export const TemplateView = () => {
   }, [ project, templateKey ]);
 
   useEffect(() => { 
-    if (template) {
-      setObjects(template.getObjects())
+    if (!template) return;
+    let objects = template.getObjects()
+    setObjects(objects)
+    let flt: any = {}
+    for (let fld of Object.values(template.fields)) {
+      let field: any = fld as any;
+      let code: string = field.code
+      let fltValue = cookies.get(`${templateKey}.filter.${code}`)
+      if (fltValue) flt[code] = fltValue;
     }
+    setFilter(flt);
+    
+
+    let subscriptions: any[] = []
+    for (let object of template.getObjects()) {
+      subscriptions.push({
+        object,
+        id: object.addEventSubscription('onLoad', (storage: any) => {
+          setRevision(revision + 1)
+        })
+      })
+    }
+    return () => {
+      subscriptions.forEach((subscription: any) => {
+        subscription.object.removeEventSubscription('onLoad', subscription.id)
+      })
+    };
+
   }, [ template ]);
+
+
+  useEffect(() => {
+
+  })
 
   useEffect(() => {
     if (!storage)
@@ -190,13 +220,19 @@ export const TemplateView = () => {
 
   if (objects)
   {
-    let tableData: any[] = []
-    for (let objectInfo of objects) {
-      let name = objectInfo.fields.name
-      if (!filter || (name && name.toLowerCase().includes(filter.toLowerCase()))) {
-        tableData.push(objectInfo)
+    let tableData: any[] = [ ...objects ];
+    if (filter) {
+      for (let code of Object.keys(filter)) {
+        tableData = tableData.filter((objectInfo: any) => {
+          let val = objectInfo.fields[code]
+          let filterValue: string = filter[code] as string;
+          if (filterValue === '') return true;
+          if (!val) return false;
+          return val && val.toLowerCase().includes(filterValue.toLowerCase())
+        })
       }
     }
+
 
     const divStyle = {
       width: '100%',
@@ -221,11 +257,13 @@ export const TemplateView = () => {
         />
         {Object.values(template.fields).map((field: any) => { 
           return <Column 
-            title = { field.name + ((field.id === 1 && filter) ? ' : [' + filter + ']' : '') } 
+            title = { `${field.name}${ filter[field.code] ? ' [ ' + filter[field.code] + ' ] ' : '' }` } 
             key = { field.id } 
-            filterDropdown={field.id === 1 && <Input defaultValue={filter} onChange={(event: any) => { applyFilter(event.target.value) }}/>}
+            filterDropdown={field.fieldType instanceof SString && 
+              <Input defaultValue={filter[field.code]} onChange={(event: any) => { applyFilter(event.target.value, field) }}/>
+            }
             sorter = { field.fieldType.sorter && ((a: any, b: any) => { 
-              return field.fieldType.sorter(a[field.id], b[field.id]) 
+              return field.fieldType.sorter(a.fields[field.code], b.fields[field.code]) 
             }) }
             render = {(text, object: any) => <field.fieldType.valueRender 
                 type={field.fieldType}

@@ -41,13 +41,6 @@ export const GameObjectView = (props: {
     </div>)
 }
 
-// const unityPlayContext = new UnityContext({
-//   loaderUrl: "game/game_25.loader.js",
-//   dataUrl: "game/game_25.data",
-//   frameworkUrl: "game/game_25.framework.js",
-//   codeUrl: "game/game_25.wasm",
-// })
-
 const unityPlayContext = new UnityContext({
   loaderUrl: "new_game/WebGl.loader.js",
   dataUrl: "new_game/WebGl.data",
@@ -58,7 +51,7 @@ const unityPlayContext = new UnityContext({
 
 export const PlayView = () => {
 
-  const { project } = useProject()
+  const { project, userPrefs } = useProject()
   const connection = useConnection();
   const { wallet, publicKey } = useWallet();
   const history = useHistory();
@@ -85,7 +78,7 @@ export const PlayView = () => {
       return
     (async () => {
       var constructedContent = await project.construct(connection)
-      let gameState = new GameState(constructedContent)
+      let gameState = new GameState(constructedContent, userPrefs.layoutPresets)
       let slots = gameState.content.getAll('slots')
       for (let slot of slots.values()) {
         let defaultCardTypeId = slot.default
@@ -111,22 +104,39 @@ export const PlayView = () => {
     setCardTypeNamesById(Object.fromEntries(result))
   }, [ gameState])
 
+  const sendGameState = (gameState: any) => {
+    let client_package = {
+      states: [
+        {
+          id: 0,
+          state_type: 0,
+          value: gameState.toObject(),
+        }
+      ]
+    }
+    unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(client_package));
+  }
+
   const onCardAttrChange = (cardId: number, attrName: string, value: number) => {
     gameState.objects.get(cardId).attrs[attrName] = value;
-    unityPlayContext.send("ReactToUnity", "UpdateGameState", gameState.toJson());
+    sendGameState(gameState)
     setStep(step + 1)
   }
 
   unityPlayContext.on("OnUnityLoaded", async () => {
     let content = gameState.content.toJson()
-    let state = gameState.toJson()
+    console.log(`Web - sending content to Unity client: ${content}`);
     unityPlayContext.send("ReactToUnity", "UpdateGameContent", content);
-    unityPlayContext.send("ReactToUnity", "UpdateGameState", state);
+    sendGameState(gameState)
   });
 
-  unityPlayContext.on("CastCard", async (cardId: number) => {
-    gameState.useCard(cardId, 1)
-    unityPlayContext.send("ReactToUnity", "UpdateGameState", gameState.toJson());
+  unityPlayContext.on("SendCommand", async (jsonData: string) => {
+    let command = JSON.parse(jsonData)
+    let clientPackage = {
+      states: gameState.playerCommand(command)
+    }
+    console.log(clientPackage)
+    unityPlayContext.send("ReactToUnity", "UpdateGameState", JSON.stringify(clientPackage));
     setStep(step + 1)
   });
 
@@ -136,7 +146,7 @@ export const PlayView = () => {
       if (logEntry.actionType == 0)
       {
         gameState.useCard(logEntry.data, logEntry.playerId)
-        unityPlayContext.send("ReactToUnity", "UpdateGameState", gameState.toJson());
+        sendGameState(gameState)
         setStep(step + 1)
       }
     }
@@ -159,20 +169,21 @@ export const PlayView = () => {
   })
   return (
     <Layout>
-      <Sider width='300'>
-        <Input onChange={(e:any) => { onHeaderFilterChange(e.target.value) }}/>
-        {gameState.content.get('attributes').map((attr: any) => (
-          <div>
-            { attr.name  } 
-            <InputNumber 
-              precision={0}
-              value={ filter.attrs[attr.code] }
-              onChange={(value) => { onAttrFilterChange(attr.code, value) }} 
-            />
-          </div>)
-        )}
-        
+      <Sider width='300'>        
         <Collapse>
+          <Panel header='Filter' key='filter'>
+            <Input onChange={(e:any) => { }}/>
+            {gameState.content.get('attributes').map((attr: any) => (
+              <div>
+                { attr.name  } 
+                <InputNumber 
+                  precision={0}
+                  value={ filter.attrs[attr.code] }
+                  onChange={(value) => { onAttrFilterChange(attr.code, value) }} 
+                />
+              </div>)
+            )}
+          </Panel>
           {data.map((elem: any) => 
             <Panel header={elem.header} key={elem.object.id}>
               <Space direction="vertical">

@@ -1,15 +1,17 @@
 import { useEffect } from 'react';
 import { Handle, Position } from 'react-flow-renderer';
-import { defaultBricksByType } from './index'
+import { defaultBricksByType, getBrickTypeName } from './index';
 import { notify } from "../../../utils/notifications";
+import { useProject } from '../../../contexts/project';
 
 export default function Brick(props: {
 	id: string,
 	data: any
 }) {
-
+	const { userPrefs } = useProject();
 	const brick = props.data.brick;
 	const brickClass = props.data.brickClass;
+	const brickTypeName = getBrickTypeName(brick.type);
 	let brickSignature = props.data.brickSignatures.find((bs: any) => bs.type === brick.type && bs.subtype === brick.subtype);
 	if (!brickSignature) {
 		brickSignature = defaultBricksByType.get(brick.type)
@@ -28,49 +30,52 @@ export default function Brick(props: {
 
 	let isHovered = false;
 
+	const copy = () => {
+		let brickJson = JSON.stringify(props.data.brick)
+		notify({ message: "Brick copied", description: brickJson.substring(0, 30) + '...', color: '#DDFFDD'})
+		navigator.clipboard.writeText(brickJson);
+	}
+
+	const paste = () => {
+		navigator.clipboard.readText().then((clipboardContents) => {
+			if (!clipboardContents) return;
+			
+			let pastedBrickTree: any = null;
+			try {
+				pastedBrickTree = JSON.parse(clipboardContents);
+			} catch {
+				notify({ message: "Invalid brickTree format in clipboard", description: clipboardContents, color: '#FFDDDD'})
+			}
+			if (!pastedBrickTree) return; // TODO: add validation
+			props.data.onPaste(pastedBrickTree, props.data.brickTree, props.data.parentBrick, props.data.paramID);
+		});
+	}
+
 	useEffect(() => {
 		let isCtrlDown = false;
 		
 		const onKeyDown = (e: KeyboardEvent) => {
-			isCtrlDown = e.keyCode === 17 || e.keyCode === 91;
+			if (!isHovered) return;
+			if (!e.ctrlKey) return;
+			let charCode = String.fromCharCode(e.which).toLowerCase();
+			if(charCode === 'c') copy();
+			if(charCode === 'v') paste();
 		};
-		const onKeyUp = (e: KeyboardEvent) => {
-			isCtrlDown = !(e.keyCode === 17 || e.keyCode === 91); // Ctrl or Cmd keys
-			
-			if (isCtrlDown && e.keyCode === 67 /*'C' key*/ && isHovered) {
-				let brickJson = JSON.stringify(props.data.brick)
-				notify({ message: "Brick copied", description: brickJson.substring(0, 30) + '...', color: '#DDFFDD'})
-				navigator.clipboard.writeText(brickJson);
-			}
 
-			if (isCtrlDown && e.keyCode === 86 /*'V' key*/ && isHovered) {
-
-				navigator.clipboard.readText().then((clipboardContents) => {
-					if (!clipboardContents) return;
-					
-					let pastedBrickTree: any = null;
-					try {
-						pastedBrickTree = JSON.parse(clipboardContents);
-					} catch {
-						notify({ message: "Invalid brickTree format in clipboard", description: clipboardContents, color: '#FFDDDD'})
-					}
-					if (!pastedBrickTree) return; // TODO: add validation
-					props.data.onPaste(pastedBrickTree, props.data.brickTree, props.data.parentBrick, props.data.paramID);
-				});
-			}
-		};
-		
 		window.addEventListener('keydown', onKeyDown);
-		window.addEventListener('keyup', onKeyUp);
-		
 		return () => {
 			window.removeEventListener('keydown', onKeyDown);
-			window.removeEventListener('keyup', onKeyUp);
 		};
 	});
+
+
 	return (
-		<div className={ props.data.readonly ? "brick" : "brick brick-active" } onPointerEnter={() => isHovered = true} onPointerLeave={() => isHovered = false}>
-			<div className={ props.data.readonly ? "remove-button" : "remove-button remove-button-active" } onClick={onRemoveButtonClicked}>x</div>
+		<div className={ `brick ${brickTypeName} ${props.data.small ? 'small' : ''} ${props.data.readonly ? 'readonly' : ''}` } 
+		onPointerEnter={() => isHovered = true }
+		onPointerLeave={() => isHovered = false }
+		style={{ width: `${Math.max(15, 4 + nestedParams.length * 5)}rem`}}
+		>
+			{!props.data.readonly && !props.data.small && <div className={"remove-button" } onClick={onRemoveButtonClicked}>x</div>}
 			<div className="brick-name">{brickSignature.name}</div>
 			{inlineParams.map((param: any) =>
 				<div className="field-container" key={param.id}>

@@ -6,6 +6,8 @@ import { BinaryReader, BinaryWriter } from 'borsh';
 import { solceryTypes } from '../solceryTypes'
 import { ValueRender, TypedataRender } from './components'
 
+const debug = { log: false, iter: 0, enabled: false }
+
 const checkValidity: (brickTree: any) => boolean = (brickTree: any) => {
   if (brickTree === undefined || brickTree === null)
     return false
@@ -17,7 +19,6 @@ const checkValidity: (brickTree: any) => boolean = (brickTree: any) => {
   }
   return result
 }
-
 
 export class SBrick extends SType {
   id = 6;
@@ -171,7 +172,7 @@ export class SBrick extends SType {
     }
     let params: any[] = []
     for (let param of value.params) {
-      let paramSignature = getParamSignatureById(brickSignature, param.id)
+      let paramSignature = getParamSignatureByName(brickSignature, param.name)
       if (paramSignature) {
         params.push({
           name: param.name,
@@ -196,6 +197,11 @@ export const customBricks: BrickSignature[] = [];
 export const solceryBricks: BrickSignature[] = [];
 export const customBricksMap: any = {};
 
+export const getParamSignatureByName = (brickSignature: BrickSignature, paramCode: string) => {
+  for (var param of brickSignature.params) {
+    if (param.code == paramCode) return param;
+  }
+}
 
 export const getParamSignatureById = (brickSignature: BrickSignature, paramId: number) => {
   for (var param of brickSignature.params) {
@@ -222,7 +228,7 @@ export const defaultBricksByType = new Map()
 
 
 
-const getBrickTypeName = (brickType: number) => {
+export const getBrickTypeName = (brickType: number) => {
   if (brickType == 0)
     return 'action'
   if (brickType == 1)
@@ -288,12 +294,20 @@ export type BrickSignature = {
   type: number,
   subtype: number,
   name: string,
+  hidden?: boolean,
   description?: string,
   params: any,
   func: any,
 }
 
 export const applyBrick: (brick: any, ctx: any) => any = (brick: any, ctx: any) => {
+  // if (debug.enabled) {
+  //   console.log(brick)
+  //   debug.iter = debug.iter + 1
+  //   if (debug.iter > 10000) {
+  //     throw new Error('END')
+  //   }
+  // }
   let params: any = {}
   for (let param of brick.params) {
     params[param.name] = param.value
@@ -321,13 +335,14 @@ export const applyBrick: (brick: any, ctx: any) => any = (brick: any, ctx: any) 
 //       .join('_');
 // };
 
-export const exportBrick = (name: string, id: number, brick: Brick) => {
+export const exportBrick = (name: string, id: number, brick: Brick, hidden: boolean = false) => {
   let paramsMap = new Map<string, BrickParamSignature>()
   exportArgsAsParams(brick, paramsMap)
-  let subtype = 10000 + id
+  let subtype = 10000 + id //TODO: magic number
   return {
     type: brick.type,
-    subtype: subtype, //TODO: magic number
+    subtype: subtype,
+    hidden: hidden,
     //name: 'custom.' + subtype + ' [' + name + ']',
     name: '[' + (subtype - 10000) + '] ' + name,
     params: Array.from(paramsMap.values()),
@@ -452,12 +467,12 @@ basicBricks.push({
 })
 
 function shuffleArray(array: any[]) {
-    for (var i = array.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
-    }
+  for (var i = array.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+  }
 }
 
 basicBricks.push({
@@ -472,7 +487,7 @@ basicBricks.push({
   func: (params: any, ctx: any) => {
     let limit = applyBrick(params.limit, ctx)
     let objs: any[] = []
-    let oldOlbj = ctx.object 
+    let oldObj = ctx.object 
     let amount = 0
     let objects = [...ctx.game.objects.values()]
     shuffleArray(objects)
@@ -487,7 +502,7 @@ basicBricks.push({
       ctx.object = obj
       applyBrick(params.action, ctx)
     }
-    ctx.object = oldOlbj
+    ctx.object = oldObj
   }
 })
 
@@ -501,8 +516,8 @@ basicBricks.push({
   ],
   func: (params: any, ctx: any) => {
     let varName = params.var_name
-    let value = params.value
-    ctx.vars[varName] = applyBrick(value, ctx)
+    let value = applyBrick(params.value, ctx)
+    ctx.vars[varName] = value
   }
 })
 
@@ -519,14 +534,7 @@ basicBricks.push({
     let value = applyBrick(params.value, ctx)
     if (ctx.object.attrs[attrName] === undefined)
       throw new Error("trying to set unknown attr " + attrName)
-    ctx.object.attrs[attrName] = value
-    if (ctx.diff) {
-      let objectId = ctx.object.id
-      let objectDiff = ctx.diff.objectAttrs.get(objectId)
-      if (!objectDiff)
-        ctx.diff.objectAttrs.set(objectId, new Map())
-      ctx.diff.objectAttrs.get(objectId).set(attrName, value)
-    }
+    ctx.game.setAttr(ctx, attrName, value)
   }
 })
 
@@ -539,8 +547,9 @@ basicBricks.push({
   func: (params: any, ctx: any) => {
     let tplId = ctx.object.tplId
     let cardType = ctx.game.content.get('cardTypes', tplId)
-    if (cardType.action) 
+    if (cardType.action) {
       applyBrick(cardType.action, ctx)
+    }
   }
 })
 
@@ -559,7 +568,7 @@ basicBricks.push({
       throw new Error("Trying to set unknown game attr " + attrName)
     ctx.game.attrs[attrName] = value
     if (ctx.diff) {
-      ctx.diff.gameAttrs.set(attrName, value)
+      ctx.diff.attrs[attrName] = value
     }
   }
 })
@@ -571,7 +580,18 @@ basicBricks.push({
   params: [
     { id: 1, code: 'duration', name: 'Duration', type: new SBrick({ brickType: 2 }) }, 
   ],
-  func: (params: any, ctx: any) => {}
+  func: (params: any, ctx: any) => {
+    let duration = applyBrick(params.duration, ctx);
+    ctx.game.exportDiff(ctx)
+    let pauseState = {
+      id: ctx.log.length,
+      state_type: 1,
+      value: {
+        delay: duration,
+      }
+    };
+    ctx.log.push(pauseState)
+  }
 })
 
 basicBricks.push({
@@ -581,7 +601,14 @@ basicBricks.push({
   params: [
     { id: 1, code: 'event_name', name: 'Event name', type: new SString() }, 
   ],
-  func: (params: any, ctx: any) => {}
+  func: (params: any, ctx: any) => {
+    let tplId = ctx.object.tplId
+    let cardType = ctx.game.content.get('cardTypes', tplId)
+    let fieldName = `action_on_${params.event_name}`;
+    if (cardType[fieldName]) {
+      applyBrick(cardType[fieldName], ctx)
+    }
+  }
 })
 
 basicBricks.push({
@@ -593,7 +620,16 @@ basicBricks.push({
     { id: 2, code: 'place', name: 'Place', type: new SBrick({ brickType: 2 }) }, 
     { id: 3, code: 'action', name: 'Action', type: new SBrick({ brickType: 0 }) }, 
   ],
-  func: (params: any, ctx: any) => {}
+  func: (params: any, ctx: any) => {
+    let card_type  = applyBrick(params.card_type, ctx)
+    let place = applyBrick(params.place, ctx)
+    let newObj = ctx.game.createEntity(card_type)
+    let oldObj = ctx.object
+    ctx.object = newObj
+    ctx.game.setAttr(ctx, 'place', place)
+    applyBrick(params.action, ctx)
+    ctx.object = oldObj
+  }
 })
 
 basicBricks.push({
@@ -601,7 +637,10 @@ basicBricks.push({
   subtype: 13,
   name: 'DeleteEntity',
   params: [],
-  func: (params: any, ctx: any) => {}
+  func: (params: any, ctx: any) => {
+    ctx.game.objects.delete(ctx.object.id);
+    ctx.diff.deleted_objects[ctx.object.id] = true;
+  }
 })
 
 
@@ -740,7 +779,7 @@ basicBricks.push({ // TODO: reuse code
   func: (params: any, ctx: any) => {
     let limit = applyBrick(params.limit, ctx)
     let objs: any[] = []
-    let oldOlbj = ctx.object 
+    let oldObj = ctx.object 
     let amount = 0
     let objects = [...ctx.game.objects.values()]
     shuffleArray(objects)
@@ -756,7 +795,7 @@ basicBricks.push({ // TODO: reuse code
       ctx.object = obj
       result = result || applyBrick(params.condition, ctx)
     }
-    ctx.object = oldOlbj
+    ctx.object = oldObj
     return result
   }
 })
@@ -773,7 +812,7 @@ basicBricks.push({ // TODO: reuse code
   func: (params: any, ctx: any) => {
     let limit = applyBrick(params.limit, ctx)
     let objs: any[] = []
-    let oldOlbj = ctx.object 
+    let oldObj = ctx.object 
     let amount = 0
     let objects = [...ctx.game.objects.values()]
     shuffleArray(objects)
@@ -789,7 +828,7 @@ basicBricks.push({ // TODO: reuse code
       ctx.object = obj
       result = result && applyBrick(params.condition, ctx)
     }
-    ctx.object = oldOlbj
+    ctx.object = oldObj
     return result
   }
 })
@@ -932,7 +971,7 @@ basicBricks.push({
   func: (params: any, ctx: any) => {
     let v1 = applyBrick(params.value1, ctx)
     let v2 = applyBrick(params.value2, ctx)
-    return v1 - Math.floor(v1 / v2) 
+    return v1 - (Math.floor(v1 / v2) * v2)
   }
 })
 
@@ -990,13 +1029,13 @@ basicBricks.push({ // TODO: reuse code
   name: 'Sum Iterator',
   params: [
     { id: 1, code: 'iter_condition',name: 'Iteration Condition', type: new SBrick({ brickType: 1 }) },
-    { id: 2, code: 'value',name: 'Value', type: new SBrick({ brickType: 2 }) },
+    { id: 2, code: 'target_value',name: 'Target Value', type: new SBrick({ brickType: 2 }) },
     { id: 3, code: 'limit', name: 'Limit', type: new SBrick({ brickType: 2 }) }
   ],
   func: (params: any, ctx: any) => {
     let limit = applyBrick(params.limit, ctx)
     let objs: any[] = []
-    let oldOlbj = ctx.object 
+    let oldObj = ctx.object 
     let amount = 0
     let objects = [...ctx.game.objects.values()]
     shuffleArray(objects)
@@ -1010,9 +1049,9 @@ basicBricks.push({ // TODO: reuse code
     let result = 0
     for (let obj of objs) {
       ctx.object = obj
-      result = result + applyBrick(params.value, ctx)
+      result = result + applyBrick(params.target_value, ctx)
     }
-    ctx.object = oldOlbj
+    ctx.object = oldObj
     return result
   }
 })
@@ -1032,6 +1071,67 @@ basicBricks.push({
     return ctx.vars[varName]
   }
 })
+
+basicBricks.push({ // TODO: reuse code
+  type: 2,
+  subtype: 16,
+  name: 'Max Iterator',
+  params: [
+    { id: 1, code: 'iter_condition',name: 'Iteration Condition', type: new SBrick({ brickType: 1 }) },
+    { id: 2, code: 'value',name: 'Value', type: new SBrick({ brickType: 2 }) },
+    { id: 3, code: 'fallback', name: 'Fallback', type: new SBrick({ brickType: 2 }) }
+  ],
+  func: (params: any, ctx: any) => {
+    let old_object = ctx.object 
+    let amount = 0
+    let objects = [...ctx.game.objects.values()]
+    shuffleArray(objects)
+    let result = Number.NEGATIVE_INFINITY
+    debug.log = true;
+    for (let obj of objects) {
+      ctx.object = obj
+      if (applyBrick(params.iter_condition, ctx)) {
+        result = Math.max(applyBrick(params.value, ctx), result)
+      }
+    }
+    debug.log = false;
+    ctx.object = old_object
+    if (result == Number.NEGATIVE_INFINITY) {
+      result = applyBrick(params.fallback, ctx)
+    }
+    return result
+  }
+})
+
+basicBricks.push({ // TODO: reuse code
+  type: 2,
+  subtype: 17,
+  name: 'Min Iterator',
+  params: [
+    { id: 1, code: 'iter_condition',name: 'Iteration Condition', type: new SBrick({ brickType: 1 }) },
+    { id: 2, code: 'value',name: 'Value', type: new SBrick({ brickType: 2 }) },
+    { id: 3, code: 'fallback', name: 'Fallback', type: new SBrick({ brickType: 2 }) }
+  ],
+  func: (params: any, ctx: any) => {
+    let old_object = ctx.object 
+    let amount = 0
+    let objects = [...ctx.game.objects.values()]
+    shuffleArray(objects)
+    let result = Number.POSITIVE_INFINITY
+    for (let obj of objects) {
+      ctx.object = obj
+      if (applyBrick(params.iter_condition, ctx)) {
+        result = Math.min(applyBrick(params.value, ctx), result)
+      }
+    }
+    ctx.object = old_object
+    if (result == Number.POSITIVE_INFINITY) {
+      result = applyBrick(params.fallback, ctx)
+    }
+    return result
+  }
+})
+
 
 
 

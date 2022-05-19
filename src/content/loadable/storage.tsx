@@ -24,7 +24,14 @@ Master.loadAll = async function(connection: Connection) { //TODO Promise
 
   let toLoad = objects.filter((obj: any) => !obj.isLoaded);
   let pubkeys = toLoad.map((obj: any) => new PublicKey(obj.id))
-  let accInfos = await connection.getMultipleAccountsInfo(pubkeys)
+  let accInfos: any[] = [];
+  for (let i = 0; i < pubkeys.length; i += 100) {
+    let keys = pubkeys.slice(i, i + 100);
+    let newInfos = await connection.getMultipleAccountsInfo(keys);
+    for (let info of newInfos) {
+      accInfos.push(info)
+    }
+  }
   let items: any[] = [];
   for (let i = 0; i < accInfos.length; i++) {
     let accInfo = accInfos[i]

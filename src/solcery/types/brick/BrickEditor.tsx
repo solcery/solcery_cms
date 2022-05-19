@@ -22,7 +22,8 @@ export const BrickEditor = (props: {
 	brickClass: any,
 	brickType: number,
 	brickTree?: any,
-	onChange?: (brickTree: any) => void
+	onChange?: (brickTree: any) => void,
+	onActivate: any
 }) => {
 	const [ active, setActive ] = useState(false)
 	let width = active ? window.innerWidth : props.width;
@@ -147,6 +148,7 @@ export const BrickEditor = (props: {
 				paramID,
 				onBrickSubtypeSelected: addBrick,
 				onPaste: onPaste,
+				readonly: !active || !props.onChange,
 			}
 		};
 	}, [ brickTree, active, props.brickSignatures, props.brickClass, addBrick, onPaste]);
@@ -159,7 +161,8 @@ export const BrickEditor = (props: {
 			source: parentBrickID,
 			sourceHandle: `h${parentBrickID}-${paramID}`,
 			target: brickID,
-			type: 'smoothstep'
+			type: 'smoothstep',
+			readonly: !active || !props.onChange,
 		});
 		return elements;
 	}, [makeAddButtonElement]);
@@ -179,7 +182,8 @@ export const BrickEditor = (props: {
 				onRemoveButtonClicked: removeBrick,
 				onPaste: onPaste,
 				onChange: props.onChange ? () => { onChange(bt) } : null,
-				readonly: !active || !props.onChange,
+				readonly: !props.onChange,
+				small: !active,
 			}
 		}
 	}, [brickTree, props.brickSignatures, props.brickClass, removeBrick, onPaste]);
@@ -274,6 +278,7 @@ export const BrickEditor = (props: {
 	}
 
 	const enable = () => {
+		props.onActivate && props.onActivate(true);
 		setActive(true)
 	}
 
@@ -282,30 +287,35 @@ export const BrickEditor = (props: {
 		if (props.onChange && active && save) {
 			props.onChange(reformat(BRICK_TREE.tree))
 		}
+		props.onActivate && props.onActivate(false);
 		setActive(false)
 	}
+
 
 	const cancel = () => {
 		reset()
+		props.onActivate && props.onActivate(false);
 		setActive(false)
 	}
 
-	let style = {
-		backgroundColor: active ? 'black' : 'transparent',
-		pointerEvents: active ? 'auto' : 'none',
-		position: active ? 'fixed' : 'relative',
-		left: 0,
-		top: 0,
-		bottom: 0,
-		right: 0,
-		zIndex: active ? 100 : 10,
-		display: active ? 'inline' : 'block',
-  	} as React.CSSProperties
+	useEffect(() => {
+		if (!active) return;
+		const onKeyDown = (e: KeyboardEvent) => {
+			if (e.keyCode === 27) { //Escape
+				cancel()
+			}
+		};
+		window.addEventListener('keydown', onKeyDown);
+		
+		return () => {
+		  window.removeEventListener('keydown', onKeyDown);
+		};
+	}, [ active ]);
 
 	return (
 	<>
 	  <div onClick={!active ? enable : undefined}>
-		<div style={style}>
+		<div className={`${active ? 'brickeditor-bg active' : 'brickeditor-bg-small'} ${!props.onChange ? 'readonly' : ''}`}>
 		  {active && <Button onClick = {save}>OK</Button>}
 		  {active && <Button onClick = {cancel}>Cancel</Button>}
 			<div ref={editorRef} className="brick-editor" style={{ 
