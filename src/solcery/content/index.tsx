@@ -237,13 +237,13 @@ export class ConstructedContent {
 		return result
 	}
 
-	toJson() {
+	toJson(pretty = false) {
 		return JSON.stringify(this.toObject(), (k: string, v: any) => {
 			if (v instanceof SType) {
 				return undefined
 			}
 			return v
-		}, 2)
+		}, pretty ? 2 : undefined)
 	}
 }
 
