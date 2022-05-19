@@ -43,7 +43,7 @@ export const HomeView = () => {
     if (!project) return;
     let constructed = project.construct();
     setConstructedContent(constructed.toJson());
-    setConstructedContentBinary(constructed.toBuffer())
+    setConstructedContentBinary(JSON.stringify(constructed.toBuffer()))
 
     let gameState = new GameState(constructed, userPrefs.layoutPresets);
     let constructedState = {
