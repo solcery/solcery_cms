@@ -67,7 +67,7 @@ Master.exportBrick = function() {
   }
 }
 
-Master.onLoad = function() {
+Master.onLoaded = function() {
   this.exportBrick()
   this.parent.execAllMixins('onObjectReload', this)
 }

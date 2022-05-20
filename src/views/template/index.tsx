@@ -179,29 +179,7 @@ export const TemplateView = () => {
       if (fltValue) flt[code] = fltValue;
     }
     setFilter(flt);
-    
-
-    let subscriptions: any[] = []
-    for (let object of template.getObjects()) {
-      subscriptions.push({
-        object,
-        id: object.addEventSubscription('onLoad', (storage: any) => {
-          setRevision(revision + 1)
-        })
-      })
-    }
-    return () => {
-      subscriptions.forEach((subscription: any) => {
-        subscription.object.removeEventSubscription('onLoad', subscription.id)
-      })
-    };
-
   }, [ template ]);
-
-
-  useEffect(() => {
-
-  })
 
   useEffect(() => {
     if (!storage)
