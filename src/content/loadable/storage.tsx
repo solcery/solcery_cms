@@ -20,8 +20,7 @@ Master.fromBinary = function(data: any) {
 Master.loadAll = async function(connection: Connection) { //TODO Promise
   if (!this.storedClass)
     return;
-  let objects = this.getAll(this.storedClass) 
-
+  let objects = this.getAll(this.storedClass)
   let toLoad = objects.filter((obj: any) => !obj.isLoaded);
   let pubkeys = toLoad.map((obj: any) => new PublicKey(obj.id))
   let accInfos: any[] = [];
@@ -44,9 +43,14 @@ Master.loadAll = async function(connection: Connection) { //TODO Promise
 }
 
 Master.onSolanaAccountChanged = async function (connection: Connection, data: any) {
-  this.objects[this.storedClass.classname] = {}
-  await this.load(connection, data)
-  this.loadAll(connection)
+  let oldObjects = this.getAll(this.storedClass);
+  await this.load(connection, data);
+  oldObjects.forEach((obj: any) => {
+    if (this.get(this.storedClass, obj.id)) {
+      this.objects[this.storedClass.classname][obj.id] = obj;
+    }
+  })
+  await this.loadAll(connection)
 }
 
 export { Master }
