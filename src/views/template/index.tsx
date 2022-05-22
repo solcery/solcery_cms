@@ -34,7 +34,9 @@ export const TemplateView = () => {
   var [ revision, setRevision ] = useState(0)
   let [ filter, setFilter ] = useState<any>()
 
-
+  let page = cookies.get(`${templateKey}.page`)
+  const defaultPage = page ? parseInt(page) : 1;
+  
   const copyToAnotherProject = async (src: PublicKey ) => {
     if (!publicKey || !project || wallet === undefined) {
       return;
@@ -151,6 +153,10 @@ export const TemplateView = () => {
     })
   }
 
+  const onPaginationChange = (page: number) => {
+    cookies.set(`${templateKey}.page`, page);
+  }
+
   const applyFilter = (value: string, field: any) => {
     if (!filter) filter = {};
     filter[field.code] = value;
@@ -217,7 +223,7 @@ export const TemplateView = () => {
     };
     return (
     <div style = {divStyle}>
-      <Table 
+      <Table key={templateKey}
         dataSource={tableData} 
         rowKey={(record: any) => record.pubkey.toBase58()}
         onRow={(record: any) => {
@@ -225,6 +231,7 @@ export const TemplateView = () => {
             onDoubleClick: event => { history.push('/template/'+ templateKey +'/' + record.id) }, 
           };
         }}
+        pagination={{ defaultCurrent: defaultPage, onChange: onPaginationChange }}
       >
         <Column 
           title="Object" 
