@@ -37,7 +37,6 @@ export class SEnum extends SType {
   }
 
   writeType = (writer: BinaryWriter) => {
-    console.log('writeType')
     writer.writeU32(this.values.length)
     for (let value of this.values) {
       writer.writeString(value)

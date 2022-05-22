@@ -14,7 +14,6 @@ Master.getTemplate = function(id: string) {
 }
 
 Master.getTemplates = function(id: string) {
-	console.log(this.templateStorage)
 	if (!this.templateStorage || !this.templateStorage.isLoaded)
 		return [];
 	return this.templateStorage.getAll(Template)

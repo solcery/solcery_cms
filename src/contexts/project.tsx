@@ -84,7 +84,6 @@ export function ProjectProvider({ children = null as any }) {
 			</ProjectContext.Provider>
 		);
 
-	console.log(projectKey)
 	return (
 		<div>
 		<Modal
