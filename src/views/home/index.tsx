@@ -42,7 +42,7 @@ export const HomeView = () => {
   useEffect(() => {
     if (!project) return;
     let constructed = project.construct();
-    setConstructedContent(constructed.toJson());
+    setConstructedContent(constructed.toJson(true));
     setConstructedContentBinary(JSON.stringify(constructed.toBuffer()))
 
     let gameState = new GameState(constructed, userPrefs.layoutPresets);
