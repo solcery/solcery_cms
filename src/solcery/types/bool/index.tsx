@@ -5,6 +5,7 @@ import { ValueRender } from './components'
 
 export class SBool extends SType {
   id = 1;
+  getName = (project: any) => 'SBool';
   static typename = "Bool";
   valueRender = ValueRender;
   readValue = (reader: BinaryReader) => { return reader.readBoolean() };

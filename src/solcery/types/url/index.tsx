@@ -6,6 +6,7 @@ export class SUrl extends SType {
   id = 4;
   static typename = 'Image';
   typename = 'Image';
+  getName = (project: any) => 'SImage';
   
   valueRender = ValueRender;
   readValue = (reader: BinaryReader) => { return reader.readString() }

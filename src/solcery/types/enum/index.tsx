@@ -11,7 +11,7 @@ export class SEnum extends SType {
   valueRender = ValueRender;
   static typedataRender = TypedataRender;
 
-  getName = () => 'Enum: ' + this.values.toString()
+  getName = (project: any) => `SEnum<${this.values.join('|')}>`;
   
   constructor(src: { values: string[] }) {
     super()

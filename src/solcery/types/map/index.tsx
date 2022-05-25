@@ -13,8 +13,8 @@ export class SMap extends SType {
   valueRender = ValueRender;
   static typedataRender = TypedataRender;
 
-  getName = () => 'Map [ ' + this.keyType ? this.keyType.getName() : 'None' +  ' => ' + this.valueType ? this.valueType.getName() : 'None' + ' ]'
-
+  getName = (project: any) => `SMap<${this.keyType.getName(project)}|${this.valueType.getName(project)}>`;
+  
   constructor(src: { keyType: SType, valueType: SType }) {
     super()
     this.keyType = src.keyType;

@@ -11,6 +11,10 @@ export class SLink extends SType {
   id = 5;
   static typename = "Link";
   valueRender = ValueRender;
+  getName = (project: any) => {
+    let template = project.getTemplate(this.templatePublicKey.toBase58());
+    return `SLink<${template.code}>`;
+  };
 
   templatePublicKey: PublicKey = new PublicKey('2WQzLh8J8Acmbzzi4qVmNv2ZX3hWycjHGMu7LRjQ8hbz');
   

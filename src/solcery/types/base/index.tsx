@@ -14,9 +14,9 @@ export interface ValueRenderParams {
 export class SType {
   id: number = 0;
   static typename = "Empty type";
-  getName: () => string = () => 'EMPTY TYPE'
+  getName: (project: any) => string = (project: any) => 'EMPTY TYPE'
   
-  nameRender = <p>{this.getName()}</p>
+  nameRender = <p>{this.getName(undefined)}</p>
   sorter: any; //TODO
 
   // static typedataRender: any = (<p>Error</p>);

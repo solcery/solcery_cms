@@ -48,6 +48,7 @@ export class SInt extends SType {
   id = 2;
   static typename = "Integer";
   valueRender = ValueRender;
+  getName = (project: any) => 'SInt';
   sorter = (a: number | undefined, b: number | undefined) => { if (!a) a = 0; if (!b) b = 0; return a - b  }
 
   readValue = (reader: BinaryReader) => { 

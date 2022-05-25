@@ -39,6 +39,25 @@ export const SolceryMenu = () => {
     }
   }, [ project ]);
 
+  // useEffect(() => {
+  //   if (!templates) return;
+  //   let res: any[] = [];
+  //   for (let tpl of templates) {
+  //     res.push({
+  //       code: tpl.code,
+  //       name: tpl.name,
+  //       fields: Object.values(tpl.fields).map((field: any) => {
+  //         return {
+  //           name: field.name,
+  //           code: field.code,
+  //           type: field.fieldType.getName(project),
+  //         }
+  //       })
+  //     })
+  //   }
+  //   console.log(JSON.stringify(res, undefined, 2))
+  // }, [ templates ])
+
   if (!project) return <></>
   return (
     <Menu mode="horizontal">

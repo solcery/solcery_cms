@@ -8,6 +8,7 @@ export class SArray extends SType {
   id = 7;
   static typename = "Array";
   subtype: SType;
+  getName = (project: any) => `SArray<${this.subtype.getName(project)}>`;
 
   valueRender = ValueRender;
   static typedataRender = TypedataRender;

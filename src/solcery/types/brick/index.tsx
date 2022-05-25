@@ -27,6 +27,8 @@ export class SBrick extends SType {
   valueRender = ValueRender;
   brickType: number;
 
+  getName = (project: any) => `SBrick<${getBrickTypeName(this.brickType)}>`;
+
   static typedataRender = TypedataRender;
    constructor(src: { brickType: number }) {
   	super()
